@@ -1,0 +1,33 @@
+<div class="container" [class.active]="modoRegistro()">
+
+  <!-- Formulario de login -->
+  <div class="form-container sign-in">
+    <app-login-form (cambiarModo)="toggleModo()"></app-login-form>
+  </div>
+
+  <!-- Formulario de registro -->
+  <div class="form-container sign-up">
+    <app-registro-form (cambiarModo)="toggleModo()"></app-registro-form>
+  </div>
+
+  <!-- Panel deslizante -->
+  <div class="toggle-container">
+    <div class="toggle">
+      <div class="toggle-panel toggle-left">
+        <h2>¡Hola de nuevo!</h2>
+        <p>Si ya tienes una cuenta, inicia sesión aquí</p>
+        <button type="button" class="btn btn-transparent" (click)="toggleModo()">
+          Iniciar sesión
+        </button>
+      </div>
+      <div class="toggle-panel toggle-right">
+        <h2>¡Bienvenido a SAESU!</h2>
+        <p>Regístrate con tu correo institucional para comenzar</p>
+        <button type="button" class="btn btn-transparent" (click)="toggleModo()">
+          Registrarse
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
