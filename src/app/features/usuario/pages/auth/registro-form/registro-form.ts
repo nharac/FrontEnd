@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   AbstractControl,
   FormBuilder,
@@ -39,7 +40,8 @@ export class RegistroForm {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {
     this.registroForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
@@ -93,6 +95,7 @@ export class RegistroForm {
         this.snackBar.open(`Registro exitoso, ${res.usuario.nombre}`, 'Cerrar', {
           duration: 3000
         });
+          this.router.navigate(['/dashboard']); 
       },
       error: (err) => {
         this.cargando.set(false);

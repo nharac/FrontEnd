@@ -1,0 +1,333 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  &__header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__badge {
+    display: inline-block;
+    align-self: center;
+    background: #e0e7ff;
+    color: #4f46e5;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+
+  &__titulo {
+    font-size: 36px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 8px 0 0;
+  }
+
+  &__subtitulo {
+    color: #7f8c8d;
+    font-size: 15px;
+    margin: 0;
+  }
+}
+
+/* ============================================ */
+/* CARD PRINCIPAL                               */
+/* ============================================ */
+.card-principal {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 14px 40px rgba(79, 70, 229, 0.15);
+  }
+
+  &__icono {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+
+    mat-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  &__titulo {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 8px 0 0;
+    text-align: center;
+  }
+
+  &__descripcion {
+    color: #7f8c8d;
+    font-size: 14px;
+    text-align: center;
+    max-width: 500px;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 18px 24px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.25);
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      background: #4338ca;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
+
+      mat-icon {
+        transform: translateX(4px);
+      }
+    }
+
+    &:active {
+      transform: translateY(0) scale(0.98);
+    }
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-top: 8px;
+
+    .emoji {
+      font-size: 16px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-icono {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: #4f46e5;
+    }
+
+    .meta-separador {
+      color: #cbd5e1;
+    }
+  }
+}
+
+/* ============================================ */
+/* ACCESOS SECUNDARIOS                          */
+/* ============================================ */
+.accesos-rapidos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__titulo {
+    font-size: 15px;
+    font-weight: 600;
+    color: #7f8c8d;
+    margin: 0;
+    text-align: center;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+.acceso-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 2px solid transparent;
+  transition: all 0.25s ease;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: #4f46e5;
+    box-shadow: 0 12px 24px rgba(79, 70, 229, 0.15);
+
+    .acceso-card__icono {
+      background: #4f46e5;
+      color: #ffffff;
+      transform: scale(1.05) rotate(-5deg);
+    }
+
+    .acceso-card__flecha {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  &__icono {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #e0e7ff;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  &__texto {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    p {
+      font-size: 12px;
+      color: #7f8c8d;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  &__flecha {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #4f46e5;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.25s ease;
+  }
+}
+
+/* ============================================ */
+/* RESPONSIVE                                   */
+/* ============================================ */
+@media (max-width: 700px) {
+  .dashboard__titulo {
+    font-size: 26px;
+  }
+
+  .card-principal {
+    padding: 24px;
+
+    &__icono {
+      width: 64px;
+      height: 64px;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    &__titulo {
+      font-size: 20px;
+    }
+
+    &__btn {
+      font-size: 14px;
+      padding: 14px 20px;
+    }
+  }
+
+  .accesos-rapidos__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .acceso-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 16px;
+
+    &__icono {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    &__texto {
+      flex: 1;
+    }
+  }
+}

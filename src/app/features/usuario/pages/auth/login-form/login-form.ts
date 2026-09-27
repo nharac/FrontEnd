@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -35,7 +36,8 @@ export class LoginForm {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {
     this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
@@ -65,6 +67,7 @@ export class LoginForm {
         this.snackBar.open(`Bienvenido, ${res.usuario.nombre}`, 'Cerrar', {
           duration: 3000
         });
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.cargando.set(false);

@@ -1,0 +1,50 @@
+<nav class="navbar">
+  <div class="navbar__brand">
+    <span class="navbar__logo">SAESU</span>
+    <span class="navbar__tagline">Portal Estudiantil</span>
+  </div>
+
+  <ul class="navbar__links">
+    <li>
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>home</mat-icon>
+        <span>Inicio</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/practica" routerLinkActive="active">
+        <mat-icon>edit_note</mat-icon>
+        <span>Práctica</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/chat" routerLinkActive="active">
+        <mat-icon>smart_toy</mat-icon>
+        <span>Chat Tutor</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/foro" routerLinkActive="active">
+        <mat-icon>forum</mat-icon>
+        <span>Foro</span>
+      </a>
+    </li>
+  </ul>
+
+  <button class="navbar__user" [matMenuTriggerFor]="menu">
+    <span class="navbar__avatar">{{ inicial }}</span>
+    <span class="navbar__name">{{ nombreUsuario }}</span>
+    <mat-icon>expand_more</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu" xPosition="before">
+    <button mat-menu-item routerLink="/perfil">
+      <mat-icon>person</mat-icon>
+      <span>Mi perfil</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar sesión</span>
+    </button>
+  </mat-menu>
+</nav>

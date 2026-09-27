@@ -1,0 +1,79 @@
+<div class="dashboard">
+
+  <!-- Encabezado -->
+  <header class="dashboard__header">
+    <span class="dashboard__badge">SAESU Focus Mode</span>
+    <h1 class="dashboard__titulo">Hola, {{ nombre }}.</h1>
+    <p class="dashboard__subtitulo">Tu única meta académica clave por hoy:</p>
+  </header>
+
+  <!-- Card principal de práctica -->
+  <section class="card-principal">
+    <div class="card-principal__icono">
+      <mat-icon>play_arrow</mat-icon>
+    </div>
+
+    <h2 class="card-principal__titulo">Práctica de Cálculo II</h2>
+    <p class="card-principal__descripcion">
+      Algoritmo optimizado: 5 ejercicios de Integrales por Sustitución (Dificultad Media)
+    </p>
+
+    <button class="card-principal__btn" (click)="irAPractica()">
+      <span>Continuar Práctica de Hoy</span>
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+
+    <div class="card-principal__meta">
+      <span class="meta-item">
+        <span class="emoji">🔥</span>
+        {{ racha }} días de racha
+      </span>
+      <span class="meta-separador">·</span>
+      <span class="meta-item">
+        <mat-icon class="meta-icono">schedule</mat-icon>
+        ~{{ minutosEstimados }} minutos
+      </span>
+    </div>
+  </section>
+
+  <!-- Accesos secundarios -->
+  <section class="accesos-rapidos">
+    <h3 class="accesos-rapidos__titulo">También puedes:</h3>
+
+    <div class="accesos-rapidos__grid">
+      <a class="acceso-card" routerLink="/chat">
+        <div class="acceso-card__icono">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+        <div class="acceso-card__texto">
+          <h4>Chat Tutor</h4>
+          <p>Pregúntale al tutor IA</p>
+        </div>
+        <mat-icon class="acceso-card__flecha">arrow_forward</mat-icon>
+      </a>
+
+      <a class="acceso-card" routerLink="/foro">
+        <div class="acceso-card__icono">
+          <mat-icon>forum</mat-icon>
+        </div>
+        <div class="acceso-card__texto">
+          <h4>Foro</h4>
+          <p>Dudas con tus compañeros</p>
+        </div>
+        <mat-icon class="acceso-card__flecha">arrow_forward</mat-icon>
+      </a>
+
+      <a class="acceso-card" routerLink="/perfil">
+        <div class="acceso-card__icono">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="acceso-card__texto">
+          <h4>Mi Perfil</h4>
+          <p>Progreso y configuración</p>
+        </div>
+        <mat-icon class="acceso-card__flecha">arrow_forward</mat-icon>
+      </a>
+    </div>
+  </section>
+
+</div>
