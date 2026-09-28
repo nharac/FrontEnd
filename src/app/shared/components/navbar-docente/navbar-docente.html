@@ -1,0 +1,44 @@
+<nav class="navbar">
+  <div class="navbar__brand">
+    <span class="navbar__logo">SAESU</span>
+    <span class="navbar__tagline">Módulo Docente</span>
+  </div>
+
+  <ul class="navbar__links">
+    <li>
+      <a routerLink="/docente" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>dashboard</mat-icon>
+        <span>Inicio</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/docente/notificaciones" routerLinkActive="active">
+        <mat-icon>notifications</mat-icon>
+        <span>Notificaciones</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/docente/foro" routerLinkActive="active">
+        <mat-icon>forum</mat-icon>
+        <span>Foro</span>
+      </a>
+    </li>
+  </ul>
+
+  <button class="navbar__user" [matMenuTriggerFor]="menu">
+    <span class="navbar__avatar">{{ iniciales }}</span>
+    <span class="navbar__name">{{ nombreDocente }}</span>
+    <mat-icon>expand_more</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu" xPosition="before">
+    <button mat-menu-item routerLink="/docente/perfil">
+      <mat-icon>person</mat-icon>
+      <span>Mi perfil</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar sesión</span>
+    </button>
+  </mat-menu>
+</nav>

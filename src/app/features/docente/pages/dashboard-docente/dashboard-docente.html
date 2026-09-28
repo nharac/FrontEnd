@@ -1,0 +1,53 @@
+<div class="dashboard">
+
+  <header class="dashboard__header">
+    <span class="dashboard__badge">Modo Docente</span>
+    <h1 class="dashboard__titulo">Bienvenido, {{ nombreDocente }} 👋</h1>
+    <p class="dashboard__subtitulo">Estas son tus tareas pendientes para hoy:</p>
+  </header>
+
+  <section class="cards">
+    <div class="card card--warning">
+      <div class="card__icono">
+        <mat-icon>mark_chat_unread</mat-icon>
+      </div>
+      <h3 class="card__titulo">—</h3>
+      <p class="card__desc">Publicaciones sin respuesta oficial</p>
+    </div>
+
+    <div class="card card--info">
+      <div class="card__icono">
+        <mat-icon>fact_check</mat-icon>
+      </div>
+      <h3 class="card__titulo">—</h3>
+      <p class="card__desc">Respuestas por validar</p>
+    </div>
+
+    <div class="card card--success">
+      <div class="card__icono">
+        <mat-icon>verified</mat-icon>
+      </div>
+      <h3 class="card__titulo">—</h3>
+      <p class="card__desc">Tasa de retención UDEC</p>
+    </div>
+  </section>
+
+  <section class="accesos">
+    <h3 class="accesos__titulo">Accesos rápidos</h3>
+    <div class="accesos__grid">
+      <a class="acceso" routerLink="/docente/notificaciones">
+        <mat-icon>notifications</mat-icon>
+        <span>Notificaciones</span>
+      </a>
+      <a class="acceso" routerLink="/docente/foro">
+        <mat-icon>forum</mat-icon>
+        <span>Foro</span>
+      </a>
+      <a class="acceso" routerLink="/docente/perfil">
+        <mat-icon>person</mat-icon>
+        <span>Mi Perfil</span>
+      </a>
+    </div>
+  </section>
+
+</div>

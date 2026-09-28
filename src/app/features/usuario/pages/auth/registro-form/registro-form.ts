@@ -95,7 +95,13 @@ export class RegistroForm {
         this.snackBar.open(`Registro exitoso, ${res.usuario.nombre}`, 'Cerrar', {
           duration: 3000
         });
-          this.router.navigate(['/dashboard']); 
+
+        // Redirige según el rol
+        if (res.usuario.rol === 'DOCENTE') {
+          this.router.navigate(['/docente']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
       },
       error: (err) => {
         this.cargando.set(false);
