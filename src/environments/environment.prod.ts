@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://tu-backend-azure.azurewebsites.net/api',
+  apiUrl: '/api',
   appName: 'SAESU',
   environmentName: 'produccion'
 };
