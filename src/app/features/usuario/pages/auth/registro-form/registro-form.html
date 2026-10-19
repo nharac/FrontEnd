@@ -14,8 +14,11 @@
     <mat-icon>mail</mat-icon>
     <input type="email" placeholder="Correo institucional" formControlName="correo">
   </div>
-  <small class="error" *ngIf="correo?.invalid && correo?.touched">
-    Ingresa un correo válido
+  <small class="error" *ngIf="correo?.hasError('required') && correo?.touched">
+    El correo es obligatorio
+  </small>
+  <small class="error" *ngIf="(correo?.hasError('email') || correo?.hasError('pattern')) && correo?.touched">
+    Usa tu correo institucional &#64;ucundinamarca.edu.co
   </small>
 
   <div class="input-group">
@@ -27,7 +30,7 @@
     </mat-icon>
   </div>
   <small class="error" *ngIf="password?.invalid && password?.touched">
-    Mínimo 8 caracteres, una mayúscula y un número
+    Mínimo 8 caracteres, con mayúscula, minúscula, número y un carácter especial (&#64;#$%^&amp;+=!)
   </small>
 
   <div class="input-group">

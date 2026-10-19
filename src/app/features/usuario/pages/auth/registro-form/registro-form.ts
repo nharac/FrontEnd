@@ -16,6 +16,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../services/auth.service';
 import { RegistroRequest } from '../../../models';
 
+/** Solo se aceptan correos institucionales (mismo patrón que valida el backend). */
+const CORREO_INSTITUCIONAL = /^[a-zA-Z0-9._%+-]+@ucundinamarca\.edu\.co$/;
+
+/** Mayúscula, minúscula, número y carácter especial (mismo patrón que valida el backend). */
+const PASSWORD_SEGURA = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/;
+
 @Component({
   selector: 'app-registro-form',
   imports: [
@@ -45,11 +51,15 @@ export class RegistroForm {
   ) {
     this.registroForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
-      correo: ['', [Validators.required, Validators.email]],
+      correo: ['', [
+        Validators.required,
+        Validators.email,
+        Validators.pattern(CORREO_INSTITUCIONAL)
+      ]],
       password: ['', [
         Validators.required,
         Validators.minLength(8),
-        Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)
+        Validators.pattern(PASSWORD_SEGURA)
       ]],
       confirmPassword: ['', [Validators.required]]
     }, {
