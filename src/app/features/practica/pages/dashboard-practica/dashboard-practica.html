@@ -1,4 +1,94 @@
-<div class="placeholder">
-  <h1>🗣️ Modulo de Practica</h1>
-  <p>En construcción 🚧</p>
+<div class="practica">
+
+  @switch (vista()) {
+
+    @case ('seleccion') {
+      <!-- ============ 1. Selección de tema ============ -->
+      <header class="practica__header">
+        <span class="practica__badge">PRÁCTICA ICFES</span>
+        <h1 class="practica__titulo">¿Qué quieres practicar hoy?</h1>
+        <p class="practica__subtitulo">Elige un tema. Si te equivocas, recibirás una pista y el tutor IA te ayudará.</p>
+      </header>
+
+      <section class="temas">
+        @for (tema of temas; track tema.id) {
+          <button type="button" class="tema" [class.tema--activo]="temaElegido() === tema.id"
+                  (click)="elegirTema(tema.id)">
+            <span class="tema__icono"><mat-icon>{{ tema.icono }}</mat-icon></span>
+            <h3>{{ tema.nombre }}</h3>
+            <p>{{ tema.descripcion }}</p>
+            @if (progresoDe(tema); as p) {
+              <div class="tema__progreso">
+                <div class="barra"><div class="barra__relleno" [style.width.%]="p.porcentaje"></div></div>
+                <small>{{ p.correctas }} de {{ p.respondidas }} correctas · {{ p.porcentaje | number: '1.0-0' }}%</small>
+              </div>
+            }
+          </button>
+        }
+      </section>
+
+      <section class="filtro">
+        <span>Dificultad:</span>
+        @for (d of dificultades; track d.nombre) {
+          <button type="button" class="chip" [class.chip--activo]="dificultadElegida() === d.id"
+                  (click)="elegirDificultad(d.id)">{{ d.nombre }}</button>
+        }
+      </section>
+
+      @if (sinPreguntas()) {
+        <p class="aviso">No hay preguntas para ese tema y dificultad. Prueba con otra combinación.</p>
+      }
+
+      <button type="button" class="btn-empezar" [disabled]="!temaElegido()" (click)="empezar()">
+        Empezar práctica <mat-icon>play_arrow</mat-icon>
+      </button>
+    }
+
+    @case ('cargando') {
+      <!-- ============ Cargando ============ -->
+      <p class="practica__estado">Cargando preguntas...</p>
+    }
+
+    @case ('sesion') {
+      <!-- ============ 2. Sesión de preguntas ============ -->
+      <div class="sesion__barra">
+        <button type="button" class="enlace" (click)="volverASeleccion()">
+          <mat-icon>arrow_back</mat-icon> Cambiar tema
+        </button>
+        <strong>{{ infoTema()?.nombre }}</strong>
+      </div>
+
+      @if (preguntaActual(); as p) {
+        <app-pregunta-card
+          [pregunta]="p"
+          [numero]="indice() + 1"
+          [total]="preguntas().length"
+          (acertada)="alAcertar($event)"
+          (siguiente)="siguiente()" />
+      }
+    }
+
+    @case ('resumen') {
+      <!-- ============ 3. Resumen ============ -->
+      <section class="resumen">
+        <mat-icon class="resumen__icono">emoji_events</mat-icon>
+        <h1>¡Terminaste la práctica de {{ infoTema()?.nombre }}!</h1>
+        <p class="resumen__dato">
+          Acertaste <strong>{{ aciertosPrimerIntento() }} de {{ preguntas().length }}</strong> al primer intento
+          ({{ porcentajeSesion() }}%).
+        </p>
+        <p class="resumen__mensaje">
+          {{ porcentajeSesion() >= 80
+              ? 'Excelente dominio del tema. ¡Sigue así!'
+              : porcentajeSesion() >= 50
+                ? 'Vas bien. Repasa las preguntas donde necesitaste pistas.'
+                : 'Este tema necesita más práctica. Apóyate en el tutor IA y vuelve a intentarlo.' }}
+        </p>
+        <div class="resumen__acciones">
+          <button type="button" class="btn-secundario" (click)="volverASeleccion()">Elegir otro tema</button>
+          <button type="button" class="btn-empezar" (click)="empezar()">Practicar de nuevo</button>
+        </div>
+      </section>
+    }
+  }
 </div>
