@@ -1,0 +1,180 @@
+$primario: #4f46e5;
+$texto: #2c3e50;
+$texto-suave: #7f8c8d;
+$borde: #e5e7eb;
+
+.detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: $primario;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.estado {
+  color: $texto-suave;
+  text-align: center;
+}
+
+.publicacion, .nueva {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);
+}
+
+.publicacion {
+  h1 { margin: 10px 0 6px; font-size: 24px; color: $texto; }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__autor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: $texto-suave;
+    font-size: 14px;
+  }
+
+  &__contenido {
+    color: $texto;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    margin: 14px 0 0;
+  }
+}
+
+.tema {
+  font-size: 12px;
+  font-weight: 600;
+  color: $primario;
+  background: #e0e7ff;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.estado-pub {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &--ok { background: #d1fae5; color: #059669; }
+  &--pendiente { background: #fef3c7; color: #b45309; }
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: $primario;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 16px;
+  color: $texto;
+  margin: 0 0 12px;
+}
+
+.nueva form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  textarea {
+    resize: vertical;
+    padding: 10px 14px;
+    border: 1px solid $borde;
+    border-radius: 12px;
+    font: inherit;
+  }
+}
+
+.btn {
+  align-self: flex-end;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 12px;
+  background: $primario;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.ayuda {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: $texto-suave;
+}
+
+.respuestas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.avatar--docente { background: #d1fae5; color: #059669; }
+
+.etiqueta {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+
+  &--tu { background: #e0e7ff; color: $primario; }
+}
+
+.eliminar {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: $texto-suave;
+}
+
+.mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: $texto;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:disabled { opacity: 0.6; cursor: default; }
+  &--peligro { background: #dc2626; color: #fff; }
+}

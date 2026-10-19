@@ -1,4 +1,78 @@
-<div class="placeholder">
-  <h1>🗣️ Foro Colaborativo</h1>
-  <p>En construcción 🚧</p>
+<div class="foro">
+  <header class="foro__header">
+    <div>
+      <span class="foro__badge">FORO COLABORATIVO</span>
+      <h1>Foro</h1>
+      <p>Pregunta, responde y aprende con tus compañeros. Los docentes marcan las respuestas oficiales.</p>
+    </div>
+    <a class="btn" routerLink="/foro/nueva"><mat-icon>add</mat-icon> Nueva publicación</a>
+  </header>
+
+  <section class="controles">
+    <form class="buscador" (ngSubmit)="buscar()">
+      <mat-icon>search</mat-icon>
+      <input type="search" name="busqueda" placeholder="Buscar en el foro..."
+             [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)">
+      @if (busqueda()) {
+        <button type="button" class="buscador__limpiar" title="Limpiar" (click)="limpiarBusqueda()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </form>
+
+    <select class="orden" [ngModel]="orden()" (ngModelChange)="cambiarOrden($event)" name="orden">
+      @for (o of ordenes; track o.id) {
+        <option [value]="o.id">{{ o.nombre }}</option>
+      }
+    </select>
+  </section>
+
+  <div class="filtros">
+    @for (t of temas; track t.nombre) {
+      <button type="button" class="chip" [class.chip--activo]="tema() === t.id" (click)="elegirTema(t.id)">
+        {{ t.nombre }}
+      </button>
+    }
+  </div>
+
+  @if (cargando()) {
+    <p class="vacio">Cargando publicaciones...</p>
+  } @else {
+    @for (p of publicaciones(); track p.id) {
+      <button type="button" class="pub" (click)="abrir(p)">
+        <div class="pub__arriba">
+          <span class="tema">{{ nombresTema[p.tema] || p.tema }}</span>
+          <time>{{ haceCuanto(p.fechaCreacion) }}</time>
+        </div>
+        <h3>{{ p.titulo }}</h3>
+        <p class="pub__preview">{{ p.contenidoPreview }}</p>
+        <div class="pub__abajo">
+          <span class="avatar" [class.avatar--docente]="p.autor.rol === 'DOCENTE'">{{ p.autor.iniciales }}</span>
+          <span>{{ p.autor.nombre }}</span>
+          @if (p.autor.rol === 'DOCENTE') {
+            <span class="etiqueta">Docente</span>
+          }
+          <span class="pub__respuestas">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            {{ p.respuestasCount }} {{ p.respuestasCount === 1 ? 'respuesta' : 'respuestas' }}
+          </span>
+        </div>
+      </button>
+    } @empty {
+      <div class="vacio">
+        <mat-icon>forum</mat-icon>
+        @if (busqueda() || tema()) {
+          <p>No hay publicaciones con esos filtros.</p>
+        } @else {
+          <p>Todavía no hay publicaciones. ¡Sé el primero en preguntar!</p>
+        }
+      </div>
+    }
+
+    @if (hayMas()) {
+      <button type="button" class="mas" (click)="cargarMas()" [disabled]="cargandoMas()">
+        {{ cargandoMas() ? 'Cargando...' : 'Cargar más' }}
+      </button>
+    }
+  }
 </div>

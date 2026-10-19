@@ -1,0 +1,64 @@
+@let r = respuesta();
+
+<div class="respuesta" [class.respuesta--oficial]="r.esOficial">
+  @if (r.esOficial) {
+    <span class="respuesta__sello"><mat-icon>verified</mat-icon> Respuesta oficial</span>
+  }
+
+  <header class="respuesta__autor">
+    <span class="avatar" [class.avatar--docente]="r.autor.rol === 'DOCENTE'">{{ r.autor.iniciales }}</span>
+    <strong>{{ r.autor.nombre }}</strong>
+    @if (r.autor.rol === 'DOCENTE') {
+      <span class="etiqueta">Docente</span>
+    }
+    <time>{{ haceCuanto(r.fechaCreacion) }}</time>
+  </header>
+
+  <p class="respuesta__contenido">{{ r.contenido }}</p>
+
+  @if (puedeMarcarOficial() || puedeResponder()) {
+    <div class="respuesta__acciones">
+      @if (puedeMarcarOficial()) {
+        @if (r.esOficial) {
+          <button type="button" class="accion accion--quitar"
+                  [disabled]="procesandoId() === r.id" (click)="quitarOficial.emit(r.id)">
+            <mat-icon>remove_done</mat-icon> Quitar oficial
+          </button>
+        } @else {
+          <button type="button" class="accion accion--oficial"
+                  [disabled]="procesandoId() === r.id" (click)="marcarOficial.emit(r.id)">
+            <mat-icon>verified</mat-icon> Marcar oficial
+          </button>
+        }
+      }
+      @if (puedeResponder()) {
+        <button type="button" class="accion" (click)="alternarRespuesta()">
+          <mat-icon>reply</mat-icon> {{ respondiendo() ? 'Cancelar' : 'Responder' }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (respondiendo()) {
+    <form class="responder" (ngSubmit)="enviarRespuesta()">
+      <textarea rows="2" name="texto" placeholder="Escribe tu respuesta a {{ r.autor.nombre }}..."
+                [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
+      <button type="submit" class="accion accion--oficial" [disabled]="!texto().trim()">Enviar</button>
+    </form>
+  }
+</div>
+
+@if (r.respuestasHijas.length) {
+  <div class="hijas" [class.hijas--sangria]="nivel() < 4">
+    @for (hija of r.respuestasHijas; track hija.id) {
+      <app-respuesta-item
+        [respuesta]="hija"
+        [nivel]="nivel() + 1"
+        [puedeMarcarOficial]="puedeMarcarOficial()"
+        [procesandoId]="procesandoId()"
+        (marcarOficial)="marcarOficial.emit($event)"
+        (quitarOficial)="quitarOficial.emit($event)"
+        (responder)="responder.emit($event)" />
+    }
+  </div>
+}

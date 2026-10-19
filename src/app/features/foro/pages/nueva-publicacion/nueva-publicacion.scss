@@ -1,0 +1,95 @@
+$primario: #4f46e5;
+$texto: #2c3e50;
+$texto-suave: #7f8c8d;
+$borde: #e5e7eb;
+
+.nueva {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: $primario;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);
+
+  h1 { margin: 0; font-size: 24px; color: $texto; }
+
+  label {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $texto;
+  }
+
+  input, select, textarea {
+    padding: 11px 14px;
+    border: 1px solid $borde;
+    border-radius: 12px;
+    font: inherit;
+    color: $texto;
+    background: #fff;
+    outline: none;
+
+    &:focus { border-color: $primario; }
+  }
+
+  textarea { resize: vertical; }
+}
+
+.ayuda { margin: 4px 0 0; color: $texto-suave; font-size: 14px; }
+
+.pie {
+  display: flex;
+  justify-content: space-between;
+}
+
+.contador {
+  margin-left: auto;
+  color: $texto-suave;
+  font-size: 12px;
+}
+
+.error { color: #dc2626; font-size: 12px; }
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.6; cursor: default; }
+
+  &--primario { background: $primario; color: #fff; }
+  &--secundario { background: #f3f4f6; color: $texto; }
+}
+
+@media (max-width: 600px) {
+  .tarjeta { padding: 20px; }
+}

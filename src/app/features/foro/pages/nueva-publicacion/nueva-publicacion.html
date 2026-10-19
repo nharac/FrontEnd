@@ -1,0 +1,43 @@
+<div class="nueva">
+  <a class="volver" routerLink="/foro"><mat-icon>arrow_back</mat-icon> Volver al foro</a>
+
+  <form class="tarjeta" [formGroup]="form" (ngSubmit)="publicar()">
+    <h1>Nueva publicación</h1>
+    <p class="ayuda">Explica tu duda con detalle: qué intentaste y en qué paso te atascaste.</p>
+
+    <label for="titulo">Título</label>
+    <input id="titulo" type="text" formControlName="titulo"
+           placeholder="Ej: ¿Cómo aplico la regla de la cadena en sen(x²)?" [attr.maxlength]="maxTitulo">
+    <div class="pie">
+      @if (titulo.touched && titulo.hasError('required')) {
+        <small class="error">El título es obligatorio</small>
+      }
+      <small class="contador">{{ titulo.value.length }}/{{ maxTitulo }}</small>
+    </div>
+
+    <label for="tema">Tema</label>
+    <select id="tema" formControlName="tema">
+      <option value="" disabled>Elige un tema</option>
+      @for (t of temas; track t.id) {
+        <option [value]="t.id">{{ t.nombre }}</option>
+      }
+    </select>
+    @if (tema.touched && tema.hasError('required')) {
+      <small class="error">Elige el tema de tu consulta</small>
+    }
+
+    <label for="contenido">Contenido</label>
+    <textarea id="contenido" rows="7" formControlName="contenido"
+              placeholder="Describe tu duda..."></textarea>
+    @if (contenido.touched && contenido.invalid) {
+      <small class="error">Escribe al menos 10 caracteres para que te puedan ayudar</small>
+    }
+
+    <div class="acciones">
+      <a class="btn btn--secundario" routerLink="/foro">Cancelar</a>
+      <button type="submit" class="btn btn--primario" [disabled]="enviando()">
+        {{ enviando() ? 'Publicando...' : 'Publicar' }}
+      </button>
+    </div>
+  </form>
+</div>

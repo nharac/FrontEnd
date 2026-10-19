@@ -50,6 +50,18 @@ export const routes: Routes = [
             .then(m => m.ListaPublicaciones)
       },
       {
+        path: 'foro/nueva',
+        loadComponent: () =>
+          import('./features/foro/pages/nueva-publicacion/nueva-publicacion')
+            .then(m => m.NuevaPublicacion)
+      },
+      {
+        path: 'foro/:id',
+        loadComponent: () =>
+          import('./features/foro/pages/ver-publicacion/ver-publicacion')
+            .then(m => m.VerPublicacion)
+      },
+      {
         path: 'perfil',
         loadComponent: () =>
           import('./features/usuario/pages/perfil/perfil')
