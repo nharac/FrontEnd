@@ -1,16 +1,46 @@
-.placeholder {
-  text-align: center;
-  padding: 60px 20px;
-  color: #2c3e50;
+.chat-tutor {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  height: calc(100vh - 160px);
+  min-height: 560px;
 
-  h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
+  &__header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  p {
+  &__badge {
+    display: inline-block;
+    align-self: center;
+    background: #e0e7ff;
+    color: #4f46e5;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+
+  &__titulo {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 4px 0 0;
+  }
+
+  &__subtitulo {
     color: #7f8c8d;
     font-size: 15px;
+    margin: 0;
+  }
+
+  &__panel {
+    flex: 1;
+    min-height: 0;
   }
 }

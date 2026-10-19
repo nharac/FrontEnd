@@ -1,0 +1,274 @@
+// Colores alineados con el resto de la app (dashboard-estudiante)
+$primario: #4f46e5;
+$primario-suave: #e0e7ff;
+$texto: #2c3e50;
+$texto-suave: #7f8c8d;
+$borde: #e5e7eb;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 420px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);
+  overflow: hidden;
+
+  // ---------- Barra superior ----------
+  &__barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid $borde;
+  }
+
+  &__tutor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: $texto;
+
+    div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    small {
+      color: $texto-suave;
+      font-size: 12px;
+    }
+  }
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: $primario-suave;
+    color: $primario;
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__contador {
+    font-size: 12px;
+    font-weight: 600;
+    color: $primario;
+    background: $primario-suave;
+    padding: 4px 10px;
+    border-radius: 999px;
+
+    &--agotado {
+      color: #b91c1c;
+      background: #fee2e2;
+    }
+  }
+
+  &__boton-icono {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: $texto-suave;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #f3f4f6;
+      color: #b91c1c;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+
+  // ---------- Zona de mensajes ----------
+  &__mensajes {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    overflow-y: auto;
+    background: #fafafe;
+  }
+
+  &__estado {
+    margin: auto;
+    color: $texto-suave;
+  }
+
+  &__vacio {
+    margin: auto;
+    max-width: 420px;
+    text-align: center;
+    color: $texto-suave;
+
+    mat-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+      color: $primario;
+    }
+  }
+
+  &__sugerencias {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+
+    button {
+      border: 1px solid $primario-suave;
+      background: #ffffff;
+      color: $primario;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+
+      &:hover {
+        background: $primario-suave;
+      }
+    }
+  }
+
+  // ---------- Entrada ----------
+  &__entrada {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 14px 20px 6px;
+    border-top: 1px solid $borde;
+
+    textarea {
+      flex: 1;
+      resize: none;
+      max-height: 140px;
+      field-sizing: content;
+      padding: 10px 14px;
+      border: 1px solid $borde;
+      border-radius: 14px;
+      font: inherit;
+      color: $texto;
+      outline: none;
+
+      &:focus {
+        border-color: $primario;
+      }
+
+      &:disabled {
+        background: #f3f4f6;
+      }
+    }
+  }
+
+  &__enviar {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: $primario;
+    color: #ffffff;
+    cursor: pointer;
+
+    &:disabled {
+      background: #c7d2fe;
+      cursor: default;
+    }
+  }
+
+  &__aviso {
+    margin: 0;
+    padding: 0 20px 12px;
+    font-size: 12px;
+    color: $texto-suave;
+    text-align: center;
+  }
+}
+
+// ---------- Burbujas ----------
+.burbuja {
+  max-width: 78%;
+  padding: 10px 14px;
+  border-radius: 16px;
+
+  &__texto {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.45;
+  }
+
+  &__hora {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    opacity: 0.7;
+    text-align: right;
+  }
+
+  &--usuario {
+    align-self: flex-end;
+    background: $primario;
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+  }
+
+  &--ia {
+    align-self: flex-start;
+    background: #ffffff;
+    color: $texto;
+    border: 1px solid $borde;
+    border-bottom-left-radius: 4px;
+  }
+
+  // Animación de "escribiendo..."
+  &--escribiendo {
+    display: flex;
+    gap: 4px;
+    padding: 14px;
+
+    span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: $texto-suave;
+      animation: rebote 1.2s infinite ease-in-out;
+
+      &:nth-child(2) { animation-delay: 0.15s; }
+      &:nth-child(3) { animation-delay: 0.3s; }
+    }
+  }
+}
+
+@keyframes rebote {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-5px); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .burbuja { max-width: 90%; }
+  .chat__barra, .chat__entrada { padding-left: 12px; padding-right: 12px; }
+  .chat__mensajes { padding: 12px; }
+}

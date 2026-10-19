@@ -1,0 +1,84 @@
+<section class="chat" [class.chat--contextual]="esContextual()">
+
+  <header class="chat__barra">
+    <div class="chat__tutor">
+      <span class="chat__avatar"><mat-icon>smart_toy</mat-icon></span>
+      <div>
+        <strong>Tutor SAESU</strong>
+        <small>{{ esContextual() ? 'Te ayuda con esta pregunta' : 'Pregúntale lo que quieras de cálculo' }}</small>
+      </div>
+    </div>
+
+    <div class="chat__acciones">
+      @if (mensajesRestantes() !== null) {
+        <span class="chat__contador" [class.chat__contador--agotado]="mensajesRestantes() === 0">
+          {{ mensajesRestantes() }} mensajes hoy
+        </span>
+      }
+      @if (!esContextual()) {
+        <button type="button" class="chat__boton-icono" title="Borrar historial"
+                [disabled]="mensajes().length === 0 || enviando()"
+                (click)="limpiarHistorial()">
+          <mat-icon>delete_sweep</mat-icon>
+        </button>
+      }
+    </div>
+  </header>
+
+  <div class="chat__mensajes" #contenedor>
+    @if (cargandoHistorial()) {
+      <p class="chat__estado">Cargando conversación...</p>
+    } @else if (mensajes().length === 0) {
+      <div class="chat__vacio">
+        <mat-icon>forum</mat-icon>
+        <p>
+          {{ esContextual()
+              ? 'Cuéntale al tutor en qué parte te atascaste. Te guiará con preguntas, sin darte la respuesta.'
+              : 'Escribe tu duda de límites, derivadas o integrales. El tutor te guiará paso a paso.' }}
+        </p>
+        <div class="chat__sugerencias">
+          @for (s of sugerencias(); track s) {
+            <button type="button" (click)="usarSugerencia(s)">{{ s }}</button>
+          }
+        </div>
+      </div>
+    } @else {
+      @for (m of mensajes(); track m.id) {
+        <div class="burbuja" [class.burbuja--usuario]="m.rolEmisor === 'usuario'"
+             [class.burbuja--ia]="m.rolEmisor === 'ia'">
+          <p class="burbuja__texto">{{ m.mensaje }}</p>
+          <time class="burbuja__hora">{{ m.fechaHora | date: 'shortTime' }}</time>
+        </div>
+      }
+    }
+
+    @if (enviando()) {
+      <div class="burbuja burbuja--ia burbuja--escribiendo" aria-label="El tutor está escribiendo">
+        <span></span><span></span><span></span>
+      </div>
+    }
+  </div>
+
+  <form class="chat__entrada" (ngSubmit)="enviar()">
+    <textarea
+      rows="1"
+      name="texto"
+      placeholder="Escribe tu duda..."
+      [ngModel]="texto()"
+      (ngModelChange)="texto.set($event)"
+      (keydown)="alPresionarTecla($event)"
+      [disabled]="mensajesRestantes() === 0"
+      [attr.maxlength]="maxCaracteres"></textarea>
+    <button type="submit" class="chat__enviar" [disabled]="!puedeEnviar()" title="Enviar">
+      <mat-icon>send</mat-icon>
+    </button>
+  </form>
+
+  <p class="chat__aviso">
+    @if (mensajesRestantes() === 0) {
+      Alcanzaste el límite de mensajes de hoy. Vuelve mañana.
+    } @else {
+      El tutor no te dará la respuesta final: te ayuda a llegar a ella.
+    }
+  </p>
+</section>
