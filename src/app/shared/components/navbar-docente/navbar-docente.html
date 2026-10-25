@@ -26,8 +26,8 @@
   </ul>
 
   <button class="navbar__user" [matMenuTriggerFor]="menu">
-    <span class="navbar__avatar">{{ iniciales }}</span>
-    <span class="navbar__name">{{ nombreDocente }}</span>
+    <span class="navbar__avatar">{{ iniciales() }}</span>
+    <span class="navbar__name">{{ nombreDocente() }}</span>
     <mat-icon>expand_more</mat-icon>
   </button>
 

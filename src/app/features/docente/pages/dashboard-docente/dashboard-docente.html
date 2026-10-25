@@ -2,50 +2,64 @@
 
   <header class="dashboard__header">
     <span class="dashboard__badge">Modo Docente</span>
-    <h1 class="dashboard__titulo">Bienvenido, {{ nombreDocente }} 👋</h1>
+    <h1 class="dashboard__titulo">Bienvenido{{ nombreDocente() ? ', ' + nombreDocente() : '' }} 👋</h1>
     <p class="dashboard__subtitulo">Estas son tus tareas pendientes para hoy:</p>
   </header>
 
   <section class="cards">
-    <div class="card card--warning">
+    <a class="card card--warning" routerLink="/docente/notificaciones">
       <div class="card__icono">
         <mat-icon>mark_chat_unread</mat-icon>
       </div>
-      <h3 class="card__titulo">—</h3>
+      <h3 class="card__titulo">{{ cargando() ? '…' : pendientes().length }}</h3>
       <p class="card__desc">Publicaciones sin respuesta oficial</p>
-    </div>
+    </a>
 
-    <div class="card card--info">
+    <a class="card card--info" routerLink="/docente/notificaciones">
       <div class="card__icono">
-        <mat-icon>fact_check</mat-icon>
+        <mat-icon>help_outline</mat-icon>
       </div>
-      <h3 class="card__titulo">—</h3>
-      <p class="card__desc">Respuestas por validar</p>
-    </div>
+      <h3 class="card__titulo">{{ cargando() ? '…' : sinRespuestas() }}</h3>
+      <p class="card__desc">Sin ninguna respuesta todavía</p>
+    </a>
 
-    <div class="card card--success">
+    <a class="card card--success" routerLink="/docente/notificaciones">
       <div class="card__icono">
-        <mat-icon>verified</mat-icon>
+        <mat-icon>hourglass_bottom</mat-icon>
       </div>
-      <h3 class="card__titulo">—</h3>
-      <p class="card__desc">Tasa de retención UDEC</p>
-    </div>
+      <h3 class="card__titulo">{{ cargando() ? '…' : diasMasAntigua() }}</h3>
+      <p class="card__desc">Días de la consulta más antigua</p>
+    </a>
   </section>
+
+  @if (error()) {
+    <p class="aviso">No se pudieron cargar las consultas. Verifica que iniciaste sesión con una cuenta de docente.</p>
+  }
+
+  @if (masAntiguas().length) {
+    <section class="urgentes">
+      <h3 class="accesos__titulo">Las que más llevan esperando</h3>
+      @for (p of masAntiguas(); track p.id) {
+        <a class="urgente" [routerLink]="['/docente/publicaciones', p.id]">
+          <span class="urgente__tema">{{ nombresTema[p.tema] || p.tema }}</span>
+          <strong>{{ p.titulo }}</strong>
+          <small>{{ p.autor.nombre }} · {{ haceCuanto(p.fechaCreacion) }} · {{ p.respuestasCount }} respuestas</small>
+          <mat-icon>chevron_right</mat-icon>
+        </a>
+      }
+    </section>
+  }
 
   <section class="accesos">
     <h3 class="accesos__titulo">Accesos rápidos</h3>
     <div class="accesos__grid">
       <a class="acceso" routerLink="/docente/notificaciones">
         <mat-icon>notifications</mat-icon>
-        <span>Notificaciones</span>
+        <span>Consultas pendientes</span>
       </a>
       <a class="acceso" routerLink="/docente/foro">
         <mat-icon>forum</mat-icon>
-        <span>Foro</span>
-      </a>
-      <a class="acceso" routerLink="/docente/perfil">
-        <mat-icon>person</mat-icon>
-        <span>Mi Perfil</span>
+        <span>Foro completo</span>
       </a>
     </div>
   </section>

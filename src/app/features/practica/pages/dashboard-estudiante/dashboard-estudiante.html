@@ -3,7 +3,7 @@
   <!-- Encabezado -->
   <header class="dashboard__header">
     <span class="dashboard__badge">SAESU Focus Mode</span>
-    <h1 class="dashboard__titulo">Hola, {{ nombre }}.</h1>
+    <h1 class="dashboard__titulo">Hola{{ nombre() ? ', ' + nombre() : '' }}.</h1>
     <p class="dashboard__subtitulo">Tu única meta académica clave por hoy:</p>
   </header>
 

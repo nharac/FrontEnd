@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { AuthService } from '../../../features/usuario/services/auth.service';
 import { TokenService } from '../../../core/services/token.service';
+import { PerfilService } from '../../../core/services/perfil.service';
 
 @Component({
   selector: 'app-navbar',
@@ -22,21 +23,27 @@ import { TokenService } from '../../../core/services/token.service';
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
-export class Navbar {
+export class Navbar implements OnInit {
 
   private authService = inject(AuthService);
   private tokenService = inject(TokenService);
+  private perfilService = inject(PerfilService);
   private router = inject(Router);
 
-  /** Nombre del usuario (mock por ahora). */
-  nombreUsuario = 'Juan';
+  /** Primer nombre del usuario autenticado (GET /api/auth/perfil). */
+  readonly nombreUsuario = this.perfilService.primerNombre;
+
+  ngOnInit(): void {
+    this.perfilService.cargar();
+  }
 
   /** Inicial para el avatar. */
   get inicial(): string {
-    return this.nombreUsuario.charAt(0).toUpperCase();
+    return this.nombreUsuario().charAt(0).toUpperCase();
   }
 
   logout(): void {
+    this.perfilService.limpiar();
     this.authService.logout();
     this.router.navigate(['/auth']);
   }

@@ -1,0 +1,52 @@
+<div class="lista">
+  <header class="lista__header">
+    <span class="lista__badge">MODO DOCENTE</span>
+    @if (modo() === 'pendientes') {
+      <h1>Consultas pendientes</h1>
+      <p>Publicaciones sin respuesta oficial, de la que más lleva esperando a la más reciente.</p>
+    } @else {
+      <h1>Foro</h1>
+      <p>Todas las publicaciones de los estudiantes y su estado.</p>
+    }
+  </header>
+
+  <div class="filtros">
+    @for (t of temas; track t.nombre) {
+      <button type="button" class="chip" [class.chip--activo]="tema() === t.id" (click)="tema.set(t.id)">
+        {{ t.nombre }}
+      </button>
+    }
+  </div>
+
+  @if (cargando()) {
+    <p class="vacio">Cargando...</p>
+  } @else {
+    @for (p of filtradas(); track p.id) {
+      <button type="button" class="pub" (click)="abrir(p)">
+        <div class="pub__arriba">
+          <span class="tema">{{ nombresTema[p.tema] || p.tema }}</span>
+          @switch (estado(p)) {
+            @case ('sin-respuestas') { <span class="estado estado--rojo">Sin respuestas</span> }
+            @case ('sin-oficial') { <span class="estado estado--ambar">Con respuestas, sin oficial</span> }
+            @case ('oficial') { <span class="estado estado--verde">Con respuesta oficial</span> }
+          }
+          @if (estado(p) !== 'oficial' && diasDesde(p.fechaCreacion) >= 3) {
+            <span class="estado estado--rojo"><mat-icon>priority_high</mat-icon>{{ diasDesde(p.fechaCreacion) }} días esperando</span>
+          }
+        </div>
+        <h3>{{ p.titulo }}</h3>
+        <p class="pub__preview">{{ p.contenidoPreview }}</p>
+        <div class="pub__abajo">
+          <span class="avatar">{{ p.autor.iniciales }}</span>
+          <span>{{ p.autor.nombre }} · {{ haceCuanto(p.fechaCreacion) }}</span>
+          <span class="pub__respuestas"><mat-icon>chat_bubble_outline</mat-icon>{{ p.respuestasCount }}</span>
+        </div>
+      </button>
+    } @empty {
+      <div class="vacio">
+        <mat-icon>task_alt</mat-icon>
+        <p>{{ modo() === 'pendientes' ? '¡Todo al día! No hay consultas pendientes.' : 'No hay publicaciones todavía.' }}</p>
+      </div>
+    }
+  }
+</div>

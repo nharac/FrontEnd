@@ -83,6 +83,26 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/docente/pages/dashboard-docente/dashboard-docente')
             .then(m => m.DashboardDocente)
+      },
+      {
+        path: 'notificaciones',
+        data: { modo: 'pendientes' },
+        loadComponent: () =>
+          import('./features/docente/pages/publicaciones-docente/publicaciones-docente')
+            .then(m => m.PublicacionesDocente)
+      },
+      {
+        path: 'foro',
+        data: { modo: 'todas' },
+        loadComponent: () =>
+          import('./features/docente/pages/publicaciones-docente/publicaciones-docente')
+            .then(m => m.PublicacionesDocente)
+      },
+      {
+        path: 'publicaciones/:id',
+        loadComponent: () =>
+          import('./features/docente/pages/publicacion-detalle/publicacion-detalle')
+            .then(m => m.PublicacionDetallePage)
       }
     ]
   },

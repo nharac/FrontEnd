@@ -1,8 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
+import { DocenteService } from '../../services/docente.service';
+import { NOMBRES_TEMA, PublicacionResumen } from '../../../foro/models/foro.model';
+import { diasDesde, haceCuanto } from '../../../../shared/utils/tiempo';
+
+/**
+ * Inicio del docente: cifras de las consultas pendientes y las más antiguas.
+ */
 @Component({
   selector: 'app-dashboard-docente',
   standalone: true,
@@ -10,9 +17,49 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './dashboard-docente.html',
   styleUrl: './dashboard-docente.scss',
 })
-export class DashboardDocente {
+export class DashboardDocente implements OnInit {
 
-  nombreDocente = 'Prof. Guillermo Ariza';
+  private docenteService = inject(DocenteService);
 
-  //cuando se termine lo de los end points se trae informacion
+  nombreDocente = signal('');
+  pendientes = signal<PublicacionResumen[]>([]);
+  cargando = signal(true);
+  error = signal(false);
+
+  readonly nombresTema = NOMBRES_TEMA;
+  readonly haceCuanto = haceCuanto;
+
+  /** Pendientes sin ninguna respuesta (ni de estudiantes). */
+  sinRespuestas = computed(() => this.pendientes().filter(p => p.respuestasCount === 0).length);
+
+  /** Días que lleva esperando la consulta pendiente más antigua. */
+  diasMasAntigua = computed(() => {
+    const lista = this.pendientes();
+    return lista.length ? Math.max(...lista.map(p => diasDesde(p.fechaCreacion))) : 0;
+  });
+
+  /** Las 3 que más llevan esperando. */
+  masAntiguas = computed(() =>
+    [...this.pendientes()]
+      .sort((a, b) => new Date(a.fechaCreacion).getTime() - new Date(b.fechaCreacion).getTime())
+      .slice(0, 3)
+  );
+
+  ngOnInit(): void {
+    this.docenteService.obtenerPerfil().subscribe({
+      next: (u) => this.nombreDocente.set(u.nombre),
+      error: () => this.nombreDocente.set('')
+    });
+
+    this.docenteService.notificaciones().subscribe({
+      next: (lista) => {
+        this.pendientes.set(lista);
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.cargando.set(false);
+        this.error.set(true);
+      }
+    });
+  }
 }
