@@ -25,6 +25,8 @@ export interface PublicacionResumen {
   autor: Autor;
   fechaCreacion: string;
   respuestasCount: number;
+  /** URL pública en S3 de la imagen adjunta (null si no tiene). */
+  imagenUrl?: string | null;
 }
 
 /** Respuesta con sus respuestas hijas (RespuestaResponse). */
@@ -47,6 +49,8 @@ export interface PublicacionDetalle {
   autor: Autor;
   fechaCreacion: string;
   respuestas: Respuesta[];
+  /** URL pública en S3 de la imagen adjunta (null si no tiene). */
+  imagenUrl?: string | null;
 }
 
 /** Cuerpo de POST /api/foro/publicaciones/{id}/respuestas. */

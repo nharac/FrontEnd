@@ -2,7 +2,20 @@
 
   @if (usuario(); as u) {
     <section class="tarjeta cabecera">
-      <span class="avatar">{{ iniciales() }}</span>
+      <div class="foto">
+        @if (fotoUrl(); as url) {
+          <img class="avatar avatar--foto" [src]="url" alt="Foto de perfil de {{ u.nombre }}">
+        } @else {
+          <span class="avatar">{{ iniciales() }}</span>
+        }
+        <label class="foto__boton" [class.foto__boton--cargando]="subiendoFoto()"
+               title="Cambiar foto de perfil">
+          <mat-icon>{{ subiendoFoto() ? 'hourglass_top' : 'photo_camera' }}</mat-icon>
+          <span class="sr-only">Cambiar foto de perfil</span>
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/gif"
+                 [disabled]="subiendoFoto()" (change)="elegirFoto($event)">
+        </label>
+      </div>
       <div class="cabecera__datos">
         <h1>{{ u.nombre }}</h1>
         <p><mat-icon>mail</mat-icon> {{ u.correo }}</p>

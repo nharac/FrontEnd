@@ -6,9 +6,9 @@
   }
 
   <header class="respuesta__autor">
-    <span class="avatar" [class.avatar--docente]="r.autor.rol === 'DOCENTE'">{{ r.autor.iniciales }}</span>
+    <span class="avatar" [class.avatar--docente]="autorDocente()">{{ r.autor.iniciales }}</span>
     <strong>{{ r.autor.nombre }}</strong>
-    @if (r.autor.rol === 'DOCENTE') {
+    @if (autorDocente()) {
       <span class="etiqueta">Docente</span>
     }
     <time>{{ haceCuanto(r.fechaCreacion) }}</time>
@@ -16,9 +16,9 @@
 
   <p class="respuesta__contenido">{{ r.contenido }}</p>
 
-  @if (puedeMarcarOficial() || puedeResponder()) {
+  @if (mostrarBotonOficial() || puedeResponder()) {
     <div class="respuesta__acciones">
-      @if (puedeMarcarOficial()) {
+      @if (mostrarBotonOficial()) {
         @if (r.esOficial) {
           <button type="button" class="accion accion--quitar"
                   [disabled]="procesandoId() === r.id" (click)="quitarOficial.emit(r.id)">

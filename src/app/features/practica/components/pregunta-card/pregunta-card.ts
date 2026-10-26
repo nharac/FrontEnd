@@ -14,18 +14,20 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { PracticaService } from '../../services/practica.service';
 import { Opcion, Pregunta, Validacion } from '../../models/practica.model';
 import { ChatPanel } from '../../../chat/components/chat-panel/chat-panel';
+import { Confeti } from '../../../../shared/components/confeti/confeti';
 
 /**
  * Tarjeta de una pregunta de práctica.
  *
  * Flujo (según ValidarRespuestaService del backend):
- * - Acierta  → se marca en verde y se habilita "Siguiente".
- * - Falla    → se marca en rojo, se muestra la pista y se abre el tutor IA
+ * - Acierta  → se marca en verde, se muestran los puntos ganados y se habilita "Siguiente".
+ * - Falla    → se marca en rojo, baja lo que vale la pregunta (20, 15, 10... mín. 5),
+ *              se muestra la pista y se abre el tutor IA
  *              contextual. El estudiante puede intentar con otra opción.
  */
 @Component({
   selector: 'app-pregunta-card',
-  imports: [MatIconModule, MatSnackBarModule, ChatPanel],
+  imports: [MatIconModule, MatSnackBarModule, ChatPanel, Confeti],
   templateUrl: './pregunta-card.html',
   styleUrl: './pregunta-card.scss',
 })
@@ -36,7 +38,7 @@ export class PreguntaCard {
   total = input(1);
 
   /** Se emite cuando el estudiante acierta. */
-  acertada = output<{ primerIntento: boolean }>();
+  acertada = output<{ primerIntento: boolean; puntos: number }>();
   /** Se emite al pulsar "Siguiente". */
   siguiente = output<void>();
 
@@ -101,7 +103,7 @@ export class PreguntaCard {
         this.validacion.set(res);
 
         if (res.esCorrecta) {
-          this.acertada.emit({ primerIntento: this.intentos() === 1 });
+          this.acertada.emit({ primerIntento: this.intentos() === 1, puntos: res.puntosGanados ?? 0 });
         } else {
           this.descartadas.update(lista => [...lista, opcionId]);
           this.seleccionada.set(null);
@@ -121,7 +123,8 @@ export class PreguntaCard {
   }
 
   pedirPista(): void {
-    if (this.pista() || this.cargandoPista()) {
+    // RF-07: solo después de al menos un intento fallido
+    if (this.intentos() === 0 || this.pista() || this.cargandoPista()) {
       return;
     }
     this.cargandoPista.set(true);

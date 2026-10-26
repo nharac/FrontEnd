@@ -7,6 +7,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ForoService } from '../../services/foro.service';
 import { NOMBRES_TEMA, OrdenForo, PublicacionResumen } from '../../models/foro.model';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
+import { esDocente } from '../../../../shared/utils/rol';
 
 /** Publicaciones por página (el backend pagina con page/size). */
 const TAMANO_PAGINA = 10;
@@ -49,6 +50,7 @@ export class ListaPublicaciones implements OnInit {
   ];
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
+  readonly esDocente = esDocente;
 
   private pagina = 0;
 

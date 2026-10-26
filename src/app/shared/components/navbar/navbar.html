@@ -29,10 +29,20 @@
         <span>Foro</span>
       </a>
     </li>
+    <li>
+      <a routerLink="/ranking" routerLinkActive="active">
+        <mat-icon>leaderboard</mat-icon>
+        <span>Ranking</span>
+      </a>
+    </li>
   </ul>
 
   <button class="navbar__user" [matMenuTriggerFor]="menu">
-    <span class="navbar__avatar">{{ inicial }}</span>
+    @if (fotoUrl(); as url) {
+      <img class="navbar__avatar navbar__avatar--foto" [src]="url" alt="">
+    } @else {
+      <span class="navbar__avatar">{{ inicial }}</span>
+    }
     <span class="navbar__name">{{ nombreUsuario() }}</span>
     <mat-icon>expand_more</mat-icon>
   </button>

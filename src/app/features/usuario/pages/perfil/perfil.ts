@@ -14,10 +14,13 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { PerfilService } from '../../../../core/services/perfil.service';
 import { PracticaService } from '../../../practica/services/practica.service';
 import { Progreso, TEMAS } from '../../../practica/models/practica.model';
-import { Rol } from '../../models/rol.enum';
+import { esDocente, esEstudiante } from '../../../../shared/utils/rol';
 
 /** Misma regla de contraseña que el backend (RegistroRequest / ActualizarPerfilRequest). */
 const PASSWORD_SEGURA = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/;
+
+/** Límite del backend (spring.servlet.multipart.max-file-size) y de nginx. */
+const MAX_FOTO_MB = 10;
 
 /** La nueva contraseña y su confirmación deben coincidir. */
 const coincidenValidator: ValidatorFn = (grupo: AbstractControl): ValidationErrors | null =>
@@ -42,6 +45,8 @@ export class Perfil implements OnInit {
 
   readonly usuario = this.perfilService.usuario;
   readonly iniciales = this.perfilService.iniciales;
+  readonly fotoUrl = this.perfilService.fotoUrl;
+  subiendoFoto = signal(false);
   readonly temas = TEMAS;
 
   progreso = signal<Progreso | null>(null);
@@ -49,8 +54,8 @@ export class Perfil implements OnInit {
   guardandoPassword = signal(false);
   mostrarPasswords = signal(false);
 
-  esEstudiante = computed(() => this.usuario()?.rol === Rol.ESTUDIANTE);
-  esDocente = computed(() => this.usuario()?.rol === Rol.DOCENTE);
+  esEstudiante = computed(() => esEstudiante(this.usuario()?.rol));
+  esDocente = computed(() => esDocente(this.usuario()?.rol));
   totalRespondidas = computed(() => {
     const p = this.progreso();
     return p ? p.limites.respondidas + p.derivadas.respondidas + p.integrales.respondidas : 0;
@@ -127,6 +132,38 @@ export class Perfil implements OnInit {
       error: (err) => {
         this.guardandoPassword.set(false);
         this.avisar(err?.message || 'No se pudo cambiar la contraseña');
+      }
+    });
+  }
+
+  /** Valida la imagen elegida y la sube a S3 (POST /api/perfil/foto). */
+  elegirFoto(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    input.value = ''; // permite volver a elegir el mismo archivo
+    if (!archivo) {
+      return;
+    }
+    if (!archivo.type.startsWith('image/')) {
+      this.avisar('El archivo debe ser una imagen (JPG, PNG, WEBP o GIF)');
+      return;
+    }
+    if (archivo.size > MAX_FOTO_MB * 1024 * 1024) {
+      this.avisar(`La imagen no puede pesar más de ${MAX_FOTO_MB} MB`);
+      return;
+    }
+
+    this.subiendoFoto.set(true);
+    this.perfilService.subirFoto(archivo).subscribe({
+      next: () => {
+        this.subiendoFoto.set(false);
+        this.avisar('Foto de perfil actualizada');
+      },
+      error: (err) => {
+        this.subiendoFoto.set(false);
+        this.avisar(err?.status === 413
+          ? `La imagen es muy pesada (máximo ${MAX_FOTO_MB} MB)`
+          : err?.message || 'No se pudo subir la foto');
       }
     });
   }

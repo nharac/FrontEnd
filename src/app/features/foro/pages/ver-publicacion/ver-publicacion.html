@@ -32,12 +32,17 @@
       </div>
       <h1>{{ p.titulo }}</h1>
       <p class="publicacion__autor">
-        <span class="avatar" [class.avatar--docente]="p.autor.rol === 'DOCENTE'">{{ p.autor.iniciales }}</span>
+        <span class="avatar" [class.avatar--docente]="esDocente(p.autor.rol)">{{ p.autor.iniciales }}</span>
         <strong>{{ p.autor.nombre }}</strong>
         @if (esAutor()) { <span class="etiqueta etiqueta--tu">Tú</span> }
         · {{ haceCuanto(p.fechaCreacion) }}
       </p>
       <p class="publicacion__contenido">{{ p.contenido }}</p>
+      @if (p.imagenUrl) {
+        <a [href]="p.imagenUrl" target="_blank" rel="noopener">
+          <img class="saesu-imagen-pub" [src]="p.imagenUrl" alt="Imagen adjunta a la publicación">
+        </a>
+      }
     </article>
 
     <section class="nueva">

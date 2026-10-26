@@ -49,7 +49,8 @@ export class PerfilService {
       return;
     }
     this.http.get<Usuario>(this.API).subscribe({
-      next: (u) => this.usuario.set(u),
+      // Si el backend aún no devuelve la foto, se conserva la que se acaba de subir
+      next: (u) => this.usuario.update(prev => ({ ...u, fotoPerfilUrl: u.fotoPerfilUrl ?? prev?.fotoPerfilUrl ?? null })),
       error: () => this.usuario.set(null)
     });
   }
@@ -60,7 +61,22 @@ export class PerfilService {
    */
   actualizar(request: ActualizarPerfilRequest): Observable<Usuario> {
     return this.http.put<Usuario>(this.API, request).pipe(
-      tap(u => this.usuario.set(u))
+      tap(u => this.usuario.update(prev => ({ ...u, fotoPerfilUrl: u.fotoPerfilUrl ?? prev?.fotoPerfilUrl ?? null })))
+    );
+  }
+
+  /** URL de la foto de perfil, o null para mostrar las iniciales. */
+  readonly fotoUrl = computed(() => this.usuario()?.fotoPerfilUrl || null);
+
+  /**
+   * Sube la foto de perfil a AWS S3 y la deja en el usuario actual.
+   * POST /api/perfil/foto (multipart, campo "archivo")
+   */
+  subirFoto(archivo: File): Observable<{ mensaje: string; url: string }> {
+    const datos = new FormData();
+    datos.append('archivo', archivo);
+    return this.http.post<{ mensaje: string; url: string }>(`${environment.apiUrl}/perfil/foto`, datos).pipe(
+      tap(res => this.usuario.update(u => u ? { ...u, fotoPerfilUrl: res.url } : u))
     );
   }
 

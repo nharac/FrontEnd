@@ -30,9 +30,16 @@
 
   @if (validacion(); as v) {
     <div class="resultado" [class.resultado--ok]="v.esCorrecta" [class.resultado--error]="!v.esCorrecta">
+      @if (v.esCorrecta && v.puntosGanados) {
+        <span class="puntos-flotantes" aria-hidden="true">+{{ v.puntosGanados }}</span>
+        <app-confeti [cantidad]="16" [alcance]="130" />
+      }
       <mat-icon>{{ v.esCorrecta ? 'celebration' : 'lightbulb' }}</mat-icon>
       <div>
-        <strong>{{ v.esCorrecta ? '¡Correcto!' : 'Aún no. Intenta con otra opción.' }}</strong>
+        <strong>{{ v.esCorrecta ? (v.mensaje || '¡Correcto!') : 'Aún no. Intenta con otra opción.' }}</strong>
+        @if (!v.esCorrecta && v.puntosEnJuego) {
+          <p class="resultado__puntos">Si aciertas ahora ganas <strong>+{{ v.puntosEnJuego }} puntos</strong>.</p>
+        }
         @if (v.esCorrecta && intentos() > 1) {
           <p>Lo lograste en {{ intentos() }} intentos. ¡Bien hecho por no rendirte!</p>
         }
@@ -49,10 +56,13 @@
 
   <div class="acciones">
     @if (!resuelta()) {
-      <button type="button" class="btn btn--secundario" (click)="pedirPista()"
-              [disabled]="!!pista() || cargandoPista()">
-        <mat-icon>tips_and_updates</mat-icon> {{ cargandoPista() ? 'Cargando...' : 'Ver pista' }}
-      </button>
+      <!-- RF-07: la pista solo se ofrece después de una respuesta incorrecta -->
+      @if (intentos() > 0 && !pista()) {
+        <button type="button" class="btn btn--secundario" (click)="pedirPista()"
+                [disabled]="cargandoPista()">
+          <mat-icon>tips_and_updates</mat-icon> {{ cargandoPista() ? 'Cargando...' : 'Ver pista' }}
+        </button>
+      }
       <button type="button" class="btn btn--secundario" (click)="alternarChat()">
         <mat-icon>smart_toy</mat-icon> {{ mostrarChat() ? 'Ocultar tutor' : 'Pedir ayuda al tutor' }}
       </button>

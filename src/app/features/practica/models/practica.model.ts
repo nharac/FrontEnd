@@ -37,6 +37,10 @@ export interface Validacion {
   mensaje: string;
   habilitarSiguiente: boolean;
   chatIaHabilitado: boolean;
+  /** Puntos ganados con este intento (0 si falló o la pregunta ya estaba resuelta). */
+  puntosGanados?: number | null;
+  /** Lo que vale acertar en el siguiente intento: 20, 15, 10... mínimo 5. */
+  puntosEnJuego?: number | null;
 }
 
 /** GET /api/practica/preguntas/{id}/pista (PistaResponse). */

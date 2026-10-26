@@ -23,6 +23,11 @@
         {{ p.autor.nombre }} · {{ haceCuanto(p.fechaCreacion) }}
       </p>
       <p class="publicacion__contenido">{{ p.contenido }}</p>
+      @if (p.imagenUrl) {
+        <a [href]="p.imagenUrl" target="_blank" rel="noopener">
+          <img class="saesu-imagen-pub" [src]="p.imagenUrl" alt="Imagen adjunta a la publicación">
+        </a>
+      }
     </article>
 
     <section class="nueva">

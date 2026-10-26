@@ -71,11 +71,21 @@
     @case ('resumen') {
       <!-- ============ 3. Resumen ============ -->
       <section class="resumen">
+        @if (puntosSesion() > 0 || porcentajeSesion() >= 80) {
+          <app-confeti [cantidad]="40" [alcance]="260" />
+        }
         <mat-icon class="resumen__icono">emoji_events</mat-icon>
         <h1>¡Terminaste la práctica de {{ infoTema()?.nombre }}!</h1>
         <p class="resumen__dato">
           Acertaste <strong>{{ aciertosPrimerIntento() }} de {{ preguntas().length }}</strong> al primer intento
           ({{ porcentajeSesion() }}%).
+        </p>
+        <p class="resumen__dato">
+          @if (puntosSesion() > 0) {
+            Ganaste <strong>+<span [appContador]="puntosSesion()" [retraso]="500"></span> puntos</strong> en esta práctica.
+          } @else {
+            Esta vez no sumaste puntos: solo cuenta la primera vez que resuelves cada pregunta.
+          }
         </p>
         <p class="resumen__mensaje">
           {{ porcentajeSesion() >= 80

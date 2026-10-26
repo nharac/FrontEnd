@@ -1,0 +1,233 @@
+// ============================================================
+// SAESU · Animaciones globales
+// Todas viven dentro de `prefers-reduced-motion: no-preference`:
+// si el sistema pide menos movimiento, la app se ve igual pero quieta.
+// ============================================================
+
+$saesu-suave: cubic-bezier(0.22, 1, 0.36, 1);   // salida suave
+$saesu-rebote: cubic-bezier(0.34, 1.56, 0.64, 1); // con un pequeño rebote
+
+@keyframes saesu-entrar {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes saesu-aparecer {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes saesu-pop {
+  0%   { opacity: 0; transform: scale(0.6); }
+  70%  { opacity: 1; transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes saesu-temblor {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+
+@keyframes saesu-latido {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+@keyframes saesu-anillo {
+  0%   { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.45); }
+  100% { box-shadow: 0 0 0 18px rgba(79, 70, 229, 0); }
+}
+
+@keyframes saesu-brillo {
+  from { transform: translateX(-120%) skewX(-20deg); }
+  to   { transform: translateX(220%) skewX(-20deg); }
+}
+
+@keyframes saesu-llama {
+  0%, 100% { transform: rotate(-4deg) scale(1); }
+  50%      { transform: rotate(4deg) scale(1.12); }
+}
+
+@keyframes saesu-flotar {
+  0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.8); }
+  20%  { opacity: 1; transform: translate(-50%, -6px) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -46px) scale(1); }
+}
+
+@keyframes saesu-llenar {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes saesu-crecer {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+@keyframes saesu-caer {
+  0%   { opacity: 0; transform: translateY(-40px) scale(0.7); }
+  60%  { opacity: 1; transform: translateY(6px) scale(1.05); }
+  100% { transform: none; }
+}
+
+@keyframes saesu-corona {
+  0%   { opacity: 0; transform: translateY(-30px) rotate(-30deg) scale(0.4); }
+  60%  { opacity: 1; transform: translateY(4px) rotate(10deg) scale(1.15); }
+  100% { transform: none; }
+}
+
+@keyframes saesu-balanceo {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
+}
+
+@keyframes saesu-confeti {
+  0%   { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--giro)); }
+}
+
+/* Utilidad: un elemento que entra deslizándose */
+.saesu-entra { animation: saesu-entrar 0.45s $saesu-suave backwards; }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  // ---------- Cambio de página: cada vista entra suavemente ----------
+  router-outlet + * {
+    display: block;
+    animation: saesu-entrar 0.4s $saesu-suave backwards;
+  }
+
+  // ---------- Botones: se elevan al pasar el mouse y se hunden al hacer clic ----------
+  button:not(.mat-mdc-menu-item):not(.opcion),
+  a.btn,
+  .card-principal__btn,
+  .acceso-card,
+  .acceso {
+    transition: transform 0.18s $saesu-suave, box-shadow 0.18s ease,
+      background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+
+    &:not(:disabled):hover { transform: translateY(-2px); }
+    &:not(:disabled):active { transform: translateY(0) scale(0.97); transition-duration: 0.06s; }
+  }
+
+  .btn:not(:disabled):hover,
+  .btn-empezar:not(:disabled):hover,
+  .card-principal__btn:hover {
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
+  }
+
+  // Brillo que cruza los botones principales
+  .btn-empezar,
+  .card-principal__btn {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      transform: translateX(-120%) skewX(-20deg);
+      pointer-events: none;
+    }
+
+    &:not(:disabled):hover::after { animation: saesu-brillo 0.75s ease; }
+  }
+
+  // Íconos de la barra: pequeño salto al pasar el mouse
+  .navbar__links a:hover mat-icon,
+  .acceso-card:hover .acceso-card__icono,
+  .acceso:hover mat-icon {
+    animation: saesu-latido 0.5s $saesu-rebote;
+  }
+
+  // ---------- Listas y tarjetas: aparecen en cascada ----------
+  .acceso-card, .acceso, .card, .tema, .pub, .fila, .tarjeta, .progreso__tema,
+  .respuesta, .mini-ranking li, .reglas li, .urgente, .opcion {
+    animation: saesu-entrar 0.45s $saesu-suave backwards;
+  }
+
+  @for $i from 1 through 12 {
+    .acceso-card:nth-child(#{$i}), .acceso:nth-child(#{$i}), .card:nth-child(#{$i}),
+    .tema:nth-child(#{$i}), .pub:nth-child(#{$i}), .fila:nth-child(#{$i}),
+    .tarjeta:nth-child(#{$i}), .progreso__tema:nth-child(#{$i}),
+    .respuesta:nth-child(#{$i}), .mini-ranking li:nth-child(#{$i}), .reglas li:nth-child(#{$i}),
+    .urgente:nth-child(#{$i}), .opcion:nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 60}ms;
+    }
+  }
+
+  // Tarjetas del foro: se levantan al pasar el mouse
+  .pub {
+    transition: transform 0.2s $saesu-suave, box-shadow 0.2s ease;
+    &:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(79, 70, 229, 0.12); }
+  }
+
+  // ---------- Barras de progreso: se llenan desde cero ----------
+  .barra__relleno {
+    transform-origin: left center;
+    animation: saesu-llenar 0.9s $saesu-suave 0.2s backwards;
+  }
+
+  // ---------- Racha: la llama se mueve ----------
+  .meta-icono--fuego,
+  .racha mat-icon {
+    display: inline-block;
+    animation: saesu-llama 1.4s ease-in-out infinite;
+  }
+
+  // ---------- Inicio: el ícono de práctica "late" ----------
+  .card-principal__icono {
+    animation: saesu-pop 0.6s $saesu-rebote backwards, saesu-anillo 2.4s ease-out 0.8s infinite;
+  }
+
+  // ---------- Práctica ----------
+  .opcion { transition: transform 0.15s $saesu-suave, border-color 0.15s, background 0.15s, box-shadow 0.15s; }
+  .opcion:not(:disabled):hover { transform: translateX(4px); }
+  .opcion--correcta { animation: saesu-pop 0.45s $saesu-rebote backwards !important; }
+  .opcion--incorrecta { animation: saesu-temblor 0.45s ease backwards !important; }
+  .resultado { animation: saesu-entrar 0.35s $saesu-suave backwards; }
+  .resultado--ok mat-icon { animation: saesu-pop 0.5s $saesu-rebote backwards; }
+  .pista { animation: saesu-entrar 0.4s $saesu-suave backwards; }
+  .resumen__icono { animation: saesu-caer 0.8s $saesu-rebote backwards, saesu-balanceo 2.2s ease-in-out 0.9s infinite; }
+  .resumen h1, .resumen__dato, .resumen__mensaje, .resumen__acciones { animation: saesu-entrar 0.5s $saesu-suave backwards; }
+  .resumen h1 { animation-delay: 0.2s; }
+  .resumen__dato { animation-delay: 0.35s; }
+  .resumen__mensaje { animation-delay: 0.5s; }
+  .resumen__acciones { animation-delay: 0.65s; }
+
+  // ---------- Perfil ----------
+  .cabecera .avatar, .cabecera .foto { animation: saesu-pop 0.55s $saesu-rebote backwards; }
+  .foto__boton { transition: transform 0.2s $saesu-rebote; }
+  .foto__boton:hover { transform: rotate(-12deg) scale(1.12); }
+
+  // ---------- Foro y docente ----------
+  .respuesta--oficial { position: relative; overflow: hidden; }
+  .respuesta--oficial::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 35%;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.16), transparent);
+    animation: saesu-brillo 1.6s ease 0.4s backwards;
+    pointer-events: none;
+  }
+  .respuesta__sello mat-icon, .estado-pub--ok mat-icon { animation: saesu-pop 0.5s $saesu-rebote backwards; }
+
+  // ---------- Chat ----------
+  .burbuja { animation: saesu-entrar 0.3s $saesu-suave backwards; }
+  .burbuja--usuario { transform-origin: right bottom; }
+
+  // ---------- Avisos (snackbar) ----------
+  .mat-mdc-snack-bar-container { animation: saesu-pop 0.35s $saesu-rebote backwards; }
+}
+
+// Si el sistema pide menos movimiento: sin animaciones ni confeti
+@media (prefers-reduced-motion: reduce) {
+  .saesu-confeti { display: none !important; }
+  .saesu-entra { animation: none; }
+}

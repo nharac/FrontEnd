@@ -8,6 +8,7 @@ import { ForoService } from '../../services/foro.service';
 import { NOMBRES_TEMA, PublicacionDetalle, Respuesta } from '../../models/foro.model';
 import { RespuestaItem } from '../../../../shared/components/respuesta-item/respuesta-item';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
+import { esDocente } from '../../../../shared/utils/rol';
 
 /**
  * /foro/:id — una publicación con sus respuestas anidadas.
@@ -38,6 +39,7 @@ export class VerPublicacion implements OnInit {
 
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
+  readonly esDocente = esDocente;
 
   private id = 0;
 

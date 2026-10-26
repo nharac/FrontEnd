@@ -98,6 +98,10 @@
       font-size: 14px;
     }
 
+    .navbar__avatar--foto {
+      object-fit: cover;
+    }
+
     .navbar__name {
       font-size: 14px;
       color: #2c3e50;
@@ -128,6 +132,25 @@
 
     &__name {
       display: none;
+    }
+  }
+}
+/* Teléfonos: 5 enlaces + usuario deben caber sin scroll horizontal */
+@media (max-width: 480px) {
+  .navbar {
+    gap: 8px;
+    padding: 8px 10px;
+
+    &__links {
+      gap: 0;
+
+      a { padding: 8px; }
+    }
+
+    &__user {
+      padding: 4px;
+
+      > mat-icon { display: none; }
     }
   }
 }

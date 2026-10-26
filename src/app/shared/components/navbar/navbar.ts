@@ -32,6 +32,7 @@ export class Navbar implements OnInit {
 
   /** Primer nombre del usuario autenticado (GET /api/auth/perfil). */
   readonly nombreUsuario = this.perfilService.primerNombre;
+  readonly fotoUrl = this.perfilService.fotoUrl;
 
   ngOnInit(): void {
     this.perfilService.cargar();

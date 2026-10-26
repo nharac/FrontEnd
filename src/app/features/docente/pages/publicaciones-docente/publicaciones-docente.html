@@ -36,6 +36,9 @@
         </div>
         <h3>{{ p.titulo }}</h3>
         <p class="pub__preview">{{ p.contenidoPreview }}</p>
+        @if (p.imagenUrl) {
+          <img class="saesu-miniatura" [src]="p.imagenUrl" alt="Imagen adjunta a la publicación" loading="lazy">
+        }
         <div class="pub__abajo">
           <span class="avatar">{{ p.autor.iniciales }}</span>
           <span>{{ p.autor.nombre }} · {{ haceCuanto(p.fechaCreacion) }}</span>

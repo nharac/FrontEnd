@@ -46,10 +46,13 @@
         </div>
         <h3>{{ p.titulo }}</h3>
         <p class="pub__preview">{{ p.contenidoPreview }}</p>
+        @if (p.imagenUrl) {
+          <img class="saesu-miniatura" [src]="p.imagenUrl" alt="Imagen adjunta a la publicación" loading="lazy">
+        }
         <div class="pub__abajo">
-          <span class="avatar" [class.avatar--docente]="p.autor.rol === 'DOCENTE'">{{ p.autor.iniciales }}</span>
+          <span class="avatar" [class.avatar--docente]="esDocente(p.autor.rol)">{{ p.autor.iniciales }}</span>
           <span>{{ p.autor.nombre }}</span>
-          @if (p.autor.rol === 'DOCENTE') {
+          @if (esDocente(p.autor.rol)) {
             <span class="etiqueta">Docente</span>
           }
           <span class="pub__respuestas">

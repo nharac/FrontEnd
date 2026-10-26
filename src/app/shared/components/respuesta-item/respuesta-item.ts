@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { Respuesta } from '../../../features/foro/models/foro.model';
 import { haceCuanto } from '../../utils/tiempo';
+import { esDocente } from '../../utils/rol';
 
 /**
  * Una respuesta del foro con sus respuestas hijas, dibujadas con sangría.
@@ -37,6 +38,16 @@ export class RespuestaItem {
 
   /** Solo se puede responder a respuestas directas (1 nivel de anidamiento). */
   puedeResponder = computed(() => this.nivel() === 0);
+
+  /** La respuesta la escribió un docente. */
+  autorDocente = computed(() => esDocente(this.respuesta().autor.rol));
+
+  /**
+   * RF-13: el docente marca como oficial respuestas de estudiantes.
+   * "Quitar oficial" se deja siempre, por si alguna quedó marcada antes.
+   */
+  mostrarBotonOficial = computed(() =>
+    this.puedeMarcarOficial() && (this.respuesta().esOficial || !this.autorDocente()));
 
   readonly haceCuanto = haceCuanto;
 

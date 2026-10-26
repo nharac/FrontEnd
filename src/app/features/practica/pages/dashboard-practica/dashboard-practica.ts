@@ -1,10 +1,13 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { PracticaService } from '../../services/practica.service';
 import { PreguntaCard } from '../../components/pregunta-card/pregunta-card';
+import { Confeti } from '../../../../shared/components/confeti/confeti';
+import { ContadorDirective } from '../../../../shared/directives/contador.directive';
 import {
   DIFICULTADES,
   Dificultad,
@@ -28,7 +31,7 @@ const PREGUNTAS_POR_SESION = 10;
  * 3. Al final ve un resumen de la sesión.
  */
 @Component({
-  imports: [DecimalPipe, MatIconModule, MatSnackBarModule, PreguntaCard],
+  imports: [DecimalPipe, MatIconModule, MatSnackBarModule, PreguntaCard, Confeti, ContadorDirective],
   selector: 'app-dashboard-practica',
   styleUrl: './dashboard-practica.scss',
   templateUrl: './dashboard-practica.html',
@@ -37,6 +40,7 @@ export class DashboardPractica implements OnInit {
 
   private practicaService = inject(PracticaService);
   private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
 
   readonly temas = TEMAS;
   readonly dificultades = DIFICULTADES;
@@ -50,6 +54,8 @@ export class DashboardPractica implements OnInit {
   preguntas = signal<Pregunta[]>([]);
   indice = signal(0);
   aciertosPrimerIntento = signal(0);
+  /** Puntos ganados en esta sesión (los da el backend al acertar). */
+  puntosSesion = signal(0);
   sinPreguntas = signal(false);
 
   preguntaActual = computed(() => this.preguntas()[this.indice()] ?? null);
@@ -61,6 +67,11 @@ export class DashboardPractica implements OnInit {
 
   ngOnInit(): void {
     this.cargarProgreso();
+    // Desde el inicio se puede llegar con un tema recomendado: /practica?tema=derivadas
+    const tema = this.route.snapshot.queryParamMap.get('tema');
+    if (this.temas.some(t => t.id === tema)) {
+      this.elegirTema(tema as Tema);
+    }
   }
 
   progresoDe(tema: InfoTema): ProgresoTema | null {
@@ -98,6 +109,7 @@ export class DashboardPractica implements OnInit {
         this.preguntas.set(preguntas);
         this.indice.set(0);
         this.aciertosPrimerIntento.set(0);
+        this.puntosSesion.set(0);
         this.vista.set('sesion');
       },
       error: (err) => {
@@ -107,7 +119,8 @@ export class DashboardPractica implements OnInit {
     });
   }
 
-  alAcertar(evento: { primerIntento: boolean }): void {
+  alAcertar(evento: { primerIntento: boolean; puntos: number }): void {
+    this.puntosSesion.update(n => n + evento.puntos);
     if (evento.primerIntento) {
       this.aciertosPrimerIntento.update(n => n + 1);
     }

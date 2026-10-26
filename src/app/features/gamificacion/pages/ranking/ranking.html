@@ -1,0 +1,91 @@
+<div class="ranking">
+
+  <header class="ranking__header">
+    <span class="ranking__badge">GAMIFICACIÓN</span>
+    <h1>Ranking de estudiantes</h1>
+    <p>Los 10 estudiantes con más puntos. Practica, ayuda en el foro y mantén tu racha para subir.</p>
+  </header>
+
+  @if (cargando()) {
+    <p class="estado">Cargando ranking...</p>
+  } @else if (error()) {
+    <p class="estado">No se pudo cargar el ranking. Intenta de nuevo en un momento.</p>
+  } @else if (!posiciones().length) {
+    <div class="vacio">
+      <mat-icon>emoji_events</mat-icon>
+      <p>Todavía nadie tiene puntos. ¡Responde una pregunta y sé el primero!</p>
+      <a class="btn" routerLink="/practica">Ir a Práctica</a>
+    </div>
+  } @else {
+
+    <!-- Podio -->
+    <section class="podio" aria-label="Podio">
+      @if (mostrarConfeti()) {
+        <app-confeti [cantidad]="36" [alcance]="220" />
+      }
+      @for (p of podio(); track p.usuarioId) {
+        <div class="podio__puesto podio__puesto--{{ p.lugar }}" [class.podio__puesto--yo]="esYo(p)">
+          @if (p.lugar === 1) {
+            <mat-icon class="podio__corona" aria-hidden="true">workspace_premium</mat-icon>
+          }
+          @if (p.fotoPerfilUrl) {
+            <img class="avatar avatar--grande" [src]="p.fotoPerfilUrl" alt="">
+          } @else {
+            <span class="avatar avatar--grande">{{ inicialesDe(p.nombre) }}</span>
+          }
+          <strong class="podio__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="tu">Tú</span> }</strong>
+          <span class="podio__puntos"><span [appContador]="p.puntosTotales" [retraso]="700"></span> pts</span>
+          @if (p.rachaActual) {
+            <span class="racha"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
+          }
+          <div class="podio__base"><span class="podio__numero">{{ p.lugar }}</span></div>
+        </div>
+      }
+    </section>
+
+    <!-- Del 4 al 10 -->
+    @if (resto().length) {
+      <ol class="lista">
+        @for (p of resto(); track p.usuarioId) {
+          <li class="fila" [class.fila--yo]="esYo(p)">
+            <span class="fila__lugar">{{ p.lugar }}</span>
+            @if (p.fotoPerfilUrl) {
+              <img class="avatar" [src]="p.fotoPerfilUrl" alt="">
+            } @else {
+              <span class="avatar">{{ inicialesDe(p.nombre) }}</span>
+            }
+            <span class="fila__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="tu">Tú</span> }</span>
+            @if (p.rachaActual) {
+              <span class="racha"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
+            }
+            <strong class="fila__puntos"><span [appContador]="p.puntosTotales" [retraso]="900"></span> pts</strong>
+          </li>
+        }
+      </ol>
+    }
+
+    <p class="mi-lugar">
+      @if (miLugar(); as lugar) {
+        <mat-icon>emoji_events</mat-icon>
+        <span>¡Vas en el puesto <strong>#{{ lugar }}</strong>! Sigue así.</span>
+      } @else {
+        <mat-icon>trending_up</mat-icon>
+        <span>Aún no estás en el top 10. Cada acierto suma, ¡tú puedes!</span>
+      }
+    </p>
+  }
+
+  <!-- Cómo se ganan puntos -->
+  <section class="reglas">
+    <h2><mat-icon>stars</mat-icon> ¿Cómo gano puntos?</h2>
+    <ul>
+      @for (r of reglas; track r.texto) {
+        <li>
+          <mat-icon>{{ r.icono }}</mat-icon>
+          <span>{{ r.texto }}</span>
+          <strong>+{{ r.puntos }}</strong>
+        </li>
+      }
+    </ul>
+  </section>
+</div>

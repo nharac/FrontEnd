@@ -66,6 +66,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/usuario/pages/perfil/perfil')
             .then(m => m.Perfil)
+      },
+      {
+        path: 'ranking',
+        loadComponent: () =>
+          import('./features/gamificacion/pages/ranking/ranking')
+            .then(m => m.Ranking)
       }
     ]
   },

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Rol } from '../../features/usuario/models/rol.enum';
+import { normalizarRol } from '../../shared/utils/rol';
 
 @Injectable({
   providedIn: 'root'
@@ -26,13 +27,12 @@ export class TokenService {
     return !!this.obtener();
   }
 
-  guardarRol(rol: Rol): void {
-    localStorage.setItem(this.ROL_KEY, rol);
+  guardarRol(rol: Rol | string): void {
+    localStorage.setItem(this.ROL_KEY, normalizarRol(rol) ?? String(rol));
   }
 
   obtenerRol(): Rol | null {
-    const rol = localStorage.getItem(this.ROL_KEY);
-    return rol as Rol | null;
+    return normalizarRol(localStorage.getItem(this.ROL_KEY));
   }
 
   esDocente(): boolean {
