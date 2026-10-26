@@ -1,3 +1,4 @@
+import { Logo } from '../logo/logo';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, interval } from 'rxjs';
@@ -13,7 +14,7 @@ import { DocenteService } from '../../../features/docente/services/docente.servi
 @Component({
   selector: 'app-navbar-docente',
   standalone: true,
-  imports: [
+  imports: [Logo, 
     CommonModule,
     RouterLink,
     RouterLinkActive,

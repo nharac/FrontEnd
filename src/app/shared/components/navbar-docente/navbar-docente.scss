@@ -14,15 +14,21 @@
 
   &__brand {
     display: flex;
+    align-items: center;
+    gap: 10px;
     text-decoration: none;
-    flex-direction: column;
     line-height: 1.1;
+  }
+
+  &__texto {
+    display: flex;
+    flex-direction: column;
 
     .navbar__logo {
       font-size: 18px;
-      font-weight: 700;
-      color: #4f46e5;
-      letter-spacing: 0.5px;
+      font-weight: 800;
+      color: #1f3247;
+      letter-spacing: 0.3px;
     }
 
     .navbar__tagline {
@@ -176,7 +182,7 @@
     &__links { gap: 0; }
     &__links a { padding: 8px 7px; }
     &__user { padding: 2px; border: 0; > mat-icon { display: none; } }
-    &__logo { font-size: 15px !important; }
+    &__texto { display: none; }
   }
   .icono-badge { margin-right: 0; }
 }

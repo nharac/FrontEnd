@@ -1,3 +1,5 @@
+import { OjoPassword } from '../../../../../shared/components/ojo-password/ojo-password';
+import { Logo } from '../../../../../shared/components/logo/logo';
 import { Component, ElementRef, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -16,7 +18,7 @@ import { esDocente } from '../../../../../shared/utils/rol';
 
 @Component({
   selector: 'app-login-form',
-  imports: [
+  imports: [OjoPassword, Logo, 
     CommonModule,
     ReactiveFormsModule,
     MatIconModule,

@@ -1,3 +1,4 @@
+import { Logo } from '../logo/logo';
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -15,7 +16,7 @@ import { esEstudiante } from '../../utils/rol';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [
+  imports: [Logo, 
     CommonModule,
     RouterLink,
     RouterLinkActive,

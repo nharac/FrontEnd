@@ -188,42 +188,40 @@
   transform: translateX(200%);
 }
 
-.btn {
-  background-color: #4f46e5;
-  color: #ffffff;
-  font-size: 13px;
-  padding: 12px 45px;
-  border: 1px solid transparent;
-  border-radius: 8px;
+// .toggle-panel delante: si no, ".container *" (padding: 0) le gana al botón
+.toggle-panel .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 12px 30px;
+  border-radius: 999px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14.5px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-top: 10px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color 0.25s, color 0.25s, box-shadow 0.25s, transform 0.2s;
 
-  &:hover:not(:disabled) {
-    background-color: #4338ca;
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.98);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  mat-icon { font-size: 19px; width: 19px; height: 19px; transition: transform 0.25s ease; }
+  &:active { transform: scale(0.97); }
 }
 
-.btn-transparent {
-  background-color: transparent;
-  border-color: #ffffff;
+.toggle-panel .btn-transparent {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  color: #ffffff;
+  backdrop-filter: blur(4px);
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background: #ffffff;
+    color: #5b3fe0;
+    box-shadow: 0 8px 22px rgba(30, 20, 90, 0.3);
   }
+  &:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45); }
 }
+
+.toggle-left .btn-transparent:hover mat-icon { transform: translateX(-3px); }
+.toggle-right .btn-transparent:hover mat-icon { transform: translateX(3px); }
 /* ============ Animaciones del login ============ */
 
 

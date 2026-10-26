@@ -84,29 +84,59 @@ small.error {
 }
 
 .btn {
-  background-color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  margin-top: 14px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background-size: 160% 160%;
+  background-position: 0% 50%;
   color: #ffffff;
-  font-size: 13px;
-  padding: 12px 45px;
-  border: 1px solid transparent;
-  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-top: 10px;
+  letter-spacing: 0.2px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+  transition: background-position 0.4s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s;
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; transition: transform 0.25s ease; }
 
   &:hover:not(:disabled) {
-    background-color: #4338ca;
+    background-position: 100% 50%;
+    box-shadow: 0 10px 22px rgba(124, 58, 237, 0.35);
+    mat-icon { transform: translateX(3px); }
   }
 
-  &:active:not(:disabled) {
-    transform: scale(0.98);
-  }
+  &:active:not(:disabled) { transform: scale(0.98); }
+
+  &:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.3); }
 
   &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    opacity: 0.75;
+    cursor: progress;
+    box-shadow: none;
   }
 }
+
+.btn__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: btn-girar 0.7s linear infinite;
+}
+
+@keyframes btn-girar { to { transform: rotate(360deg); } }
+.form-logo { margin-bottom: 10px; filter: drop-shadow(0 6px 14px rgba(31, 50, 71, 0.25)); }
+
+// Campo de contraseña con el botón del ojo: espacio a la derecha y color del "hueco" del tachón
+.input-group:has(app-ojo-password) input { padding-right: 50px; }
+.input-group:has(input:focus) { --ojo-fondo: #ffffff; }

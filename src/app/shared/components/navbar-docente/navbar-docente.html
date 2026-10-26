@@ -1,7 +1,10 @@
 <nav class="navbar">
-  <a class="navbar__brand" routerLink="/docente">
-    <span class="navbar__logo">SAESU</span>
-    <span class="navbar__tagline">Módulo Docente</span>
+  <a class="navbar__brand" routerLink="/docente" aria-label="SAESU, ir al inicio">
+    <app-logo [size]="36" />
+    <span class="navbar__texto">
+      <span class="navbar__logo">SAESU</span>
+      <span class="navbar__tagline">Módulo Docente</span>
+    </span>
   </a>
 
   <ul class="navbar__links">

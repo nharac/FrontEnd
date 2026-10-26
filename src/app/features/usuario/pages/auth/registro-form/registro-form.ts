@@ -1,3 +1,5 @@
+import { OjoPassword } from '../../../../../shared/components/ojo-password/ojo-password';
+import { Logo } from '../../../../../shared/components/logo/logo';
 import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -25,7 +27,7 @@ const PASSWORD_SEGURA = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/
 
 @Component({
   selector: 'app-registro-form',
-  imports: [
+  imports: [OjoPassword, Logo, 
     CommonModule,
     ReactiveFormsModule,
     MatIconModule,

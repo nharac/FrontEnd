@@ -1,8 +1,11 @@
 <nav class="navbar">
-  <div class="navbar__brand">
-    <span class="navbar__logo">SAESU</span>
-    <span class="navbar__tagline">Portal Estudiantil</span>
-  </div>
+  <a class="navbar__brand" routerLink="/dashboard" aria-label="SAESU, ir al inicio">
+    <app-logo [size]="36" />
+    <span class="navbar__texto">
+      <span class="navbar__logo">SAESU</span>
+      <span class="navbar__tagline">Portal Estudiantil</span>
+    </span>
+  </a>
 
   <ul class="navbar__links">
     <li>
