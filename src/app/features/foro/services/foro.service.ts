@@ -67,6 +67,16 @@ export class ForoService {
    * Crea una publicación.
    * POST /api/foro/publicaciones
    */
+  /**
+   * Sube la imagen de un ejercicio a S3 y devuelve su URL.
+   * POST /api/foro/imagenes (multipart, campo "archivo")
+   */
+  subirImagen(archivo: File): Observable<{ url: string }> {
+    const datos = new FormData();
+    datos.append('archivo', archivo);
+    return this.http.post<{ url: string }>(`${this.API}/imagenes`, datos);
+  }
+
   crear(request: CrearPublicacionRequest): Observable<PublicacionDetalle> {
     return this.http.post<PublicacionDetalle>(`${this.API}/publicaciones`, request);
   }

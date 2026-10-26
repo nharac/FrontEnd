@@ -15,6 +15,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../../services/auth.service';
 import { RegistroRequest } from '../../../models';
+import { esDocente } from '../../../../../shared/utils/rol';
 
 /** Solo se aceptan correos institucionales (mismo patrón que valida el backend). */
 const CORREO_INSTITUCIONAL = /^[a-zA-Z0-9._%+-]+@ucundinamarca\.edu\.co$/;
@@ -107,7 +108,7 @@ export class RegistroForm {
         });
 
         // Redirige según el rol
-        if (res.usuario.rol === 'DOCENTE') {
+        if (esDocente(res.usuario.rol)) {
           this.router.navigate(['/docente']);
         } else {
           this.router.navigate(['/dashboard']);

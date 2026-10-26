@@ -28,11 +28,14 @@
           @if (p.lugar === 1) {
             <mat-icon class="podio__corona" aria-hidden="true">workspace_premium</mat-icon>
           }
-          @if (p.fotoPerfilUrl) {
-            <img class="avatar avatar--grande" [src]="p.fotoPerfilUrl" alt="">
-          } @else {
-            <span class="avatar avatar--grande">{{ inicialesDe(p.nombre) }}</span>
-          }
+          <span class="avatar-caja">
+            @if (p.fotoPerfilUrl) {
+              <img class="avatar avatar--grande" [src]="p.fotoPerfilUrl" alt="">
+            } @else {
+              <span class="avatar avatar--grande">{{ inicialesDe(p.nombre) }}</span>
+            }
+            <app-medalla [lugar]="p.lugar" tamano="lg" />
+          </span>
           <strong class="podio__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="tu">Tú</span> }</strong>
           <span class="podio__puntos"><span [appContador]="p.puntosTotales" [retraso]="700"></span> pts</span>
           @if (p.rachaActual) {

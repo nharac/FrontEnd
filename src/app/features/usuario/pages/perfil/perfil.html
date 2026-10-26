@@ -8,6 +8,7 @@
         } @else {
           <span class="avatar">{{ iniciales() }}</span>
         }
+        <app-medalla [lugar]="miLugar()" tamano="lg" />
         <label class="foto__boton" [class.foto__boton--cargando]="subiendoFoto()"
                title="Cambiar foto de perfil">
           <mat-icon>{{ subiendoFoto() ? 'hourglass_top' : 'photo_camera' }}</mat-icon>
@@ -25,6 +26,17 @@
           </span>
           @if (u.fechaRegistro) {
             <span class="chip chip--suave">Miembro desde {{ u.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
+          }
+          @if (miLugar(); as lugar) {
+            @if (lugar <= 3) {
+              <span class="chip chip--top chip--top-{{ lugar }}"><mat-icon>military_tech</mat-icon> Top {{ lugar }} del ranking</span>
+            }
+          }
+          @if (esEstudiante() && u.puntosTotales != null) {
+            <span class="chip chip--puntos"><mat-icon>stars</mat-icon> {{ u.puntosTotales }} pts</span>
+          }
+          @if (esEstudiante() && u.rachaActual) {
+            <span class="chip chip--racha"><mat-icon class="meta-icono--fuego">local_fire_department</mat-icon> {{ u.rachaActual }} {{ u.rachaActual === 1 ? 'día' : 'días' }}</span>
           }
         </div>
       </div>
@@ -49,6 +61,10 @@
           }
         </div>
       </section>
+    }
+
+    @if (esEstudiante()) {
+      <app-logros-grid />
     }
 
     <section class="tarjeta">

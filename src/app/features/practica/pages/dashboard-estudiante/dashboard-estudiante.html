@@ -62,11 +62,14 @@
         @for (p of top3(); track p.usuarioId; let i = $index) {
           <li>
             <span class="mini-ranking__lugar mini-ranking__lugar--{{ i + 1 }}">{{ i + 1 }}</span>
-            @if (p.fotoPerfilUrl) {
-              <img class="mini-ranking__avatar" [src]="p.fotoPerfilUrl" alt="">
-            } @else {
-              <span class="mini-ranking__avatar">{{ inicialesDe(p.nombre) }}</span>
-            }
+            <span class="mini-ranking__caja">
+              @if (p.fotoPerfilUrl) {
+                <img class="mini-ranking__avatar" [src]="p.fotoPerfilUrl" alt="">
+              } @else {
+                <span class="mini-ranking__avatar">{{ inicialesDe(p.nombre) }}</span>
+              }
+              <app-medalla [lugar]="i + 1" tamano="sm" />
+            </span>
             <span class="mini-ranking__nombre">{{ p.nombre }}</span>
             <strong>{{ p.puntosTotales }} pts</strong>
           </li>

@@ -1,0 +1,32 @@
+<section class="tarjeta logros">
+  <div class="logros__cabecera">
+    <h2><mat-icon>emoji_events</mat-icon> Mis logros</h2>
+    @if (!cargando() && !error()) {
+      <span class="logros__contador">{{ obtenidos() }} de {{ logros().length }}</span>
+    }
+  </div>
+
+  @if (cargando()) {
+    <p class="logros__estado">Cargando logros...</p>
+  } @else if (error()) {
+    <p class="logros__estado">No se pudieron cargar los logros.</p>
+  } @else {
+    <div class="barra" aria-hidden="true"><div class="barra__relleno" [style.width.%]="porcentaje()"></div></div>
+
+    <ul class="insignias">
+      @for (l of logros(); track l.codigo) {
+        <li class="insignia" [class.insignia--obtenida]="l.obtenido"
+            [attr.aria-label]="l.nombre + (l.obtenido ? ', obtenido' : ', pendiente') + ': ' + l.descripcion">
+          <span class="insignia__icono">
+            <mat-icon>{{ l.obtenido ? l.icono : 'lock' }}</mat-icon>
+          </span>
+          <strong>{{ l.nombre }}</strong>
+          <small>{{ l.descripcion }}</small>
+          @if (l.obtenido && l.fechaObtenido) {
+            <time class="insignia__fecha">{{ l.fechaObtenido | date: 'dd/MM/yyyy' }}</time>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

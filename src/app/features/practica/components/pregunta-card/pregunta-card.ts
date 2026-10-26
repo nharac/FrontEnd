@@ -13,6 +13,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { PracticaService } from '../../services/practica.service';
 import { Opcion, Pregunta, Validacion } from '../../models/practica.model';
+import { Logro } from '../../../gamificacion/models/logro.model';
 import { ChatPanel } from '../../../chat/components/chat-panel/chat-panel';
 import { Confeti } from '../../../../shared/components/confeti/confeti';
 
@@ -38,7 +39,7 @@ export class PreguntaCard {
   total = input(1);
 
   /** Se emite cuando el estudiante acierta. */
-  acertada = output<{ primerIntento: boolean; puntos: number }>();
+  acertada = output<{ primerIntento: boolean; puntos: number; logros: Logro[] }>();
   /** Se emite al pulsar "Siguiente". */
   siguiente = output<void>();
 
@@ -103,7 +104,11 @@ export class PreguntaCard {
         this.validacion.set(res);
 
         if (res.esCorrecta) {
-          this.acertada.emit({ primerIntento: this.intentos() === 1, puntos: res.puntosGanados ?? 0 });
+          this.acertada.emit({
+            primerIntento: this.intentos() === 1,
+            puntos: res.puntosGanados ?? 0,
+            logros: res.nuevosLogros ?? []
+          });
         } else {
           this.descartadas.update(lista => [...lista, opcionId]);
           this.seleccionada.set(null);

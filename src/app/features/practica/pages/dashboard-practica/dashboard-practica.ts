@@ -8,6 +8,8 @@ import { PracticaService } from '../../services/practica.service';
 import { PreguntaCard } from '../../components/pregunta-card/pregunta-card';
 import { Confeti } from '../../../../shared/components/confeti/confeti';
 import { ContadorDirective } from '../../../../shared/directives/contador.directive';
+import { LogroAviso } from '../../../gamificacion/components/logro-aviso/logro-aviso';
+import { Logro } from '../../../gamificacion/models/logro.model';
 import {
   DIFICULTADES,
   Dificultad,
@@ -31,7 +33,7 @@ const PREGUNTAS_POR_SESION = 10;
  * 3. Al final ve un resumen de la sesión.
  */
 @Component({
-  imports: [DecimalPipe, MatIconModule, MatSnackBarModule, PreguntaCard, Confeti, ContadorDirective],
+  imports: [DecimalPipe, MatIconModule, MatSnackBarModule, PreguntaCard, Confeti, ContadorDirective, LogroAviso],
   selector: 'app-dashboard-practica',
   styleUrl: './dashboard-practica.scss',
   templateUrl: './dashboard-practica.html',
@@ -56,6 +58,8 @@ export class DashboardPractica implements OnInit {
   aciertosPrimerIntento = signal(0);
   /** Puntos ganados en esta sesión (los da el backend al acertar). */
   puntosSesion = signal(0);
+  /** Logros recién desbloqueados (se muestran como aviso flotante). */
+  logrosNuevos = signal<Logro[]>([]);
   sinPreguntas = signal(false);
 
   preguntaActual = computed(() => this.preguntas()[this.indice()] ?? null);
@@ -119,8 +123,11 @@ export class DashboardPractica implements OnInit {
     });
   }
 
-  alAcertar(evento: { primerIntento: boolean; puntos: number }): void {
+  alAcertar(evento: { primerIntento: boolean; puntos: number; logros: Logro[] }): void {
     this.puntosSesion.update(n => n + evento.puntos);
+    if (evento.logros.length) {
+      this.logrosNuevos.set(evento.logros);
+    }
     if (evento.primerIntento) {
       this.aciertosPrimerIntento.update(n => n + 1);
     }

@@ -1,0 +1,111 @@
+$primario: #4f46e5;
+$oro: #f59e0b;
+$texto: #2c3e50;
+$suave: #6b7280;
+
+.tarjeta {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px 28px;
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);
+}
+
+.logros__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 17px;
+    color: $texto;
+
+    mat-icon { color: $oro; }
+  }
+}
+
+.logros__contador {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.logros__estado { color: $suave; margin: 0; }
+
+.barra {
+  height: 8px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: #fef3c7;
+  overflow: hidden;
+
+  &__relleno { height: 100%; background: linear-gradient(90deg, $oro, #f97316); }
+}
+
+.insignias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insignia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 10px 12px;
+  border-radius: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  color: $suave;
+
+  strong { font-size: 13px; color: #9ca3af; }
+  small { font-size: 11px; line-height: 1.3; }
+
+  &__icono {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #9ca3af;
+    mat-icon { font-size: 26px; width: 26px; height: 26px; }
+  }
+
+  &__fecha { margin-top: 2px; font-size: 11px; color: #b45309; font-weight: 600; }
+
+  &--obtenida {
+    background: linear-gradient(180deg, #fffbeb, #fff);
+    border-color: #fde68a;
+    color: #78350f;
+
+    strong { color: $texto; }
+
+    .insignia__icono {
+      background: linear-gradient(135deg, $oro, #f97316);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .insignia { animation: saesu-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+  @for $i from 1 through 11 {
+    .insignia:nth-child(#{$i}) { animation-delay: #{0.1 + $i * 0.06}s; }
+  }
+  .insignia--obtenida .insignia__icono { animation: saesu-latido 2.6s ease-in-out 1.2s infinite; }
+  .insignia--obtenida:hover .insignia__icono { animation: saesu-balanceo 0.6s ease-in-out; }
+}

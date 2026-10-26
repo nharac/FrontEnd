@@ -148,6 +148,18 @@ $borde: #e5e7eb;
 
   &--docente { background: #d1fae5; color: #059669; }
   &--suave { background: #f3f4f6; color: $texto-suave; }
+  &--puntos, &--racha {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  }
+  &--puntos { background: #fef3c7; color: #92400e; }
+  &--top { display: inline-flex; align-items: center; gap: 3px; color: #fff; mat-icon { font-size: 15px; width: 15px; height: 15px; } }
+  &--top-1 { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  &--top-2 { background: linear-gradient(90deg, #64748b, #94a3b8); }
+  &--top-3 { background: linear-gradient(90deg, #a35d2a, #c2773e); }
+  &--racha { background: #ffedd5; color: #c2410c; }
 }
 
 .progreso {

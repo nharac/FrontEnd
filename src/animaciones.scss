@@ -1,3 +1,5 @@
+@use 'sass:list';
+
 // ============================================================
 // SAESU · Animaciones globales
 // Todas viven dentro de `prefers-reduced-motion: no-preference`:
@@ -84,6 +86,24 @@ $saesu-rebote: cubic-bezier(0.34, 1.56, 0.64, 1); // con un pequeño rebote
   50%      { transform: rotate(6deg); }
 }
 
+@keyframes saesu-vt-salir {
+  to { opacity: 0; transform: translateY(-8px) scale(0.99); }
+}
+
+@keyframes saesu-vt-entrar {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
+@keyframes saesu-onda {
+  to { transform: scale(1); opacity: 0; }
+}
+
+@keyframes saesu-despedida {
+  0%   { transform: none; opacity: 1; }
+  30%  { transform: scale(1.03); }
+  100% { transform: scale(0.85) translateY(-20px); opacity: 0; }
+}
+
 @keyframes saesu-confeti {
   0%   { opacity: 1; transform: translate(0, 0) rotate(0); }
   100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--giro)); }
@@ -94,11 +114,27 @@ $saesu-rebote: cubic-bezier(0.34, 1.56, 0.64, 1); // con un pequeño rebote
 
 @media (prefers-reduced-motion: no-preference) {
 
-  // ---------- Cambio de página: cada vista entra suavemente ----------
-  router-outlet + * {
-    display: block;
-    animation: saesu-entrar 0.4s $saesu-suave backwards;
+  // ---------- Cambio de página (View Transitions): la vieja sale y la nueva entra ----------
+  ::view-transition-old(root) { animation: saesu-vt-salir 0.25s ease-in both; }
+  ::view-transition-new(root) { animation: saesu-vt-entrar 0.4s $saesu-suave both; }
+  // La barra de navegación se queda quieta mientras cambia el contenido
+  .navbar { view-transition-name: saesu-navbar; }
+
+  // ---------- Onda al hacer clic ----------
+  .saesu-onda-host { position: relative; overflow: hidden; }
+  .saesu-onda {
+    position: absolute;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.25;
+    transform: scale(0);
+    pointer-events: none;
+    animation: saesu-onda 0.6s ease-out forwards;
   }
+
+  // ---------- Login: tarjeta que tiembla si falla y se despide si entra ----------
+  .container.container--error { animation: saesu-temblor 0.5s ease; }
+  .container.container--exito { animation: saesu-despedida 0.5s ease-in forwards; }
 
   // ---------- Botones: se elevan al pasar el mouse y se hunden al hacer clic ----------
   button:not(.mat-mdc-menu-item):not(.opcion),
@@ -213,6 +249,7 @@ $saesu-rebote: cubic-bezier(0.34, 1.56, 0.64, 1); // con un pequeño rebote
     inset: 0;
     width: 35%;
     background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.16), transparent);
+    transform: translateX(-120%) skewX(-20deg);
     animation: saesu-brillo 1.6s ease 0.4s backwards;
     pointer-events: none;
   }
@@ -222,8 +259,121 @@ $saesu-rebote: cubic-bezier(0.34, 1.56, 0.64, 1); // con un pequeño rebote
   .burbuja { animation: saesu-entrar 0.3s $saesu-suave backwards; }
   .burbuja--usuario { transform-origin: right bottom; }
 
+  // ---------- Login y registro (formularios dentro de la tarjeta) ----------
+  .form-container form > * {
+    animation: saesu-entrar 0.5s $saesu-suave backwards;
+  }
+  @for $i from 1 through 14 {
+    .form-container form > :nth-child(#{$i}) { animation-delay: #{0.25 + $i * 0.05}s; }
+  }
+
+  // Al cambiar de login a registro, el formulario que aparece vuelve a entrar en cascada
+  .container.active .sign-up form > *,
+  .container:not(.active) .sign-in form > * {
+    animation-name: saesu-entrar;
+  }
+
+  .form-container .input-group {
+    transition: transform 0.2s $saesu-suave;
+
+    input { transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s; }
+    input:focus { box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14); }
+
+    mat-icon:not(.toggle-password) { transition: color 0.25s, transform 0.25s $saesu-rebote; }
+    &:focus-within { transform: translateY(-1px); }
+    &:focus-within mat-icon:not(.toggle-password) { color: #4f46e5; transform: translateY(-50%) scale(1.18); }
+
+    .toggle-password { transition: color 0.2s, transform 0.3s $saesu-rebote; }
+    .toggle-password:active { transform: translateY(-50%) rotate(-20deg) scale(0.85); }
+  }
+
+  .form-container small.error { animation: saesu-temblor 0.4s ease backwards; }
+
+  .form-container .btn:disabled { animation: saesu-latido 1s ease-in-out infinite; }
+
+  .form-container .btn {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      transform: translateX(-120%) skewX(-20deg);
+      pointer-events: none;
+    }
+    &:not(:disabled):hover::after { animation: saesu-brillo 0.75s ease; }
+  }
+
   // ---------- Avisos (snackbar) ----------
   .mat-mdc-snack-bar-container { animation: saesu-pop 0.35s $saesu-rebote backwards; }
+}
+
+// ============================================================
+// Login: fondo con manchas de color y símbolos de cálculo que suben
+// ============================================================
+.auth-fondo { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+
+.auth-mancha {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.45;
+
+  &--1 { width: 380px; height: 380px; top: -80px; left: -60px; background: #a5b4fc; }
+  &--2 { width: 320px; height: 320px; bottom: -90px; right: -40px; background: #c4b5fd; }
+  &--3 { width: 240px; height: 240px; top: 40%; left: 55%; background: #99f6e4; opacity: 0.3; }
+}
+
+.auth-simbolo {
+  position: absolute;
+  bottom: -60px;
+  color: #6366f1;
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 700;
+  opacity: 0;
+  user-select: none;
+}
+
+$saesu-pos: (4%, 13%, 22%, 31%, 40%, 49%, 58%, 67%, 76%, 85%, 92%, 97%);
+$saesu-tam: (34px, 22px, 40px, 26px, 30px, 20px, 36px, 24px, 28px, 42px, 22px, 30px);
+@for $i from 1 through 12 {
+  .auth-simbolo:nth-child(#{$i + 3}) {
+    left: list.nth($saesu-pos, $i);
+    font-size: list.nth($saesu-tam, $i);
+  }
+}
+
+@media (max-width: 700px) {
+  .auth-simbolo:nth-child(n + 10) { display: none; }
+}
+
+@keyframes saesu-subir-simbolo {
+  0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+  15%  { opacity: 0.3; }
+  85%  { opacity: 0.25; }
+  100% { opacity: 0; transform: translateY(-115vh) rotate(25deg); }
+}
+
+@keyframes saesu-flotar-mancha {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(40px, 30px) scale(1.12); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .auth-simbolo { animation: saesu-subir-simbolo 18s linear infinite; }
+  @for $i from 1 through 12 {
+    .auth-simbolo:nth-child(#{$i + 3}) {
+      animation-duration: #{14 + ($i * 7) % 11}s;
+      animation-delay: #{-1 * ($i * 3) % 17}s;
+    }
+  }
+  .auth-mancha { animation: saesu-flotar-mancha 14s ease-in-out infinite; }
+  .auth-mancha--2 { animation-duration: 18s; animation-direction: reverse; }
+  .auth-mancha--3 { animation-duration: 11s; animation-delay: -4s; }
 }
 
 // Si el sistema pide menos movimiento: sin animaciones ni confeti

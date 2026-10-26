@@ -64,6 +64,8 @@ $bronce: #c2773e;
   &--grande { width: 64px; height: 64px; font-size: 20px; border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); }
 }
 
+.avatar-caja { position: relative; display: inline-block; border-radius: 50%; line-height: 0; }
+
 .tu {
   margin-left: 6px;
   padding: 1px 8px;
@@ -231,7 +233,7 @@ $bronce: #c2773e;
   .podio__puesto--1 .podio__numero { animation-delay: 0.85s; }
 
   // 2. Los estudiantes "caen" sobre su puesto
-  .podio__puesto > .avatar,
+  .podio__puesto > .avatar-caja,
   .podio__nombre,
   .podio__puntos,
   .podio__puesto > .racha {
@@ -266,7 +268,7 @@ $bronce: #c2773e;
   }
 
   // 5. Tu puesto palpita para que te encuentres rápido
-  .podio__puesto.podio__puesto--yo > .avatar {
+  .podio__puesto.podio__puesto--yo > .avatar-caja {
     animation:
       saesu-caer 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s backwards,
       saesu-anillo 1.8s ease-out 1.6s 3;

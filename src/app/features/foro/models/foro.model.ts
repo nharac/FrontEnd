@@ -72,6 +72,8 @@ export interface CrearPublicacionRequest {
   titulo: string;
   contenido: string;
   tema: TemaForo;
+  /** URL devuelta por POST /api/foro/imagenes (opcional). */
+  imagenUrl?: string | null;
 }
 
 /** Orden del listado que acepta el backend. */

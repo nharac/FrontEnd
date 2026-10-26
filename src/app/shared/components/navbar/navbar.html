@@ -38,11 +38,14 @@
   </ul>
 
   <button class="navbar__user" [matMenuTriggerFor]="menu">
-    @if (fotoUrl(); as url) {
-      <img class="navbar__avatar navbar__avatar--foto" [src]="url" alt="">
-    } @else {
-      <span class="navbar__avatar">{{ inicial }}</span>
-    }
+    <span class="navbar__caja">
+      @if (fotoUrl(); as url) {
+        <img class="navbar__avatar navbar__avatar--foto" [src]="url" alt="">
+      } @else {
+        <span class="navbar__avatar">{{ inicial }}</span>
+      }
+      <app-medalla [lugar]="miLugar()" tamano="sm" />
+    </span>
     <span class="navbar__name">{{ nombreUsuario() }}</span>
     <mat-icon>expand_more</mat-icon>
   </button>

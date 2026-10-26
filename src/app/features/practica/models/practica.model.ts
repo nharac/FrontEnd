@@ -1,3 +1,5 @@
+import { Logro } from '../../gamificacion/models/logro.model';
+
 /**
  * Modelos del módulo de práctica.
  * Reflejan los DTOs del backend (paquete practica.application.dto).
@@ -41,6 +43,8 @@ export interface Validacion {
   puntosGanados?: number | null;
   /** Lo que vale acertar en el siguiente intento: 20, 15, 10... mínimo 5. */
   puntosEnJuego?: number | null;
+  /** Logros que se desbloquearon con este acierto. */
+  nuevosLogros?: Logro[];
 }
 
 /** GET /api/practica/preguntas/{id}/pista (PistaResponse). */

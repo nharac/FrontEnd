@@ -404,6 +404,8 @@
     &--3 { background: #c2773e; }
   }
 
+  &__caja { position: relative; display: inline-block; line-height: 0; }
+
   &__avatar {
     display: grid;
     place-items: center;

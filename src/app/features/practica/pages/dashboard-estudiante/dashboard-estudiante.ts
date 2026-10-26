@@ -10,11 +10,12 @@ import { PosicionRanking, inicialesDe } from '../../../gamificacion/models/ranki
 import { PracticaService } from '../../services/practica.service';
 import { InfoTema, Progreso, TEMAS } from '../../models/practica.model';
 import { ContadorDirective } from '../../../../shared/directives/contador.directive';
+import { Medalla } from '../../../../shared/components/medalla/medalla';
 
 @Component({
   selector: 'app-dashboard-estudiante',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective],
+  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective, Medalla],
   templateUrl: './dashboard-estudiante.html',
   styleUrl: './dashboard-estudiante.scss',
 })

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../../services/auth.service';
 import { LoginRequest } from '../../../models';
+import { esDocente } from '../../../../../shared/utils/rol';
 
 @Component({
   selector: 'app-login-form',
@@ -30,6 +31,9 @@ export class LoginForm {
 
   cargando = signal(false);
   mostrarPassword = signal(false);
+
+  /** Para animar la tarjeta del login (tiembla si falla, se despide si entra). */
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   loginForm: FormGroup;
 
@@ -68,19 +72,32 @@ export class LoginForm {
           duration: 3000
         });
 
-        // Redirige según el rol
-        if (res.usuario.rol === 'DOCENTE') {
-          this.router.navigate(['/docente']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
+        // La tarjeta se despide y luego redirige según el rol
+        const destino = esDocente(res.usuario.rol) ? '/docente' : '/dashboard';
+        this.animarTarjeta('container--exito');
+        setTimeout(() => this.router.navigate([destino]), this.animaciones() ? 450 : 0);
       },
       error: (err) => {
         this.cargando.set(false);
+        this.animarTarjeta('container--error', 600);
         this.snackBar.open(err.message || 'Error al iniciar sesión', 'Cerrar', {
           duration: 3000
         });
       }
     });
+  }
+
+  private animaciones(): boolean {
+    return !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  /** Pone una clase de animación en la tarjeta; si se da duración, la quita al terminar. */
+  private animarTarjeta(clase: string, duracionMs?: number): void {
+    const tarjeta = this.host.nativeElement.closest<HTMLElement>('.container');
+    if (!tarjeta || !this.animaciones()) return;
+    tarjeta.classList.remove(clase);
+    void tarjeta.offsetWidth; // reinicia la animación si se repite
+    tarjeta.classList.add(clase);
+    if (duracionMs) setTimeout(() => tarjeta.classList.remove(clase), duracionMs);
   }
 }

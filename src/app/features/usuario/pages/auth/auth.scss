@@ -1,11 +1,62 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :host {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  overflow: hidden;
   font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 50%, #ecfeff 100%);
+}
+
+.container {
+  z-index: 1;
+  transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Luz que sigue al mouse por el fondo */
+:host::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(99, 102, 241, 0.16), transparent 60%);
+}
+
+/* El fondo se mueve un poco en sentido contrario (paralaje) */
+.auth-fondo {
+  transform: translate(var(--px, 0), var(--py, 0));
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Detalles del panel morado */
+.burbuja-panel {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+
+  &--1 { width: 180px; height: 180px; top: -50px; left: 30%; }
+  &--2 { width: 110px; height: 110px; bottom: 40px; left: 60%; }
+  &--3 { width: 70px; height: 70px; top: 45%; left: 85%; }
+}
+
+.toggle-panel__icono {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 34px;
+  font-weight: 700;
 }
 
 .container {
@@ -172,4 +223,57 @@
   &:hover {
     background-color: rgba(255, 255, 255, 0.15);
   }
+}
+/* ============ Animaciones del login ============ */
+
+
+@keyframes entrada-tarjeta {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes degradado {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@keyframes burbuja {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-18px) scale(1.08); }
+}
+
+@keyframes icono-panel {
+  0%, 100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(8deg) scale(1.06); }
+}
+
+@keyframes texto-panel {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .container { animation: entrada-tarjeta 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+  // El panel morado cambia de tono lentamente
+  .toggle {
+    background: linear-gradient(120deg, #4f46e5, #7c3aed, #6366f1, #8b5cf6);
+    background-size: 300% 300%;
+    animation: degradado 10s ease infinite;
+  }
+
+  .burbuja-panel { animation: burbuja 6s ease-in-out infinite; }
+  .burbuja-panel--2 { animation-duration: 8s; animation-delay: -2s; }
+  .burbuja-panel--3 { animation-duration: 5s; animation-delay: -1s; }
+
+  .toggle-panel__icono { animation: icono-panel 4s ease-in-out infinite; }
+
+  // Textos del panel: entran al cargar y cada vez que se cambia de modo
+  .toggle-right > * { animation: texto-panel 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .container.active .toggle-left > * { animation: texto-panel 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .toggle-right > :nth-child(2), .container.active .toggle-left > :nth-child(2) { animation-delay: 0.45s; }
+  .toggle-right > :nth-child(3), .container.active .toggle-left > :nth-child(3) { animation-delay: 0.55s; }
+  .toggle-right > :nth-child(4), .container.active .toggle-left > :nth-child(4) { animation-delay: 0.65s; }
+  .toggle-right > :nth-child(1), .container.active .toggle-left > :nth-child(1) { animation-delay: 0.35s; }
+  .container.active .toggle-right > * { animation: none; }
 }

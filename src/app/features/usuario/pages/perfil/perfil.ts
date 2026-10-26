@@ -15,6 +15,9 @@ import { PerfilService } from '../../../../core/services/perfil.service';
 import { PracticaService } from '../../../practica/services/practica.service';
 import { Progreso, TEMAS } from '../../../practica/models/practica.model';
 import { esDocente, esEstudiante } from '../../../../shared/utils/rol';
+import { LogrosGrid } from '../../../gamificacion/components/logros-grid/logros-grid';
+import { RankingService } from '../../../gamificacion/services/ranking.service';
+import { Medalla } from '../../../../shared/components/medalla/medalla';
 
 /** Misma regla de contraseña que el backend (RegistroRequest / ActualizarPerfilRequest). */
 const PASSWORD_SEGURA = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/;
@@ -31,7 +34,7 @@ const coincidenValidator: ValidatorFn = (grupo: AbstractControl): ValidationErro
  * edición del nombre y cambio de contraseña (PUT /api/auth/perfil).
  */
 @Component({
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, MatSnackBarModule],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, MatSnackBarModule, LogrosGrid, Medalla],
   selector: 'app-perfil',
   styleUrl: './perfil.scss',
   templateUrl: './perfil.html',
@@ -55,6 +58,9 @@ export class Perfil implements OnInit {
   mostrarPasswords = signal(false);
 
   esEstudiante = computed(() => esEstudiante(this.usuario()?.rol));
+  private rankingService = inject(RankingService);
+  /** Puesto en el ranking (para la medalla del top 3). */
+  miLugar = computed(() => this.esEstudiante() ? this.rankingService.lugarDe(this.usuario()?.id) : null);
   esDocente = computed(() => esDocente(this.usuario()?.rol));
   totalRespondidas = computed(() => {
     const p = this.progreso();
@@ -83,6 +89,7 @@ export class Perfil implements OnInit {
 
   ngOnInit(): void {
     this.perfilService.cargar(true);
+    this.rankingService.obtenerTop().subscribe({ error: () => {} });
     this.practicaService.obtenerProgreso().subscribe({
       next: (p) => this.progreso.set(p),
       error: () => this.progreso.set(null) // docentes o error: no se muestra

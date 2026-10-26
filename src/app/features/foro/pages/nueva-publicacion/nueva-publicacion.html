@@ -33,10 +33,30 @@
       <small class="error">Escribe al menos 10 caracteres para que te puedan ayudar</small>
     }
 
+    <span class="etiqueta">Imagen del ejercicio <small>(opcional)</small></span>
+    @if (vistaPrevia(); as src) {
+      <div class="imagen">
+        <img [src]="src" alt="Vista previa de la imagen adjunta">
+        <button type="button" class="imagen__quitar" (click)="quitarImagen()" aria-label="Quitar imagen">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    } @else {
+      <label class="subir" [class.subir--encima]="arrastrando()"
+             (dragover)="$event.preventDefault(); arrastrando.set(true)"
+             (dragleave)="arrastrando.set(false)"
+             (drop)="soltarImagen($event)">
+        <mat-icon>add_photo_alternate</mat-icon>
+        <span>Arrastra una foto de tu ejercicio o <strong>haz clic para elegirla</strong></span>
+        <small>JPG, PNG, WEBP o GIF · máximo 5 MB</small>
+        <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" (change)="elegirImagen($event)">
+      </label>
+    }
+
     <div class="acciones">
       <a class="btn btn--secundario" routerLink="/foro">Cancelar</a>
       <button type="submit" class="btn btn--primario" [disabled]="enviando()">
-        {{ enviando() ? 'Publicando...' : 'Publicar' }}
+        {{ enviando() ? (archivo() ? 'Subiendo imagen...' : 'Publicando...') : 'Publicar' }}
       </button>
     </div>
   </form>

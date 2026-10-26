@@ -7,6 +7,7 @@ import { PosicionRanking, REGLAS_PUNTOS, inicialesDe } from '../../models/rankin
 import { PerfilService } from '../../../../core/services/perfil.service';
 import { Confeti } from '../../../../shared/components/confeti/confeti';
 import { ContadorDirective } from '../../../../shared/directives/contador.directive';
+import { Medalla } from '../../../../shared/components/medalla/medalla';
 
 /**
  * /ranking: podio con los 3 primeros, lista del 4 al 10
@@ -14,7 +15,7 @@ import { ContadorDirective } from '../../../../shared/directives/contador.direct
  */
 @Component({
   selector: 'app-ranking',
-  imports: [RouterLink, MatIconModule, Confeti, ContadorDirective],
+  imports: [RouterLink, MatIconModule, Confeti, ContadorDirective, Medalla],
   templateUrl: './ranking.html',
   styleUrl: './ranking.scss',
 })
