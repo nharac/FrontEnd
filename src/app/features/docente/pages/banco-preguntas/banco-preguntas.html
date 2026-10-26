@@ -1,0 +1,88 @@
+<div class="dp-pagina">
+  <header class="dp-cabecera">
+    <div>
+      <h1>Banco de preguntas</h1>
+      <p>{{ preguntas().length }} pregunta{{ preguntas().length === 1 ? '' : 's' }} · {{ activas() }} activa{{ activas() === 1 ? '' : 's' }} en la práctica</p>
+    </div>
+    <a class="dp-btn" routerLink="/docente/preguntas/nueva"><mat-icon>add</mat-icon> Nueva pregunta</a>
+  </header>
+
+  <section class="dp-tarjeta">
+    <div class="dp-filtros">
+      <select class="dp-select" aria-label="Tema" [ngModel]="tema()" (ngModelChange)="tema.set($event); cargar()">
+        <option value="">Todos los temas</option>
+        <option value="limites">Límites</option>
+        <option value="derivadas">Derivadas</option>
+        <option value="integrales">Integrales</option>
+      </select>
+      <select class="dp-select" aria-label="Dificultad" [ngModel]="dificultad()" (ngModelChange)="dificultad.set($event); cargar()">
+        <option value="">Todas las dificultades</option>
+        <option value="basico">Básico</option>
+        <option value="intermedio">Intermedio</option>
+        <option value="avanzado">Avanzado</option>
+      </select>
+      <input class="dp-input buscar" type="search" placeholder="Buscar en el enunciado"
+             [ngModel]="busqueda()" (ngModelChange)="buscarConPausa($event)" aria-label="Buscar pregunta">
+      <div class="dp-segmentado" role="group" aria-label="Estado">
+        <button type="button" [class.activo]="estado() === 'todas'" (click)="cambiarEstadoFiltro('todas')">Todas</button>
+        <button type="button" [class.activo]="estado() === 'activas'" (click)="cambiarEstadoFiltro('activas')">Activas</button>
+        <button type="button" [class.activo]="estado() === 'inactivas'" (click)="cambiarEstadoFiltro('inactivas')">Inactivas</button>
+      </div>
+    </div>
+  </section>
+
+  @if (error()) {
+    <p class="dp-aviso-error">No se pudo cargar el banco de preguntas.</p>
+  } @else {
+    <section class="lista" [class.lista--cargando]="cargando()">
+      @for (p of preguntas(); track p.id; let i = $index) {
+        <article class="pregunta" [class.pregunta--inactiva]="!p.activa" [class.pregunta--abierta]="abiertaId() === p.id"
+                 [style.animation-delay.ms]="i < 12 ? i * 30 : 0">
+          <button type="button" class="pregunta__cabeza" (click)="alternarDetalle(p.id)" [attr.aria-expanded]="abiertaId() === p.id">
+            <div class="pregunta__chips">
+              <span class="dp-chip dp-chip--indigo">{{ nombresTema[p.tema] }}</span>
+              <span class="dp-chip">{{ nombresDificultad[p.dificultad] }}</span>
+              @if (!p.activa) { <span class="dp-chip dp-chip--ambar"><mat-icon>visibility_off</mat-icon> Inactiva</span> }
+            </div>
+            <p class="pregunta__enunciado">{{ p.enunciado }}</p>
+            <div class="pregunta__stats">
+              @if (p.intentos) {
+                <span class="acierto" [class]="'acierto acierto--' + color(p.porcentajeAcierto)">{{ p.porcentajeAcierto }} % de acierto</span>
+                <small>{{ p.intentos }} intento{{ p.intentos === 1 ? '' : 's' }}</small>
+              } @else {
+                <small>Sin intentos todavía</small>
+              }
+              <mat-icon class="flecha">expand_more</mat-icon>
+            </div>
+          </button>
+
+          @if (abiertaId() === p.id) {
+            <div class="pregunta__detalle">
+              <ul class="opciones">
+                @for (o of p.opciones; track o.letra) {
+                  <li [class.correcta]="o.esCorrecta">
+                    <b>{{ o.letra }}</b> {{ o.texto }}
+                    @if (o.esCorrecta) { <mat-icon>check_circle</mat-icon> }
+                  </li>
+                }
+              </ul>
+              @if (p.pista) { <p class="pista"><mat-icon>tips_and_updates</mat-icon> {{ p.pista }}</p> }
+              <div class="acciones">
+                <a class="dp-btn dp-btn--claro dp-btn--chico" [routerLink]="['/docente/preguntas', p.id]"><mat-icon>edit</mat-icon> Editar</a>
+                <button type="button" class="dp-btn dp-btn--chico" [class.dp-btn--peligro]="p.activa"
+                        [disabled]="procesandoId() === p.id" (click)="alternarActiva(p, $event)">
+                  <mat-icon>{{ p.activa ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  {{ p.activa ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div>
+            </div>
+          }
+        </article>
+      } @empty {
+        @if (!cargando()) {
+          <div class="dp-tarjeta dp-vacio"><mat-icon>quiz</mat-icon><p>No hay preguntas con esos filtros.</p></div>
+        }
+      }
+    </section>
+  }
+</div>

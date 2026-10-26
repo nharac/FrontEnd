@@ -1,0 +1,12 @@
+<div class="grafico" role="img" [attr.aria-label]="'Actividad de los últimos 14 días: ' + total() + ' intentos'">
+  @for (b of barras(); track b.fecha; let i = $index) {
+    <div class="dia" [class.dia--hoy]="b.hoy" [title]="b.titulo">
+      <span class="valor">{{ b.intentos || '' }}</span>
+      <div class="columna">
+        <i [style.height.%]="b.alto" [style.animation-delay.ms]="i * 35"></i>
+      </div>
+      <small>{{ b.letra }}</small>
+    </div>
+  }
+</div>
+<p class="pie">{{ total() }} intentos en 14 días</p>

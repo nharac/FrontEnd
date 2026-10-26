@@ -1,6 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, interval } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,10 +30,21 @@ export class NavbarDocente implements OnInit {
   private docenteService = inject(DocenteService);
   private router = inject(Router);
 
+  private destroyRef = inject(DestroyRef);
+
   nombreDocente = signal('Docente');
   iniciales = signal('D');
+  /** Consultas sin respuesta oficial (badge rojo). */
+  pendientes = this.docenteService.pendientes;
 
   ngOnInit(): void {
+    // Contador de consultas pendientes: al entrar, cada minuto y cada vez que se cambia de página
+    this.docenteService.refrescarPendientes();
+    interval(60_000).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.docenteService.refrescarPendientes());
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.docenteService.refrescarPendientes());
+
     // Nombre real del docente que inició sesión (GET /api/auth/perfil)
     this.docenteService.obtenerPerfil().subscribe({
       next: (u) => {

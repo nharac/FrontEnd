@@ -1,0 +1,106 @@
+<div class="dp-pagina">
+  <a class="dp-volver" routerLink="/docente/estudiantes"><mat-icon>arrow_back</mat-icon> Volver a estudiantes</a>
+
+  @if (error()) {
+    <p class="dp-aviso-error">No se encontró el estudiante.</p>
+  } @else if (!datos()) {
+    <p class="dp-vacio">Cargando…</p>
+  } @else {
+    @let d = datos()!;
+    @let e = d.resumen;
+
+    <section class="dp-tarjeta perfil">
+      @if (e.fotoPerfilUrl) {
+        <img class="perfil__foto" [src]="e.fotoPerfilUrl" alt="Foto de {{ e.nombre }}">
+      } @else {
+        <span class="perfil__foto perfil__foto--iniciales">{{ iniciales(e.nombre) }}</span>
+      }
+      <div class="perfil__datos">
+        <h1>{{ e.nombre }}</h1>
+        <p><mat-icon>mail</mat-icon> {{ e.correo }}</p>
+        <div class="perfil__chips">
+          <span class="dp-chip dp-chip--ambar"><mat-icon>stars</mat-icon> {{ e.puntos }} pts</span>
+          <span class="dp-chip" [class.dp-chip--rojo]="e.racha > 0"><mat-icon>local_fire_department</mat-icon> {{ e.racha }} días de racha</span>
+          <span class="dp-chip dp-chip--indigo"><mat-icon>emoji_events</mat-icon> {{ d.logrosObtenidos }} logros</span>
+          <span class="dp-chip">Desde {{ d.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+      <div class="perfil__estado">
+        @if (e.enRiesgo) {
+          <span class="dp-chip dp-chip--rojo"><mat-icon>warning</mat-icon> En riesgo</span>
+          @for (m of e.motivosRiesgo; track m) { <small>{{ m }}</small> }
+        } @else {
+          <span class="dp-chip dp-chip--verde"><mat-icon>check_circle</mat-icon> Al día</span>
+          <small>Última actividad {{ e.ultimaActividad ? haceCuanto(e.ultimaActividad) : '—' }}</small>
+        }
+      </div>
+    </section>
+
+    <section class="dp-kpis">
+      <div class="dp-kpi"><span class="dp-kpi__icono"><mat-icon>edit_note</mat-icon></span><div><strong>{{ e.intentos }}</strong><span>Intentos</span></div></div>
+      <div class="dp-kpi dp-kpi--verde"><span class="dp-kpi__icono"><mat-icon>task_alt</mat-icon></span><div><strong>{{ e.porcentaje }} %</strong><span>Aciertos</span></div></div>
+      <div class="dp-kpi dp-kpi--ambar"><span class="dp-kpi__icono"><mat-icon>forum</mat-icon></span><div><strong>{{ d.publicaciones + d.respuestasForo }}</strong><span>Aportes en el foro</span></div></div>
+      <div class="dp-kpi"><span class="dp-kpi__icono"><mat-icon>verified</mat-icon></span><div><strong>{{ d.respuestasOficiales }}</strong><span>Respuestas oficiales</span></div></div>
+    </section>
+
+    <div class="dp-grid-2">
+      <section class="dp-tarjeta">
+        <h2><mat-icon>insights</mat-icon> Progreso por tema</h2>
+        @for (t of e.porTema; track t.tema) {
+          <div class="tema">
+            <div class="tema__fila">
+              <strong>{{ nombresTema[t.tema] }}</strong>
+              <span>{{ t.resueltas }} / {{ t.totalPreguntas }} resueltas</span>
+            </div>
+            <div class="dp-barra" [class]="'dp-barra dp-barra--' + color(t.porcentaje, t.intentos)">
+              <i [style.width.%]="avance(t.resueltas, t.totalPreguntas)"></i>
+            </div>
+            <small>{{ t.intentos ? t.porcentaje + ' % de aciertos en ' + t.intentos + ' intentos' : 'Aún no practica este tema' }}</small>
+          </div>
+        }
+      </section>
+
+      <section class="dp-tarjeta">
+        <h2><mat-icon>calendar_month</mat-icon> Actividad (14 días)</h2>
+        <app-actividad-chart [dias]="d.actividad" [mostrarEstudiantes]="false" />
+      </section>
+    </div>
+
+    <div class="dp-grid-2">
+      <section class="dp-tarjeta">
+        <h2><mat-icon>history</mat-icon> Últimos intentos</h2>
+        @for (i of d.ultimosIntentos; track $index) {
+          <div class="intento">
+            <mat-icon [class.ok]="i.correcta" [class.mal]="!i.correcta">{{ i.correcta ? 'check_circle' : 'cancel' }}</mat-icon>
+            <div>
+              <p>{{ i.enunciado }}</p>
+              <small>{{ nombresTema[i.tema] }} · Eligió {{ i.opcionElegida }} · {{ haceCuanto(i.fecha) }}</small>
+            </div>
+          </div>
+        } @empty {
+          <div class="dp-vacio"><mat-icon>hourglass_empty</mat-icon><p>Todavía no ha respondido preguntas.</p></div>
+        }
+      </section>
+
+      <section class="dp-tarjeta">
+        <h2><mat-icon>report</mat-icon> Donde más se equivoca</h2>
+        @for (p of d.preguntasConMasFallos; track p.preguntaId) {
+          <div class="fallo">
+            <span class="fallo__n">{{ p.fallos }}×</span>
+            <div>
+              <p>{{ p.enunciado }}</p>
+              <small>{{ nombresTema[p.tema] }}</small>
+            </div>
+            @if (p.resuelta) {
+              <span class="dp-chip dp-chip--verde">Ya la resolvió</span>
+            } @else {
+              <span class="dp-chip dp-chip--rojo">Sin resolver</span>
+            }
+          </div>
+        } @empty {
+          <div class="dp-vacio"><mat-icon>emoji_events</mat-icon><p>Sin fallos por ahora.</p></div>
+        }
+      </section>
+    </div>
+  }
+</div>

@@ -109,6 +109,49 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/docente/pages/publicacion-detalle/publicacion-detalle')
             .then(m => m.PublicacionDetallePage)
+      },
+      {
+        path: 'estadisticas',
+        loadComponent: () =>
+          import('./features/docente/pages/estadisticas-docente/estadisticas-docente')
+            .then(m => m.EstadisticasDocente)
+      },
+      {
+        path: 'estudiantes',
+        loadComponent: () =>
+          import('./features/docente/pages/estudiantes-docente/estudiantes-docente')
+            .then(m => m.EstudiantesDocente)
+      },
+      {
+        path: 'estudiantes/:id',
+        loadComponent: () =>
+          import('./features/docente/pages/estudiante-detalle/estudiante-detalle')
+            .then(m => m.EstudianteDetallePage)
+      },
+      {
+        path: 'preguntas',
+        loadComponent: () =>
+          import('./features/docente/pages/banco-preguntas/banco-preguntas')
+            .then(m => m.BancoPreguntas)
+      },
+      {
+        // "nueva" y ":id" usan el mismo formulario (crear / editar)
+        path: 'preguntas/nueva',
+        loadComponent: () =>
+          import('./features/docente/pages/pregunta-form/pregunta-form')
+            .then(m => m.PreguntaForm)
+      },
+      {
+        path: 'preguntas/:id',
+        loadComponent: () =>
+          import('./features/docente/pages/pregunta-form/pregunta-form')
+            .then(m => m.PreguntaForm)
+      },
+      {
+        path: 'moderacion',
+        loadComponent: () =>
+          import('./features/docente/pages/moderacion-docente/moderacion-docente')
+            .then(m => m.ModeracionDocente)
       }
     ]
   },

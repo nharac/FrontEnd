@@ -38,6 +38,8 @@ export interface Respuesta {
   fechaCreacion: string;
   /** Lista vacía si no tiene hijas. */
   respuestasHijas: Respuesta[];
+  /** Ocultada por un docente: el backend reemplaza el contenido por un aviso. */
+  oculta?: boolean;
 }
 
 /** Publicación completa con su árbol de respuestas (PublicacionDetalleResponse). */

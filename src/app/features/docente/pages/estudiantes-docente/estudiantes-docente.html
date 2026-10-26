@@ -1,0 +1,100 @@
+<div class="dp-pagina">
+  <header class="dp-cabecera">
+    <div>
+      <h1>Estudiantes</h1>
+      <p>
+        {{ estudiantes().length }} estudiante{{ estudiantes().length === 1 ? '' : 's' }}
+        @if (enRiesgo()) { · <b class="riesgo-texto">{{ enRiesgo() }} en riesgo</b> }
+      </p>
+    </div>
+    <button type="button" class="dp-btn" [disabled]="exportando() || !estudiantes().length" (click)="exportar()">
+      <mat-icon>download</mat-icon> {{ exportando() ? 'Exportando…' : 'Exportar a Excel (CSV)' }}
+    </button>
+  </header>
+
+  <section class="dp-tarjeta">
+    <div class="dp-filtros barra">
+      <label class="buscar">
+        <mat-icon>search</mat-icon>
+        <input class="dp-input" type="search" placeholder="Buscar por nombre o correo"
+               [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" aria-label="Buscar estudiante">
+      </label>
+      <div class="dp-segmentado" role="group" aria-label="Filtrar por estado">
+        <button type="button" [class.activo]="filtro() === 'todos'" (click)="cambiarFiltro('todos')">Todos</button>
+        <button type="button" [class.activo]="filtro() === 'riesgo'" (click)="cambiarFiltro('riesgo')">En riesgo ({{ enRiesgo() }})</button>
+        <button type="button" [class.activo]="filtro() === 'aldia'" (click)="cambiarFiltro('aldia')">Al día</button>
+      </div>
+    </div>
+
+    @if (error()) {
+      <p class="dp-aviso-error">No se pudo cargar la lista de estudiantes.</p>
+    } @else if (cargando()) {
+      <p class="dp-vacio">Cargando estudiantes…</p>
+    } @else {
+      <div class="dp-tabla-caja">
+        <table class="dp-tabla">
+          <thead>
+            <tr>
+              <th><button type="button" (click)="ordenarPor('nombre')">Estudiante <mat-icon>{{ iconoOrden('nombre') }}</mat-icon></button></th>
+              <th><button type="button" (click)="ordenarPor('puntos')">Puntos <mat-icon>{{ iconoOrden('puntos') }}</mat-icon></button></th>
+              <th><button type="button" (click)="ordenarPor('porcentaje')">Aciertos <mat-icon>{{ iconoOrden('porcentaje') }}</mat-icon></button></th>
+              @for (t of temas; track t) { <th class="col-tema">{{ nombresTema[t] }}</th> }
+              <th><button type="button" (click)="ordenarPor('ultima')">Última actividad <mat-icon>{{ iconoOrden('ultima') }}</mat-icon></button></th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of visibles(); track e.id; let i = $index) {
+              <tr (click)="abrir(e)" (keydown.enter)="abrir(e)" tabindex="0" [style.animation-delay.ms]="i * 25">
+                <td>
+                  <div class="dp-persona">
+                    @if (e.fotoPerfilUrl) {
+                      <img [src]="e.fotoPerfilUrl" alt="">
+                    } @else {
+                      <span class="dp-avatar">{{ iniciales(e.nombre) }}</span>
+                    }
+                    <div><a [routerLink]="['/docente/estudiantes', e.id]" (click)="$event.stopPropagation()">{{ e.nombre }}</a><small>{{ e.correo }}</small></div>
+                  </div>
+                </td>
+                <td>
+                  <b>{{ e.puntos }}</b>
+                  @if (e.racha > 0) { <span class="racha" [matTooltip]="e.racha + ' días seguidos practicando'"><mat-icon>local_fire_department</mat-icon>{{ e.racha }}</span> }
+                </td>
+                <td>
+                  @if (e.intentos) {
+                    <div class="pct">
+                      <span>{{ e.porcentaje }} %</span>
+                      <div class="dp-barra" [class]="'dp-barra dp-barra--' + color(e.porcentaje)"><i [style.width.%]="e.porcentaje"></i></div>
+                    </div>
+                  } @else { <span class="nada">—</span> }
+                </td>
+                @for (t of temas; track t) {
+                  @let tp = temaDe(e, t);
+                  <td class="col-tema">
+                    @if (tp && tp.intentos) {
+                      <span class="tema-pct" [class]="'tema-pct tema-pct--' + color(tp.porcentaje)"
+                            [matTooltip]="tp.resueltas + ' de ' + tp.totalPreguntas + ' preguntas resueltas'">{{ tp.porcentaje }} %</span>
+                    } @else { <span class="nada">—</span> }
+                  </td>
+                }
+                <td class="ultima">{{ e.ultimaActividad ? haceCuanto(e.ultimaActividad) : 'Nunca' }}</td>
+                <td>
+                  @if (e.enRiesgo) {
+                    <span class="dp-chip dp-chip--rojo" [matTooltip]="e.motivosRiesgo.join(' · ')"><mat-icon>warning</mat-icon> En riesgo</span>
+                  } @else {
+                    <span class="dp-chip dp-chip--verde"><mat-icon>check_circle</mat-icon> Al día</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr class="sin-filas"><td colspan="8">
+                <div class="dp-vacio"><mat-icon>person_search</mat-icon><p>No hay estudiantes con ese filtro.</p></div>
+              </td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="nota"><mat-icon>info</mat-icon> "En riesgo": más de 7 días sin practicar, o menos del 50 % de aciertos con al menos 5 intentos.</p>
+    }
+  </section>
+</div>

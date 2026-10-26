@@ -28,16 +28,19 @@ export class RespuestaItem {
   puedeMarcarOficial = input(false);
   /** Id de la respuesta que se está procesando (deshabilita sus botones). */
   procesandoId = input<number | null>(null);
+  /** true en el panel docente: muestra "Ocultar" (moderación). */
+  puedeModerar = input(false);
 
   marcarOficial = output<number>();
   quitarOficial = output<number>();
+  ocultar = output<number>();
   responder = output<{ padreId: number; contenido: string }>();
 
   respondiendo = signal(false);
   texto = signal('');
 
   /** Solo se puede responder a respuestas directas (1 nivel de anidamiento). */
-  puedeResponder = computed(() => this.nivel() === 0);
+  puedeResponder = computed(() => this.nivel() === 0 && !this.respuesta().oculta);
 
   /** La respuesta la escribió un docente. */
   autorDocente = computed(() => esDocente(this.respuesta().autor.rol));
@@ -47,7 +50,11 @@ export class RespuestaItem {
    * "Quitar oficial" se deja siempre, por si alguna quedó marcada antes.
    */
   mostrarBotonOficial = computed(() =>
-    this.puedeMarcarOficial() && (this.respuesta().esOficial || !this.autorDocente()));
+    !this.respuesta().oculta && this.puedeMarcarOficial() && (this.respuesta().esOficial || !this.autorDocente()));
+
+  /** Moderación: solo respuestas visibles de estudiantes. */
+  mostrarBotonOcultar = computed(() =>
+    this.puedeModerar() && !this.respuesta().oculta && !this.autorDocente());
 
   readonly haceCuanto = haceCuanto;
 

@@ -1,0 +1,96 @@
+<div class="dp-pagina">
+  <header class="dp-cabecera">
+    <div>
+      <h1>Estadísticas del grupo</h1>
+      <p>Cómo van tus estudiantes en límites, derivadas e integrales.</p>
+    </div>
+    <a class="dp-btn dp-btn--claro" routerLink="/docente/estudiantes">
+      <mat-icon>groups</mat-icon> Ver estudiantes
+    </a>
+  </header>
+
+  @if (error()) {
+    <p class="dp-aviso-error">No se pudieron cargar las estadísticas. Verifica que iniciaste sesión como docente.</p>
+  } @else if (!datos()) {
+    <p class="dp-vacio">Cargando estadísticas…</p>
+  } @else {
+    @let d = datos()!;
+
+    <section class="dp-kpis">
+      <a class="dp-kpi" routerLink="/docente/estudiantes">
+        <span class="dp-kpi__icono"><mat-icon>groups</mat-icon></span>
+        <div><strong [appContador]="d.totalEstudiantes"></strong><span>Estudiantes</span></div>
+      </a>
+      <div class="dp-kpi dp-kpi--verde">
+        <span class="dp-kpi__icono"><mat-icon>bolt</mat-icon></span>
+        <div><strong [appContador]="d.activosSemana"></strong><span>Practicaron esta semana</span></div>
+      </div>
+      <div class="dp-kpi">
+        <span class="dp-kpi__icono"><mat-icon>task_alt</mat-icon></span>
+        <div><strong>{{ d.porcentajeAciertoGeneral }} %</strong><span>Aciertos del grupo</span></div>
+      </div>
+      <a class="dp-kpi" [class.dp-kpi--rojo]="d.estudiantesEnRiesgo > 0" [class.dp-kpi--verde]="d.estudiantesEnRiesgo === 0"
+         routerLink="/docente/estudiantes" [queryParams]="{ filtro: 'riesgo' }">
+        <span class="dp-kpi__icono"><mat-icon>{{ d.estudiantesEnRiesgo ? 'warning' : 'verified' }}</mat-icon></span>
+        <div><strong [appContador]="d.estudiantesEnRiesgo"></strong><span>En riesgo</span></div>
+      </a>
+      <a class="dp-kpi dp-kpi--ambar" routerLink="/docente/preguntas">
+        <span class="dp-kpi__icono"><mat-icon>quiz</mat-icon></span>
+        <div><strong [appContador]="d.preguntasActivas"></strong><span>Preguntas activas</span></div>
+      </a>
+    </section>
+
+    <div class="dp-grid-2">
+      <section class="dp-tarjeta">
+        <h2><mat-icon>insights</mat-icon> Aciertos por tema</h2>
+        @for (t of d.porTema; track t.tema) {
+          <div class="tema">
+            <div class="tema__fila">
+              <strong>{{ nombresTema[t.tema] }}</strong>
+              <span>{{ t.intentos ? t.porcentaje + ' %' : 'Sin intentos' }}</span>
+            </div>
+            <div class="dp-barra" [class]="'dp-barra dp-barra--' + color(t.porcentaje, t.intentos)">
+              <i [style.width.%]="t.intentos ? t.porcentaje : 0"></i>
+            </div>
+            <small>{{ t.intentos }} intentos · {{ t.estudiantes }} estudiante{{ t.estudiantes === 1 ? '' : 's' }} · {{ t.preguntasActivas }} preguntas</small>
+          </div>
+        }
+      </section>
+
+      <section class="dp-tarjeta">
+        <h2><mat-icon>calendar_month</mat-icon> Actividad (últimos 14 días)</h2>
+        <app-actividad-chart [dias]="d.actividad" />
+      </section>
+    </div>
+
+    <section class="dp-tarjeta">
+      <h2><mat-icon>report</mat-icon> Preguntas en las que más fallan</h2>
+      @for (p of d.preguntasDificiles; track p.id; let i = $index) {
+        <article class="dificil">
+          <span class="dificil__puesto">{{ i + 1 }}</span>
+          <div class="dificil__cuerpo">
+            <p class="dificil__enunciado">{{ p.enunciado }}</p>
+            <div class="dificil__chips">
+              <span class="dp-chip dp-chip--indigo">{{ nombresTema[p.tema] }}</span>
+              <span class="dp-chip">{{ nombresDificultad[p.dificultad] }}</span>
+              <span class="dp-chip dp-chip--rojo">{{ p.fallos }} de {{ p.intentos }} {{ p.intentos === 1 ? 'intento fallido' : 'intentos fallidos' }}</span>
+            </div>
+            @if (p.errorFrecuente) {
+              <p class="dificil__error"><mat-icon>lightbulb</mat-icon> La respuesta incorrecta que más eligen: <b>{{ p.errorFrecuente }}</b></p>
+            }
+          </div>
+          <div class="dificil__lado">
+            <strong>{{ p.porcentajeFallo }} %</strong>
+            <small>de fallo</small>
+            <a class="dp-btn dp-btn--claro dp-btn--chico" [routerLink]="['/docente/preguntas', p.id]">Revisar</a>
+          </div>
+        </article>
+      } @empty {
+        <div class="dp-vacio">
+          <mat-icon>emoji_events</mat-icon>
+          <p>Todavía no hay fallos registrados. ¡Buen trabajo del grupo!</p>
+        </div>
+      }
+    </section>
+  }
+</div>

@@ -1,0 +1,319 @@
+// ============================================
+// Panel docente: estilos compartidos por estadísticas, estudiantes,
+// banco de preguntas y moderación (prefijo dp-).
+// Van globales para no repetirlos en cada componente (presupuesto de 8 kB por componente).
+// ============================================
+
+$dp-indigo: #4f46e5;
+$dp-indigo-suave: #e0e7ff;
+$dp-texto: #2c3e50;
+$dp-gris: #7f8c8d;
+$dp-borde: #e5e7eb;
+$dp-verde: #059669;
+$dp-verde-suave: #d1fae5;
+$dp-ambar: #d97706;
+$dp-ambar-suave: #fef3c7;
+$dp-rojo: #dc2626;
+$dp-rojo-suave: #fee2e2;
+
+.dp-pagina {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: 'Poppins', sans-serif;
+  color: $dp-texto;
+}
+
+.dp-cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  h1 { margin: 0; font-size: 26px; font-weight: 700; }
+  p { margin: 4px 0 0; color: $dp-gris; font-size: 14px; }
+}
+
+.dp-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: $dp-indigo;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.dp-tarjeta {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  > h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    mat-icon { color: $dp-indigo; }
+  }
+}
+
+.dp-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  @media (max-width: 860px) { grid-template-columns: 1fr; }
+}
+
+// ---------- KPIs ----------
+.dp-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.dp-kpi {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+
+  &__icono {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: $dp-indigo-suave;
+    color: $dp-indigo;
+  }
+  &--verde &__icono { background: $dp-verde-suave; color: $dp-verde; }
+  &--ambar &__icono { background: $dp-ambar-suave; color: $dp-ambar; }
+  &--rojo &__icono { background: $dp-rojo-suave; color: $dp-rojo; }
+
+  strong { display: block; font-size: 24px; font-weight: 800; line-height: 1.1; white-space: nowrap; }
+  span { font-size: 12.5px; color: $dp-gris; }
+}
+
+// ---------- Barras ----------
+.dp-barra {
+  height: 10px;
+  background: #eef2ff;
+  border-radius: 999px;
+  overflow: hidden;
+
+  > i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: $dp-indigo;
+    transform-origin: left;
+  }
+  &--verde > i { background: #10b981; }
+  &--ambar > i { background: #f59e0b; }
+  &--rojo > i { background: #ef4444; }
+}
+
+// ---------- Chips y etiquetas ----------
+.dp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #4b5563;
+  white-space: nowrap;
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+  &--indigo { background: $dp-indigo-suave; color: $dp-indigo; }
+  &--verde { background: $dp-verde-suave; color: $dp-verde; }
+  &--ambar { background: $dp-ambar-suave; color: #b45309; }
+  &--rojo { background: $dp-rojo-suave; color: $dp-rojo; }
+}
+
+// ---------- Filtros y formularios ----------
+.dp-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.dp-input,
+.dp-select,
+.dp-textarea {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: $dp-texto;
+  background: #fff;
+  border: 1px solid $dp-borde;
+  border-radius: 10px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus {
+    border-color: $dp-indigo;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+}
+.dp-textarea { width: 100%; box-sizing: border-box; resize: vertical; }
+
+.dp-segmentado {
+  display: inline-flex;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 3px;
+
+  button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    border: 0;
+    background: transparent;
+    color: #4b5563;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    &.activo { background: #fff; color: $dp-indigo; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+  }
+}
+
+// ---------- Botones ----------
+.dp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  background: $dp-indigo;
+  color: #fff;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover:not(:disabled) { box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  &--claro { background: #fff; color: $dp-indigo; border: 1px solid $dp-borde; }
+  &--claro:hover:not(:disabled) { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); }
+  &--peligro { background: $dp-rojo-suave; color: $dp-rojo; }
+  &--peligro:hover:not(:disabled) { box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2); }
+  &--chico { padding: 6px 10px; font-size: 13px; }
+}
+
+// ---------- Tabla ----------
+.dp-tabla-caja { overflow-x: auto; }
+
+.dp-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: $dp-gris;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 10px 12px;
+    border-bottom: 1px solid $dp-borde;
+    white-space: nowrap;
+  }
+  th button {
+    font: inherit;
+    color: inherit;
+    text-transform: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+  }
+  tbody tr { cursor: pointer; transition: background 0.15s; }
+  tbody tr:hover { background: #f9fafb; }
+}
+
+.dp-persona {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+
+  img, .dp-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex: none; }
+  .dp-avatar {
+    display: grid;
+    place-items: center;
+    background: $dp-indigo;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  small { display: block; color: $dp-gris; font-size: 12px; }
+}
+
+.dp-vacio {
+  text-align: center;
+  color: $dp-gris;
+  padding: 32px 16px;
+  mat-icon { font-size: 40px; width: 40px; height: 40px; color: #c7d2fe; }
+  p { margin: 8px 0 0; }
+}
+
+.dp-aviso-error {
+  background: $dp-rojo-suave;
+  color: #991b1b;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+// ---------- Animaciones (solo si el usuario no pidió reducir movimiento) ----------
+@media (prefers-reduced-motion: no-preference) {
+  .dp-pagina > * { animation: saesu-entrar 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .dp-pagina > *:nth-child(2) { animation-delay: 0.05s; }
+  .dp-pagina > *:nth-child(3) { animation-delay: 0.1s; }
+  .dp-pagina > *:nth-child(4) { animation-delay: 0.15s; }
+  .dp-pagina > *:nth-child(5) { animation-delay: 0.2s; }
+  .dp-kpi { animation: saesu-entrar 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; transition: transform 0.2s; }
+  .dp-kpi:nth-child(2) { animation-delay: 0.06s; }
+  .dp-kpi:nth-child(3) { animation-delay: 0.12s; }
+  .dp-kpi:nth-child(4) { animation-delay: 0.18s; }
+  .dp-kpi:nth-child(5) { animation-delay: 0.24s; }
+  a.dp-kpi:hover { transform: translateY(-3px); }
+  .dp-barra > i { animation: saesu-llenar 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s backwards; }
+  .dp-btn:active:not(:disabled) { transform: scale(0.97); }
+  .dp-tabla tbody tr { animation: saesu-aparecer 0.35s ease backwards; }
+}

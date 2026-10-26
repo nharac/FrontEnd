@@ -32,6 +32,27 @@
     </a>
   </section>
 
+  @if (grupo(); as g) {
+    <section class="grupo">
+      <h3 class="accesos__titulo">Tu grupo</h3>
+      <div class="dp-kpis">
+        <a class="dp-kpi" [class.dp-kpi--rojo]="g.estudiantesEnRiesgo > 0" [class.dp-kpi--verde]="!g.estudiantesEnRiesgo"
+           routerLink="/docente/estudiantes" [queryParams]="{ filtro: 'riesgo' }">
+          <span class="dp-kpi__icono"><mat-icon>{{ g.estudiantesEnRiesgo ? 'warning' : 'verified' }}</mat-icon></span>
+          <div><strong>{{ g.estudiantesEnRiesgo }}</strong><span>Estudiantes en riesgo</span></div>
+        </a>
+        <a class="dp-kpi dp-kpi--verde" routerLink="/docente/estadisticas">
+          <span class="dp-kpi__icono"><mat-icon>bolt</mat-icon></span>
+          <div><strong>{{ g.activosSemana }} / {{ g.totalEstudiantes }}</strong><span>Practicaron esta semana</span></div>
+        </a>
+        <a class="dp-kpi" routerLink="/docente/estadisticas">
+          <span class="dp-kpi__icono"><mat-icon>task_alt</mat-icon></span>
+          <div><strong>{{ g.porcentajeAciertoGeneral }} %</strong><span>Aciertos del grupo</span></div>
+        </a>
+      </div>
+    </section>
+  }
+
   @if (error()) {
     <p class="aviso">No se pudieron cargar las consultas. Verifica que iniciaste sesión con una cuenta de docente.</p>
   }
@@ -57,9 +78,25 @@
         <mat-icon>notifications</mat-icon>
         <span>Consultas pendientes</span>
       </a>
+      <a class="acceso" routerLink="/docente/estudiantes">
+        <mat-icon>groups</mat-icon>
+        <span>Estudiantes</span>
+      </a>
+      <a class="acceso" routerLink="/docente/estadisticas">
+        <mat-icon>insights</mat-icon>
+        <span>Estadísticas</span>
+      </a>
+      <a class="acceso" routerLink="/docente/preguntas">
+        <mat-icon>quiz</mat-icon>
+        <span>Banco de preguntas</span>
+      </a>
       <a class="acceso" routerLink="/docente/foro">
         <mat-icon>forum</mat-icon>
         <span>Foro completo</span>
+      </a>
+      <a class="acceso" routerLink="/docente/moderacion">
+        <mat-icon>shield</mat-icon>
+        <span>Moderación</span>
       </a>
     </div>
   </section>

@@ -1,0 +1,95 @@
+<div class="dp-pagina">
+  <a class="dp-volver" routerLink="/docente/preguntas"><mat-icon>arrow_back</mat-icon> Volver al banco</a>
+
+  <header class="dp-cabecera">
+    <div>
+      <h1>{{ id() ? 'Editar pregunta' : 'Nueva pregunta' }}</h1>
+      <p>Cuatro opciones (A, B, C y D) y una sola correcta.</p>
+    </div>
+    @if (id() && !activa()) { <span class="dp-chip dp-chip--ambar"><mat-icon>visibility_off</mat-icon> Inactiva</span> }
+  </header>
+
+  @if (cargando()) {
+    <p class="dp-vacio">Cargando pregunta…</p>
+  } @else {
+    <div class="contenido">
+      <form class="dp-tarjeta formulario" (ngSubmit)="guardar()" novalidate>
+        <div class="fila">
+          <label>Tema
+            <select class="dp-select" name="tema" [ngModel]="tema()" (ngModelChange)="tema.set($event)">
+              <option value="limites">Límites</option>
+              <option value="derivadas">Derivadas</option>
+              <option value="integrales">Integrales</option>
+            </select>
+          </label>
+          <label>Dificultad
+            <select class="dp-select" name="dificultad" [ngModel]="dificultad()" (ngModelChange)="dificultad.set($event)">
+              <option value="basico">Básico</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
+            </select>
+          </label>
+        </div>
+
+        <label>Enunciado
+          <textarea class="dp-textarea" name="enunciado" rows="3" maxlength="2000"
+                    placeholder="Ej: ¿Cuál es la derivada de f(x) = x⁴?"
+                    [ngModel]="enunciado()" (ngModelChange)="enunciado.set($event)"></textarea>
+          <small class="ayuda">Puedes usar símbolos como ² ³ √ π ∫ → ∞</small>
+        </label>
+
+        <fieldset>
+          <legend>Opciones <small>(haz clic en el círculo de la correcta)</small></legend>
+          @for (l of letras; track l) {
+            <div class="opcion" [class.opcion--correcta]="correcta() === l">
+              <label class="radio" [attr.aria-label]="'Marcar ' + l + ' como correcta'">
+                <input type="radio" name="correcta" [value]="l" [checked]="correcta() === l" (change)="correcta.set(l)">
+                <span>{{ l }}</span>
+              </label>
+              <input class="dp-input" [name]="'opcion' + l" maxlength="500" [placeholder]="'Opción ' + l"
+                     [ngModel]="textos()[l]" (ngModelChange)="cambiarTexto(l, $event)">
+              @if (correcta() === l) { <mat-icon class="check">check_circle</mat-icon> }
+            </div>
+          }
+        </fieldset>
+
+        <label>Pista <small>(opcional: se muestra después del primer fallo)</small>
+          <textarea class="dp-textarea" name="pista" rows="2" maxlength="1000"
+                    placeholder="Ej: Usa la regla de la potencia."
+                    [ngModel]="pista()" (ngModelChange)="pista.set($event)"></textarea>
+        </label>
+
+        @if (id() && intentos()) {
+          <p class="nota"><mat-icon>info</mat-icon> Esta pregunta tiene {{ intentos() }} intentos de estudiantes: se conservan al editarla.</p>
+        }
+
+        @if (intentoEnviar() && errores().length) {
+          <ul class="dp-aviso-error errores">@for (e of errores(); track e) { <li>{{ e }}</li> }</ul>
+        }
+        @if (errorServidor()) { <p class="dp-aviso-error">{{ errorServidor() }}</p> }
+
+        <div class="botones">
+          <a class="dp-btn dp-btn--claro" routerLink="/docente/preguntas">Cancelar</a>
+          <button type="submit" class="dp-btn" [disabled]="guardando()">
+            <mat-icon>save</mat-icon> {{ guardando() ? 'Guardando…' : (id() ? 'Guardar cambios' : 'Crear pregunta') }}
+          </button>
+        </div>
+      </form>
+
+      <aside class="dp-tarjeta previa">
+        <h2><mat-icon>visibility</mat-icon> Así la verá el estudiante</h2>
+        <div class="previa__chips">
+          <span class="dp-chip dp-chip--indigo">{{ nombresTema[tema()] }}</span>
+          <span class="dp-chip">{{ nombresDificultad[dificultad()] }}</span>
+        </div>
+        <p class="previa__enunciado">{{ enunciado() || 'Aquí aparecerá el enunciado…' }}</p>
+        @for (l of letras; track l) {
+          <div class="previa__opcion" [class.previa__opcion--ok]="correcta() === l">
+            <b>{{ l }}</b> {{ textos()[l] || '…' }}
+          </div>
+        }
+        @if (pista()) { <p class="previa__pista"><mat-icon>lightbulb</mat-icon> {{ pista() }}</p> }
+      </aside>
+    </div>
+  }
+</div>

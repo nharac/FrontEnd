@@ -1,8 +1,8 @@
 <nav class="navbar">
-  <div class="navbar__brand">
+  <a class="navbar__brand" routerLink="/docente">
     <span class="navbar__logo">SAESU</span>
     <span class="navbar__tagline">Módulo Docente</span>
-  </div>
+  </a>
 
   <ul class="navbar__links">
     <li>
@@ -12,9 +12,33 @@
       </a>
     </li>
     <li>
-      <a routerLink="/docente/notificaciones" routerLinkActive="active">
-        <mat-icon>notifications</mat-icon>
-        <span>Notificaciones</span>
+      <a routerLink="/docente/notificaciones" routerLinkActive="active"
+         [attr.aria-label]="'Consultas pendientes' + (pendientes() ? ': ' + pendientes() : '')">
+        <span class="icono-badge">
+          <mat-icon>notifications</mat-icon>
+          @if (pendientes()) {
+            <b class="badge">{{ pendientes()! > 99 ? '99+' : pendientes() }}</b>
+          }
+        </span>
+        <span>Consultas</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/docente/estudiantes" routerLinkActive="active">
+        <mat-icon>groups</mat-icon>
+        <span>Estudiantes</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/docente/estadisticas" routerLinkActive="active">
+        <mat-icon>insights</mat-icon>
+        <span>Estadísticas</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/docente/preguntas" routerLinkActive="active">
+        <mat-icon>quiz</mat-icon>
+        <span>Preguntas</span>
       </a>
     </li>
     <li>
@@ -32,9 +56,9 @@
   </button>
 
   <mat-menu #menu="matMenu" xPosition="before">
-    <button mat-menu-item routerLink="/docente/perfil">
-      <mat-icon>person</mat-icon>
-      <span>Mi perfil</span>
+    <button mat-menu-item routerLink="/docente/moderacion">
+      <mat-icon>shield</mat-icon>
+      <span>Moderación del foro</span>
     </button>
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>

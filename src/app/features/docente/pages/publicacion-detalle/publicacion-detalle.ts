@@ -1,5 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -25,6 +25,7 @@ export class PublicacionDetallePage implements OnInit {
   private route = inject(ActivatedRoute);
   private docenteService = inject(DocenteService);
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
 
   publicacion = signal<PublicacionDetalle | null>(null);
   cargando = signal(true);
@@ -32,6 +33,7 @@ export class PublicacionDetallePage implements OnInit {
   procesandoId = signal<number | null>(null);
   texto = signal('');
   enviando = signal(false);
+  ocultandoPublicacion = signal(false);
 
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
@@ -68,6 +70,7 @@ export class PublicacionDetallePage implements OnInit {
         this.procesandoId.set(null);
         this.avisar('Respuesta marcada como oficial');
         this.cargar();
+        this.docenteService.refrescarPendientes();
       },
       error: (err) => {
         this.procesandoId.set(null);
@@ -85,10 +88,57 @@ export class PublicacionDetallePage implements OnInit {
         this.procesandoId.set(null);
         this.avisar('Se quitó el estado oficial');
         this.cargar();
+        this.docenteService.refrescarPendientes();
       },
       error: (err) => {
         this.procesandoId.set(null);
         this.avisar(err?.message || 'No se pudo quitar el estado oficial');
+      }
+    });
+  }
+
+  /** Moderación: oculta la respuesta y ofrece deshacer. */
+  ocultarRespuesta(respuestaId: number): void {
+    this.procesandoId.set(respuestaId);
+    this.docenteService.ocultarRespuesta(respuestaId).subscribe({
+      next: () => {
+        this.procesandoId.set(null);
+        this.cargar();
+        this.snackBar.open('Respuesta oculta para los estudiantes', 'Deshacer', { duration: 6000 })
+          .onAction().subscribe(() => {
+            this.docenteService.restaurarRespuesta(respuestaId).subscribe({
+              next: () => { this.avisar('Respuesta restaurada'); this.cargar(); }
+            });
+          });
+      },
+      error: (err) => {
+        this.procesandoId.set(null);
+        this.avisar(err?.message || 'No se pudo ocultar la respuesta');
+      }
+    });
+  }
+
+  /** Moderación: oculta toda la publicación y vuelve al foro (con opción de deshacer). */
+  ocultarPublicacion(): void {
+    this.ocultandoPublicacion.set(true);
+    this.docenteService.ocultarPublicacion(this.id).subscribe({
+      next: () => {
+        this.ocultandoPublicacion.set(false);
+        const id = this.id;
+        this.router.navigate(['/docente/foro']);
+        this.snackBar.open('Publicación oculta. La encuentras en Moderación.', 'Deshacer', { duration: 6000 })
+          .onAction().subscribe(() => {
+            this.docenteService.restaurarPublicacion(id).subscribe({
+              next: () => {
+                this.avisar('Publicación restaurada');
+                this.router.navigate(['/docente/publicaciones', id]);
+              }
+            });
+          });
+      },
+      error: (err) => {
+        this.ocultandoPublicacion.set(false);
+        this.avisar(err?.message || 'No se pudo ocultar la publicación');
       }
     });
   }

@@ -123,11 +123,11 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
 
     @media (max-width: 700px) {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 }
@@ -204,3 +204,5 @@
   small { grid-area: meta; color: #7f8c8d; }
   mat-icon { grid-area: icono; color: #7f8c8d; }
 }
+
+.grupo { display: flex; flex-direction: column; gap: 16px; }

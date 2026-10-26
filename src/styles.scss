@@ -5,6 +5,9 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 @use './animaciones';
+@use './docente-panel';
+// Íconos incluidos en el proyecto (no dependen de internet)
+@use 'material-symbols/outlined';
 
 html {
   height: 100%;

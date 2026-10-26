@@ -16,6 +16,10 @@
         } @else {
           <span class="estado-pub estado-pub--pendiente"><mat-icon>schedule</mat-icon> Pendiente de respuesta oficial</span>
         }
+        <button type="button" class="ocultar-pub" [disabled]="ocultandoPublicacion()" (click)="ocultarPublicacion()"
+                title="Ocultar esta publicación del foro (se puede restaurar desde Moderación)">
+          <mat-icon>visibility_off</mat-icon> Ocultar publicación
+        </button>
       </div>
       <h1>{{ p.titulo }}</h1>
       <p class="publicacion__autor">
@@ -48,9 +52,11 @@
         <app-respuesta-item
           [respuesta]="r"
           [puedeMarcarOficial]="true"
+          [puedeModerar]="true"
           [procesandoId]="procesandoId()"
           (marcarOficial)="marcarOficial($event)"
           (quitarOficial)="quitarOficial($event)"
+          (ocultar)="ocultarRespuesta($event)"
           (responder)="responder($event.contenido, $event.padreId)" />
       } @empty {
         <p class="estado">Todavía nadie ha respondido esta consulta.</p>

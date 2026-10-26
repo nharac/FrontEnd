@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { DocenteService } from '../../services/docente.service';
 import { NOMBRES_TEMA, PublicacionResumen } from '../../../foro/models/foro.model';
+import { EstadisticasGrupo } from '../../models/docente.model';
 import { diasDesde, haceCuanto } from '../../../../shared/utils/tiempo';
 
 /**
@@ -25,6 +26,8 @@ export class DashboardDocente implements OnInit {
   pendientes = signal<PublicacionResumen[]>([]);
   cargando = signal(true);
   error = signal(false);
+  /** Resumen del grupo (si falla, simplemente no se muestra). */
+  grupo = signal<EstadisticasGrupo | null>(null);
 
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
@@ -49,6 +52,11 @@ export class DashboardDocente implements OnInit {
     this.docenteService.obtenerPerfil().subscribe({
       next: (u) => this.nombreDocente.set(u.nombre),
       error: () => this.nombreDocente.set('')
+    });
+
+    this.docenteService.estadisticas().subscribe({
+      next: (g) => this.grupo.set(g),
+      error: () => this.grupo.set(null)
     });
 
     this.docenteService.notificaciones().subscribe({

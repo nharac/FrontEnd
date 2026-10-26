@@ -1,0 +1,44 @@
+<div class="dp-pagina">
+  <header class="dp-cabecera">
+    <div>
+      <h1>Moderación del foro</h1>
+      <p>Contenido que ocultaste. Los estudiantes no lo ven; puedes restaurarlo cuando quieras.</p>
+    </div>
+    <a class="dp-btn dp-btn--claro" routerLink="/docente/foro"><mat-icon>forum</mat-icon> Ir al foro</a>
+  </header>
+
+  @if (error()) {
+    <p class="dp-aviso-error">No se pudo cargar el contenido oculto.</p>
+  } @else if (cargando()) {
+    <p class="dp-vacio">Cargando…</p>
+  } @else {
+    <section class="lista">
+      @for (i of items(); track clave(i)) {
+        <article class="dp-tarjeta item">
+          <div class="item__cabeza">
+            <span class="dp-chip" [class.dp-chip--ambar]="i.tipo === 'PUBLICACION'" [class.dp-chip--indigo]="i.tipo === 'RESPUESTA'">
+              <mat-icon>{{ i.tipo === 'PUBLICACION' ? 'article' : 'chat_bubble_outline' }}</mat-icon>
+              {{ i.tipo === 'PUBLICACION' ? 'Publicación' : 'Respuesta' }}
+            </span>
+            <span class="item__titulo">{{ i.tipo === 'RESPUESTA' ? 'En: ' : '' }}{{ i.tituloPublicacion }}</span>
+          </div>
+          <blockquote>{{ i.contenido }}</blockquote>
+          <div class="item__pie">
+            <small>
+              Escrita por <b>{{ i.autor }}</b> {{ haceCuanto(i.fechaCreacion) }} ·
+              ocultada{{ i.ocultadoPor ? ' por ' + i.ocultadoPor : '' }} {{ i.fechaOculta ? haceCuanto(i.fechaOculta) : '' }}
+            </small>
+            <button type="button" class="dp-btn dp-btn--claro dp-btn--chico" [disabled]="procesando() === clave(i)" (click)="restaurar(i)">
+              <mat-icon>restore</mat-icon> Restaurar
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="dp-tarjeta dp-vacio">
+          <mat-icon>verified_user</mat-icon>
+          <p>No hay contenido oculto. Para ocultar algo, abre una publicación del foro y usa <b>Ocultar</b>.</p>
+        </div>
+      }
+    </section>
+  }
+</div>

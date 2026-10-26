@@ -133,3 +133,18 @@ $ok: #059669;
     border-left: 2px solid #e0e7ff;
   }
 }
+
+// Moderación: respuesta ocultada por un docente
+.respuesta--oculta {
+  background: #f9fafb;
+  .respuesta__contenido {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #9ca3af;
+    font-style: italic;
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+}
+
+.accion--ocultar { color: #dc2626; margin-left: auto; }

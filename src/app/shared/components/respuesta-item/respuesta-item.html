@@ -1,6 +1,6 @@
 @let r = respuesta();
 
-<div class="respuesta" [class.respuesta--oficial]="r.esOficial">
+<div class="respuesta" [class.respuesta--oficial]="r.esOficial" [class.respuesta--oculta]="r.oculta">
   @if (r.esOficial) {
     <span class="respuesta__sello"><mat-icon>verified</mat-icon> Respuesta oficial</span>
   }
@@ -14,9 +14,12 @@
     <time>{{ haceCuanto(r.fechaCreacion) }}</time>
   </header>
 
-  <p class="respuesta__contenido">{{ r.contenido }}</p>
+  <p class="respuesta__contenido">
+    @if (r.oculta) { <mat-icon>visibility_off</mat-icon> }
+    {{ r.contenido }}
+  </p>
 
-  @if (mostrarBotonOficial() || puedeResponder()) {
+  @if (mostrarBotonOficial() || puedeResponder() || mostrarBotonOcultar()) {
     <div class="respuesta__acciones">
       @if (mostrarBotonOficial()) {
         @if (r.esOficial) {
@@ -34,6 +37,12 @@
       @if (puedeResponder()) {
         <button type="button" class="accion" (click)="alternarRespuesta()">
           <mat-icon>reply</mat-icon> {{ respondiendo() ? 'Cancelar' : 'Responder' }}
+        </button>
+      }
+      @if (mostrarBotonOcultar()) {
+        <button type="button" class="accion accion--ocultar"
+                [disabled]="procesandoId() === r.id" (click)="ocultar.emit(r.id)">
+          <mat-icon>visibility_off</mat-icon> Ocultar
         </button>
       }
     </div>
@@ -55,9 +64,11 @@
         [respuesta]="hija"
         [nivel]="nivel() + 1"
         [puedeMarcarOficial]="puedeMarcarOficial()"
+        [puedeModerar]="puedeModerar()"
         [procesandoId]="procesandoId()"
         (marcarOficial)="marcarOficial.emit($event)"
         (quitarOficial)="quitarOficial.emit($event)"
+        (ocultar)="ocultar.emit($event)"
         (responder)="responder.emit($event)" />
     }
   </div>
