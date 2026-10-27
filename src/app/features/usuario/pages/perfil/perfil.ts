@@ -9,7 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { PerfilService } from '../../../../core/services/perfil.service';
 import { PracticaService } from '../../../practica/services/practica.service';
@@ -34,7 +34,7 @@ const coincidenValidator: ValidatorFn = (grupo: AbstractControl): ValidationErro
  * edición del nombre y cambio de contraseña (PUT /api/auth/perfil).
  */
 @Component({
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, MatSnackBarModule, LogrosGrid, Medalla],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, LogrosGrid, Medalla],
   selector: 'app-perfil',
   styleUrl: './perfil.scss',
   templateUrl: './perfil.html',

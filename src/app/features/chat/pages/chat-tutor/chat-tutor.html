@@ -1,11 +1,39 @@
 <div class="chat-tutor">
   <header class="chat-tutor__header">
-    <span class="chat-tutor__badge">TUTOR IA</span>
-    <h1 class="chat-tutor__titulo">Chat con el tutor</h1>
-    <p class="chat-tutor__subtitulo">
-      Resuelve tus dudas de cálculo. El tutor te guía con preguntas para que llegues tú mismo a la respuesta.
-    </p>
+    <span class="chat-tutor__badge"><mat-icon>smart_toy</mat-icon> TUTOR IA</span>
+    <h1>Chat con el tutor</h1>
+    <p>Resuelve tus dudas de cálculo. El tutor te guía con preguntas para que llegues tú mismo a la respuesta.</p>
   </header>
 
-  <app-chat-panel class="chat-tutor__panel" />
+  <div class="chat-tutor__cuerpo">
+    <app-chat-panel class="chat-tutor__panel" />
+
+    <aside class="chat-tutor__lateral">
+      <section class="ct-tarjeta">
+        <h2><mat-icon>psychology</mat-icon> Cómo te ayuda</h2>
+        <ul class="ct-lista">
+          <li><mat-icon>quiz</mat-icon><span><b>Te pregunta</b> para que razones el siguiente paso.</span></li>
+          <li><mat-icon>stairs</mat-icon><span><b>Pistas progresivas</b>, de lo general a lo específico.</span></li>
+          <li><mat-icon>block</mat-icon><span><b>No da la respuesta final</b>: el mérito es tuyo.</span></li>
+        </ul>
+      </section>
+
+      <section class="ct-tarjeta">
+        <h2><mat-icon>bolt</mat-icon> Pregunta rápida</h2>
+        @for (t of temas; track t.nombre) {
+          <div class="ct-tema">
+            <span class="ct-tema__nombre ct-tema__nombre--{{ t.id }}"><mat-icon>{{ t.icono }}</mat-icon> {{ t.nombre }}</span>
+            @for (p of t.preguntas; track p) {
+              <button type="button" class="ct-rapida" (click)="preguntar(p)">{{ p }}<mat-icon>north_east</mat-icon></button>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="ct-tarjeta ct-tarjeta--enlaces">
+        <a routerLink="/practica"><mat-icon>edit_note</mat-icon><span><b>Pon a prueba lo aprendido</b><small>Ir a la práctica</small></span></a>
+        <a routerLink="/foro/nueva"><mat-icon>forum</mat-icon><span><b>Pregunta a tus compañeros</b><small>Publicar en el foro</small></span></a>
+      </section>
+    </aside>
+  </div>
 </div>

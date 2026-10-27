@@ -11,6 +11,12 @@ import { PracticaService } from '../../services/practica.service';
 import { InfoTema, Progreso, TEMAS } from '../../models/practica.model';
 import { ContadorDirective } from '../../../../shared/directives/contador.directive';
 import { Medalla } from '../../../../shared/components/medalla/medalla';
+import { LogrosService } from '../../../gamificacion/services/logros.service';
+import { Logro } from '../../../gamificacion/models/logro.model';
+import { ForoService } from '../../../foro/services/foro.service';
+import { NOMBRES_TEMA, PublicacionResumen } from '../../../foro/models/foro.model';
+import { haceCuanto } from '../../../../shared/utils/tiempo';
+import { saludoSegunHora } from '../../../../shared/components/aviso/aviso.model';
 
 @Component({
   selector: 'app-dashboard-estudiante',
@@ -25,6 +31,59 @@ export class DashboardEstudiante implements OnInit {
   private perfilService = inject(PerfilService);
   private rankingService = inject(RankingService);
   private practicaService = inject(PracticaService);
+  private logrosService = inject(LogrosService);
+  private foroService = inject(ForoService);
+
+  readonly temas = TEMAS;
+  readonly nombresTema = NOMBRES_TEMA;
+  readonly haceCuanto = haceCuanto;
+  readonly saludo = saludoSegunHora();
+  /** "lunes 26 de octubre" */
+  readonly hoy = (() => {
+    const t = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  })();
+
+  /** Logros (GET /api/logros) y últimas publicaciones del foro. */
+  logros = signal<Logro[]>([]);
+  foroReciente = signal<PublicacionResumen[]>([]);
+
+  logrosObtenidos = computed(() => this.logros().filter(l => l.obtenido).length);
+  /** El siguiente logro por desbloquear (el primero que falta, en el orden del backend). */
+  proximoLogro = computed(() => this.logros().find(l => !l.obtenido) ?? null);
+
+  /** Aciertos sumando los tres temas. */
+  totales = computed(() => {
+    const p = this.progreso();
+    if (!p) return { respondidas: 0, correctas: 0, porcentaje: 0 };
+    const respondidas = TEMAS.reduce((s, t) => s + (p[t.id]?.respondidas ?? 0), 0);
+    const correctas = TEMAS.reduce((s, t) => s + (p[t.id]?.correctas ?? 0), 0);
+    return { respondidas, correctas, porcentaje: respondidas ? Math.round((correctas / respondidas) * 100) : 0 };
+  });
+
+  readonly puntos = computed(() => this.perfilService.usuario()?.puntosTotales ?? this.miFilaPublica()?.puntosTotales ?? 0);
+  readonly fotoUrl = this.perfilService.fotoUrl;
+  readonly iniciales = this.perfilService.iniciales;
+
+  /** Circunferencia del anillo de progreso (r = 34). */
+  readonly circunferencia = 2 * Math.PI * 34;
+
+  progresoDe(tema: string) {
+    const t = this.progreso()?.[tema as keyof Progreso];
+    return { respondidas: t?.respondidas ?? 0, correctas: t?.correctas ?? 0, porcentaje: Math.round(t?.porcentaje ?? 0) };
+  }
+
+  /** Mensaje corto según cómo va en el tema. */
+  estadoTema(porcentaje: number, respondidas: number): string {
+    if (!respondidas) return 'Sin empezar';
+    if (porcentaje >= 80) return '¡Vas excelente!';
+    if (porcentaje >= 50) return 'Vas bien';
+    return 'Necesita repaso';
+  }
+
+  practicar(tema: string): void {
+    this.router.navigate(['/practica'], { queryParams: { tema } });
+  }
 
   /** Progreso por tema (GET /api/practica/progreso). */
   progreso = signal<Progreso | null>(null);
@@ -52,6 +111,8 @@ export class DashboardEstudiante implements OnInit {
   top3 = computed(() => this.ranking().slice(0, 3));
 
   /** Fila del estudiante actual en el ranking, si está en el top 10. */
+  private miFilaPublica = computed(() => this.miFila());
+
   private miFila = computed(() => {
     const id = this.perfilService.usuario()?.id;
     return this.ranking().find(p => p.usuarioId === id) ?? null;
@@ -76,6 +137,14 @@ export class DashboardEstudiante implements OnInit {
     this.practicaService.obtenerProgreso().subscribe({
       next: (p) => this.progreso.set(p),
       error: () => this.progreso.set(null)
+    });
+    this.logrosService.listar().subscribe({
+      next: (l) => this.logros.set(l ?? []),
+      error: () => this.logros.set([])
+    });
+    this.foroService.listar({ size: 3 }).subscribe({
+      next: (lista) => this.foroReciente.set((lista ?? []).slice(0, 3)),
+      error: () => this.foroReciente.set([])
     });
     this.rankingService.obtenerTop().subscribe({
       next: (lista) => {

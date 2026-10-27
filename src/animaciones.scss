@@ -137,7 +137,7 @@ $saesu-rebote: cubic-bezier(0.34, 1.56, 0.64, 1); // con un pequeño rebote
   .container.container--exito { animation: saesu-despedida 0.5s ease-in forwards; }
 
   // ---------- Botones: se elevan al pasar el mouse y se hunden al hacer clic ----------
-  button:not(.mat-mdc-menu-item):not(.opcion),
+  button:not(.mat-mdc-menu-item):not(.opcion):not(.pc-opcion):not(.pr-tema),
   a.btn,
   .card-principal__btn,
   .acceso-card,
@@ -308,7 +308,7 @@ $saesu-rebote: cubic-bezier(0.34, 1.56, 0.64, 1); // con un pequeño rebote
   }
 
   // ---------- Avisos (snackbar) ----------
-  .mat-mdc-snack-bar-container { animation: saesu-pop 0.35s $saesu-rebote backwards; }
+  .mat-mdc-snack-bar-container:not(.saesu-aviso) { animation: saesu-pop 0.35s $saesu-rebote backwards; }
 }
 
 // ============================================================

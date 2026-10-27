@@ -1,0 +1,28 @@
+@if (tipo() === 'bienvenida') {
+  <div class="aviso__avatar">
+    @if (datos.fotoUrl) {
+      <img [src]="datos.fotoUrl" alt="">
+    } @else {
+      <span>{{ iniciales }}</span>
+    }
+    <span class="aviso__mano" aria-hidden="true">👋</span>
+  </div>
+  <div class="aviso__texto">
+    <strong>¡{{ saludo }}, {{ primerNombre }}!</strong>
+    <small>{{ datos.esDocente ? 'Tu panel docente está listo.' : datos.mensaje || 'Qué bueno verte de nuevo en SAESU.' }}</small>
+  </div>
+} @else {
+  <span class="aviso__icono"><mat-icon>{{ icono() }}</mat-icon></span>
+  <p class="aviso__texto">{{ datos.mensaje }}</p>
+}
+
+@if (accionTexto()) {
+  <button type="button" class="aviso__accion" (click)="accion()">{{ accionTexto() }}</button>
+}
+<button type="button" class="aviso__cerrar" (click)="cerrar()" aria-label="Cerrar aviso">
+  <mat-icon>close</mat-icon>
+</button>
+
+@if (duracionMs > 0) {
+  <i class="aviso__tiempo" [style.animation-duration.ms]="duracionMs" aria-hidden="true"></i>
+}

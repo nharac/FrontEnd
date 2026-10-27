@@ -1,3 +1,6 @@
+import { Aviso } from '../../../../../shared/components/aviso/aviso';
+import { DatosAviso } from '../../../../../shared/components/aviso/aviso.model';
+import { RouterLink } from '@angular/router';
 import { OjoPassword } from '../../../../../shared/components/ojo-password/ojo-password';
 import { Logo } from '../../../../../shared/components/logo/logo';
 import { Component, ElementRef, EventEmitter, Output, inject, signal } from '@angular/core';
@@ -10,7 +13,7 @@ import {
   Validators
 } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../../services/auth.service';
 import { LoginRequest } from '../../../models';
@@ -18,11 +21,10 @@ import { esDocente } from '../../../../../shared/utils/rol';
 
 @Component({
   selector: 'app-login-form',
-  imports: [OjoPassword, Logo, 
+  imports: [OjoPassword, Logo, RouterLink, 
     CommonModule,
     ReactiveFormsModule,
-    MatIconModule,
-    MatSnackBarModule
+    MatIconModule
   ],
   styleUrl: './login-form.scss',
   templateUrl: './login-form.html',
@@ -70,8 +72,18 @@ export class LoginForm {
     this.authService.login(request).subscribe({
       next: (res) => {
         this.cargando.set(false);
-        this.snackBar.open(`Bienvenido, ${res.usuario.nombre}`, 'Cerrar', {
-          duration: 3000
+        // Bienvenida con saludo según la hora, foto o iniciales y una mano que saluda
+        this.snackBar.openFromComponent(Aviso, {
+          data: {
+            tipo: 'bienvenida',
+            mensaje: 'Qué bueno verte de nuevo en SAESU.',
+            nombre: res.usuario.nombre,
+            fotoUrl: res.usuario.fotoPerfilUrl ?? null,
+            esDocente: esDocente(res.usuario.rol)
+          } satisfies DatosAviso,
+          duration: 4500,
+          verticalPosition: 'top',
+          horizontalPosition: 'end'
         });
 
         // La tarjeta se despide y luego redirige según el rol

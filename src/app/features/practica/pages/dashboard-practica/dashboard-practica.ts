@@ -1,8 +1,8 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { PracticaService } from '../../services/practica.service';
 import { PreguntaCard } from '../../components/pregunta-card/pregunta-card';
@@ -23,6 +23,9 @@ import {
 
 type Vista = 'seleccion' | 'cargando' | 'sesion' | 'resumen';
 
+/** Cómo terminó cada pregunta de la sesión: al primer intento, después de fallar, o aún sin resolver. */
+export type ResultadoPregunta = 'primer' | 'reintento' | null;
+
 /** Cantidad de preguntas por sesión de práctica. */
 const PREGUNTAS_POR_SESION = 10;
 
@@ -33,7 +36,7 @@ const PREGUNTAS_POR_SESION = 10;
  * 3. Al final ve un resumen de la sesión.
  */
 @Component({
-  imports: [DecimalPipe, MatIconModule, MatSnackBarModule, PreguntaCard, Confeti, ContadorDirective, LogroAviso],
+  imports: [DecimalPipe, RouterLink, MatIconModule, PreguntaCard, Confeti, ContadorDirective, LogroAviso],
   selector: 'app-dashboard-practica',
   styleUrl: './dashboard-practica.scss',
   templateUrl: './dashboard-practica.html',
@@ -46,6 +49,14 @@ export class DashboardPractica implements OnInit {
 
   readonly temas = TEMAS;
   readonly dificultades = DIFICULTADES;
+  readonly descripcionDificultad: Record<string, string> = {
+    todas: 'Mezcla de niveles, como en el examen',
+    basico: 'Para calentar y repasar lo esencial',
+    intermedio: 'Ejercicios tipo ICFES',
+    avanzado: 'Retos para subir de nivel'
+  };
+  /** Perímetro del anillo de progreso (r = 26). */
+  readonly perimetro = 2 * Math.PI * 26;
 
   vista = signal<Vista>('seleccion');
   progreso = signal<Progreso | null>(null);
@@ -61,9 +72,37 @@ export class DashboardPractica implements OnInit {
   /** Logros recién desbloqueados (se muestran como aviso flotante). */
   logrosNuevos = signal<Logro[]>([]);
   sinPreguntas = signal(false);
+  /** Resultado de cada pregunta de la sesión (puntos de colores de la barra superior). */
+  resultados = signal<ResultadoPregunta[]>([]);
 
   preguntaActual = computed(() => this.preguntas()[this.indice()] ?? null);
   infoTema = computed(() => this.temas.find(t => t.id === this.temaElegido()) ?? null);
+  reintentos = computed(() => this.resultados().filter(r => r === 'reintento').length);
+
+  /** Tema sugerido: el que nunca ha practicado o el de menor porcentaje de aciertos. */
+  recomendado = computed<Tema | null>(() => {
+    const p = this.progreso();
+    if (!p) {
+      return null;
+    }
+    const orden = [...this.temas].sort((a, b) =>
+      (p[a.id].respondidas === 0 ? -1 : p[a.id].porcentaje) - (p[b.id].respondidas === 0 ? -1 : p[b.id].porcentaje));
+    const primero = orden[0];
+    // Si ya domina todos los temas no hay nada que recomendar
+    return primero && (p[primero.id].respondidas === 0 || p[primero.id].porcentaje < 100) ? primero.id : null;
+  });
+
+  /** Totales de todos los temas para la cabecera. */
+  totalGeneral = computed(() => {
+    const p = this.progreso();
+    if (!p) {
+      return null;
+    }
+    const respondidas = this.temas.reduce((n, t) => n + p[t.id].respondidas, 0);
+    const correctas = this.temas.reduce((n, t) => n + p[t.id].correctas, 0);
+    return { respondidas, correctas, porcentaje: respondidas ? Math.round((correctas / respondidas) * 100) : 0 };
+  });
+
   porcentajeSesion = computed(() => {
     const total = this.preguntas().length;
     return total ? Math.round((this.aciertosPrimerIntento() / total) * 100) : 0;
@@ -80,6 +119,11 @@ export class DashboardPractica implements OnInit {
 
   progresoDe(tema: InfoTema): ProgresoTema | null {
     return this.progreso()?.[tema.id] ?? null;
+  }
+
+  /** Trazo del anillo para un porcentaje (stroke-dashoffset). */
+  trazo(porcentaje: number): number {
+    return this.perimetro * (1 - Math.min(Math.max(porcentaje, 0), 100) / 100);
   }
 
   elegirTema(tema: Tema): void {
@@ -114,6 +158,7 @@ export class DashboardPractica implements OnInit {
         this.indice.set(0);
         this.aciertosPrimerIntento.set(0);
         this.puntosSesion.set(0);
+        this.resultados.set(preguntas.map(() => null));
         this.vista.set('sesion');
       },
       error: (err) => {
@@ -131,6 +176,8 @@ export class DashboardPractica implements OnInit {
     if (evento.primerIntento) {
       this.aciertosPrimerIntento.update(n => n + 1);
     }
+    const i = this.indice();
+    this.resultados.update(lista => lista.map((r, j) => j === i ? (evento.primerIntento ? 'primer' : 'reintento') : r));
   }
 
   siguiente(): void {

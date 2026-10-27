@@ -9,7 +9,7 @@ import {
   untracked
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { PracticaService } from '../../services/practica.service';
 import { Opcion, Pregunta, Validacion } from '../../models/practica.model';
@@ -28,9 +28,13 @@ import { Confeti } from '../../../../shared/components/confeti/confeti';
  */
 @Component({
   selector: 'app-pregunta-card',
-  imports: [MatIconModule, MatSnackBarModule, ChatPanel, Confeti],
+  imports: [MatIconModule, ChatPanel, Confeti],
   templateUrl: './pregunta-card.html',
   styleUrl: './pregunta-card.scss',
+  host: {
+    '[class.con-tutor]': 'mostrarChat() && !resuelta()',
+    '(document:keydown)': 'alPresionarTecla($event)'
+  }
 })
 export class PreguntaCard {
 
@@ -60,7 +64,14 @@ export class PreguntaCard {
     const nombres: Record<string, string> = { basico: 'Básico', intermedio: 'Intermedio', avanzado: 'Avanzado' };
     return nombres[this.pregunta().dificultad] ?? this.pregunta().dificultad;
   });
-  progresoPct = computed(() => Math.round(((this.numero() - 1) / Math.max(this.total(), 1)) * 100));
+  /** Lo que vale acertar ahora: 20 al primer intento y baja 5 por fallo (mínimo 5). */
+  valeAhora = computed(() => {
+    const v = this.validacion();
+    if (v?.esCorrecta) {
+      return v.puntosGanados ?? 0;
+    }
+    return v?.puntosEnJuego ?? Math.max(5, 20 - 5 * this.intentos());
+  });
 
   constructor() {
     // Reinicia el estado cada vez que llega una pregunta nueva
@@ -143,6 +154,34 @@ export class PreguntaCard {
         this.snackBar.open(err?.message || 'No se pudo obtener la pista', 'Cerrar', { duration: 3500 });
       }
     });
+  }
+
+  /**
+   * Atajos de teclado: A-D (o 1-4) eligen opción y Enter responde o pasa a la siguiente.
+   * No se activan mientras se escribe en el chat ni con teclas modificadoras.
+   */
+  alPresionarTecla(evento: KeyboardEvent): void {
+    const destino = evento.target as HTMLElement | null;
+    if (evento.ctrlKey || evento.metaKey || evento.altKey || evento.repeat
+        || destino?.closest('input, textarea, select, [contenteditable="true"]')) {
+      return;
+    }
+
+    const tecla = evento.key.toLowerCase();
+    const indice = 'abcd'.indexOf(tecla) >= 0 ? 'abcd'.indexOf(tecla) : '1234'.indexOf(tecla);
+    const opcion = indice >= 0 && tecla.length === 1 ? this.pregunta().opciones[indice] : undefined;
+
+    if (opcion) {
+      evento.preventDefault();
+      this.elegir(opcion);
+    } else if (tecla === 'enter' && !destino?.closest('button:not(.pc-opcion), a')) {
+      evento.preventDefault();
+      if (this.resuelta()) {
+        this.siguiente.emit();
+      } else {
+        this.responder();
+      }
+    }
   }
 
   alternarChat(): void {

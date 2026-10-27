@@ -1,94 +1,188 @@
-<div class="ranking">
+<div class="rk">
 
-  <header class="ranking__header">
-    <span class="ranking__badge">GAMIFICACIÓN</span>
-    <h1>Ranking de estudiantes</h1>
-    <p>Los 10 estudiantes con más puntos. Practica, ayuda en el foro y mantén tu racha para subir.</p>
+  <header class="rk-cabecera">
+    <div>
+      <span class="rk-badge"><mat-icon>emoji_events</mat-icon> GAMIFICACIÓN</span>
+      <h1>Ranking de estudiantes</h1>
+      <p>Practica, ayuda en el foro y mantén tu racha para subir. El ranking semanal se reinicia cada lunes.</p>
+    </div>
+    <div class="rk-periodos" role="tablist" aria-label="Periodo del ranking">
+      @for (p of periodos; track p.id) {
+        <button type="button" role="tab" [attr.aria-selected]="periodo() === p.id"
+                [class.activo]="periodo() === p.id" (click)="cambiarPeriodo(p.id)">{{ p.nombre }}</button>
+      }
+    </div>
   </header>
 
-  @if (cargando()) {
-    <p class="estado">Cargando ranking...</p>
-  } @else if (error()) {
-    <p class="estado">No se pudo cargar el ranking. Intenta de nuevo en un momento.</p>
-  } @else if (!posiciones().length) {
-    <div class="vacio">
-      <mat-icon>emoji_events</mat-icon>
-      <p>Todavía nadie tiene puntos. ¡Responde una pregunta y sé el primero!</p>
-      <a class="btn" routerLink="/practica">Ir a Práctica</a>
-    </div>
-  } @else {
-
-    <!-- Podio -->
-    <section class="podio" aria-label="Podio">
-      @if (mostrarConfeti()) {
-        <app-confeti [cantidad]="36" [alcance]="220" />
-      }
-      @for (p of podio(); track p.usuarioId) {
-        <div class="podio__puesto podio__puesto--{{ p.lugar }}" [class.podio__puesto--yo]="esYo(p)">
-          @if (p.lugar === 1) {
-            <mat-icon class="podio__corona" aria-hidden="true">workspace_premium</mat-icon>
-          }
-          <span class="avatar-caja">
-            @if (p.fotoPerfilUrl) {
-              <img class="avatar avatar--grande" [src]="p.fotoPerfilUrl" alt="">
-            } @else {
-              <span class="avatar avatar--grande">{{ inicialesDe(p.nombre) }}</span>
-            }
-            <app-medalla [lugar]="p.lugar" tamano="lg" />
-          </span>
-          <strong class="podio__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="tu">Tú</span> }</strong>
-          <span class="podio__puntos"><span [appContador]="p.puntosTotales" [retraso]="700"></span> pts</span>
-          @if (p.rachaActual) {
-            <span class="racha"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
-          }
-          <div class="podio__base"><span class="podio__numero">{{ p.lugar }}</span></div>
+  <div class="rk-layout">
+    <main class="rk-principal">
+      @if (cargando()) {
+        <div class="rk-esqueleto rk-esqueleto--podio" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="rk-esqueleto" aria-hidden="true"><span></span></div>
+      } @else if (error()) {
+        <div class="rk-vacio">
+          <span class="rk-vacio__icono"><mat-icon>cloud_off</mat-icon></span>
+          <strong>No se pudo cargar el ranking</strong>
+          <p>Revisa tu conexión e intenta de nuevo.</p>
+          <button type="button" class="rk-btn" (click)="cargar()"><mat-icon>refresh</mat-icon> Reintentar</button>
         </div>
-      }
-    </section>
-
-    <!-- Del 4 al 10 -->
-    @if (resto().length) {
-      <ol class="lista">
-        @for (p of resto(); track p.usuarioId) {
-          <li class="fila" [class.fila--yo]="esYo(p)">
-            <span class="fila__lugar">{{ p.lugar }}</span>
-            @if (p.fotoPerfilUrl) {
-              <img class="avatar" [src]="p.fotoPerfilUrl" alt="">
-            } @else {
-              <span class="avatar">{{ inicialesDe(p.nombre) }}</span>
-            }
-            <span class="fila__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="tu">Tú</span> }</span>
-            @if (p.rachaActual) {
-              <span class="racha"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
-            }
-            <strong class="fila__puntos"><span [appContador]="p.puntosTotales" [retraso]="900"></span> pts</strong>
-          </li>
-        }
-      </ol>
-    }
-
-    <p class="mi-lugar">
-      @if (miLugar(); as lugar) {
-        <mat-icon>emoji_events</mat-icon>
-        <span>¡Vas en el puesto <strong>#{{ lugar }}</strong>! Sigue así.</span>
+      } @else if (!posiciones().length) {
+        <div class="rk-vacio">
+          <span class="rk-vacio__icono"><mat-icon>emoji_events</mat-icon></span>
+          <strong>Nadie ha sumado puntos {{ infoPeriodo().corto }}</strong>
+          <p>¡Es tu oportunidad! Responde una pregunta y quedarás en el primer lugar.</p>
+          <a class="rk-btn" routerLink="/practica"><mat-icon>play_arrow</mat-icon> Ir a practicar</a>
+        </div>
       } @else {
-        <mat-icon>trending_up</mat-icon>
-        <span>Aún no estás en el top 10. Cada acierto suma, ¡tú puedes!</span>
-      }
-    </p>
-  }
 
-  <!-- Cómo se ganan puntos -->
-  <section class="reglas">
-    <h2><mat-icon>stars</mat-icon> ¿Cómo gano puntos?</h2>
-    <ul>
-      @for (r of reglas; track r.texto) {
-        <li>
-          <mat-icon>{{ r.icono }}</mat-icon>
-          <span>{{ r.texto }}</span>
-          <strong>+{{ r.puntos }}</strong>
-        </li>
+        <!-- Podio -->
+        <section class="rk-podio" aria-label="Podio">
+          @if (mostrarConfeti()) {
+            <app-confeti [cantidad]="36" [alcance]="220" />
+          }
+          @for (p of podio(); track p.usuarioId) {
+            @let color = colorAvatar(p.nombre);
+            <div class="rk-puesto rk-puesto--{{ p.lugar }}" [class.rk-puesto--yo]="esYo(p)">
+              @if (p.lugar === 1) {
+                <mat-icon class="rk-puesto__corona" aria-hidden="true">crown</mat-icon>
+              }
+              <span class="rk-puesto__avatar">
+                @if (p.fotoPerfilUrl) {
+                  <img [src]="p.fotoPerfilUrl" alt="">
+                } @else {
+                  <span [style.background]="color.fondo" [style.color]="color.texto">{{ inicialesDe(p.nombre) }}</span>
+                }
+                <app-medalla [lugar]="p.lugar" tamano="lg" />
+              </span>
+              <strong class="rk-puesto__nombre" [title]="p.nombre">{{ p.nombre }}</strong>
+              @if (esYo(p)) { <span class="rk-tu">Tú</span> }
+              <span class="rk-puesto__puntos"><span [appContador]="p.puntosTotales" [retraso]="700"></span> pts</span>
+              @if (p.rachaActual) {
+                <span class="rk-racha" [title]="p.rachaActual + ' días seguidos'"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
+              }
+              <div class="rk-puesto__base"><span>{{ p.lugar }}</span></div>
+            </div>
+          }
+        </section>
+
+        <!-- Del 4 al 10 -->
+        @if (resto().length || fueraDelTop()) {
+          <ol class="rk-lista">
+            @for (p of resto(); track p.usuarioId) {
+              @let color = colorAvatar(p.nombre);
+              <li class="rk-fila" [class.rk-fila--yo]="esYo(p)">
+                <span class="rk-fila__lugar">{{ p.lugar }}</span>
+                @if (p.fotoPerfilUrl) {
+                  <img class="rk-fila__avatar" [src]="p.fotoPerfilUrl" alt="">
+                } @else {
+                  <span class="rk-fila__avatar" [style.background]="color.fondo" [style.color]="color.texto">{{ inicialesDe(p.nombre) }}</span>
+                }
+                <div class="rk-fila__cuerpo">
+                  <span class="rk-fila__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="rk-tu">Tú</span> }</span>
+                  <span class="rk-fila__barra"><i [style.width.%]="ancho(p.puntosTotales)"></i></span>
+                </div>
+                @if (p.rachaActual) {
+                  <span class="rk-racha"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
+                }
+                <strong class="rk-fila__puntos"><span [appContador]="p.puntosTotales" [retraso]="900"></span> pts</strong>
+              </li>
+            }
+            @if (fueraDelTop(); as yo) {
+              <li class="rk-separador" aria-hidden="true"><span></span><span></span><span></span></li>
+              <li class="rk-fila rk-fila--yo">
+                <span class="rk-fila__lugar">{{ yo.posicion }}</span>
+                <span class="rk-fila__avatar rk-fila__avatar--yo"><mat-icon>person</mat-icon></span>
+                <div class="rk-fila__cuerpo">
+                  <span class="rk-fila__nombre">Tú <span class="rk-tu">Tu puesto</span></span>
+                  <span class="rk-fila__barra"><i [style.width.%]="ancho(yo.puntos)"></i></span>
+                </div>
+                <strong class="rk-fila__puntos">{{ yo.puntos }} pts</strong>
+              </li>
+            }
+          </ol>
+        }
       }
-    </ul>
-  </section>
+
+      <!-- Cómo se ganan puntos -->
+      <section class="rk-caja">
+        <h2><mat-icon>stars</mat-icon> ¿Cómo gano puntos?</h2>
+        <ul class="rk-reglas">
+          @for (r of reglas; track r.texto) {
+            <li>
+              <span class="rk-reglas__icono"><mat-icon>{{ r.icono }}</mat-icon></span>
+              <span><b>{{ r.texto }}</b><small>{{ r.detalle }}</small></span>
+              <strong>{{ r.puntos }}</strong>
+            </li>
+          }
+        </ul>
+      </section>
+    </main>
+
+    <aside class="rk-lateral">
+      @if (yo(); as yo) {
+        <!-- Mi posición -->
+        <section class="rk-yo">
+          <span class="rk-yo__etiqueta">Tu posición {{ infoPeriodo().corto }}</span>
+          @if (yo.posicion) {
+            <div class="rk-yo__puesto">
+              <strong>#{{ yo.posicion }}</strong>
+              <span>de {{ yo.participantes }} {{ yo.participantes === 1 ? 'estudiante' : 'estudiantes' }}</span>
+            </div>
+            @if (yo.puntosParaSubir && yo.siguienteNombre) {
+              <p class="rk-yo__meta">Te faltan <b>{{ yo.puntosParaSubir }} pts</b> para pasar a {{ yo.siguienteNombre }}</p>
+              <span class="rk-yo__barra"><i [style.width.%]="avanceSubir()"></i></span>
+            } @else {
+              <p class="rk-yo__meta"><mat-icon>military_tech</mat-icon> ¡Vas primero! Defiende tu lugar.</p>
+            }
+          } @else {
+            <div class="rk-yo__puesto"><strong>—</strong><span>Aún sin puesto</span></div>
+            <p class="rk-yo__meta">Suma tus primeros puntos {{ infoPeriodo().corto }} para entrar al ranking.</p>
+            <a class="rk-yo__accion" routerLink="/practica"><mat-icon>play_arrow</mat-icon> Practicar ahora</a>
+          }
+          <div class="rk-yo__cifras">
+            <div><b>+{{ yo.puntosHoy }}</b><small>hoy</small></div>
+            <div><b>+{{ yo.puntosSemana }}</b><small>semana</small></div>
+            <div><b><mat-icon>local_fire_department</mat-icon>{{ yo.rachaActual }}</b><small>{{ yo.rachaActual === 1 ? 'día' : 'días' }} de racha</small></div>
+          </div>
+        </section>
+
+        <!-- Nivel -->
+        @let n = nivel();
+        <section class="rk-caja rk-nivel">
+          <span class="rk-nivel__icono"><mat-icon>{{ n.actual.icono }}</mat-icon></span>
+          <div class="rk-nivel__cuerpo">
+            <small>Tu nivel · {{ yo.puntosTotales }} pts</small>
+            <strong>{{ n.actual.nombre }}</strong>
+            <span class="rk-nivel__barra"><i [style.width.%]="n.avance"></i></span>
+            <small>
+              @if (n.siguiente) {
+                {{ n.faltan }} pts para <b>{{ n.siguiente.nombre }}</b>
+              } @else {
+                ¡Llegaste al nivel máximo!
+              }
+            </small>
+          </div>
+        </section>
+
+        <!-- Últimos puntos -->
+        <section class="rk-caja">
+          <h2><mat-icon>history</mat-icon> Tus últimos puntos</h2>
+          @if (yo.ultimosMovimientos.length) {
+            <ul class="rk-movimientos">
+              @for (m of yo.ultimosMovimientos; track $index) {
+                @let d = describirMovimiento(m.motivo);
+                <li>
+                  <span class="rk-movimientos__icono"><mat-icon>{{ d.icono }}</mat-icon></span>
+                  <span><b>{{ d.texto }}</b><small>{{ haceCuanto(m.fecha) }}</small></span>
+                  <strong>+{{ m.cantidad }}</strong>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="rk-nada">Todavía no tienes puntos. ¡Tu primera respuesta correcta vale +20!</p>
+          }
+        </section>
+      }
+    </aside>
+  </div>
 </div>

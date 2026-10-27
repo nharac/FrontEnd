@@ -6,6 +6,10 @@
 @use '@angular/material' as mat;
 @use './animaciones';
 @use './docente-panel';
+@use './estudiante-inicio';
+@use './estudiante-practica';
+@use './estudiante-comunidad';
+@use './estudiante-ranking';
 // Íconos incluidos en el proyecto (no dependen de internet)
 @use 'material-symbols/outlined';
 
@@ -63,4 +67,24 @@ body {
   border: 1px solid #e5e7eb;
   object-fit: contain;
   background: #f9fafb;
+}
+
+// ============================================
+// Avisos (snackbar): el contenedor de Material queda transparente y el componente
+// Aviso dibuja la tarjeta (ver shared/components/aviso)
+// ============================================
+.mat-mdc-snack-bar-container.saesu-aviso {
+  --mdc-snackbar-container-color: transparent;
+  --mat-snack-bar-container-color: transparent;
+  --mdc-snackbar-container-shape: 16px;
+  margin: 16px !important;
+
+  .mdc-snackbar__surface {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  .mat-mdc-snack-bar-label { padding: 0 !important; }
 }

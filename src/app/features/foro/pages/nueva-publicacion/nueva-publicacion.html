@@ -1,63 +1,103 @@
 <div class="nueva">
-  <a class="volver" routerLink="/foro"><mat-icon>arrow_back</mat-icon> Volver al foro</a>
+  <a class="fo-volver" routerLink="/foro"><mat-icon>arrow_back</mat-icon> Volver al foro</a>
 
-  <form class="tarjeta" [formGroup]="form" (ngSubmit)="publicar()">
-    <h1>Nueva publicación</h1>
-    <p class="ayuda">Explica tu duda con detalle: qué intentaste y en qué paso te atascaste.</p>
+  <div class="nueva__layout">
+    <form class="fo-form" [formGroup]="form" (ngSubmit)="publicar()">
+      <header>
+        <span class="fo-form__icono"><mat-icon>edit_square</mat-icon></span>
+        <div>
+          <h1>Nueva publicación</h1>
+          <p>Explica tu duda con detalle: qué intentaste y en qué paso te atascaste.</p>
+        </div>
+      </header>
 
-    <label for="titulo">Título</label>
-    <input id="titulo" type="text" formControlName="titulo"
-           placeholder="Ej: ¿Cómo aplico la regla de la cadena en sen(x²)?" [attr.maxlength]="maxTitulo">
-    <div class="pie">
-      @if (titulo.touched && titulo.hasError('required')) {
-        <small class="error">El título es obligatorio</small>
+      <label for="titulo">Título</label>
+      <input id="titulo" type="text" formControlName="titulo" [class.invalido]="titulo.touched && titulo.invalid"
+             placeholder="Ej: ¿Cómo aplico la regla de la cadena en sen(x²)?" [attr.maxlength]="maxTitulo">
+      <div class="fo-form__pie">
+        @if (titulo.touched && titulo.hasError('required')) {
+          <small class="error">El título es obligatorio</small>
+        }
+        <small class="contador">{{ titulo.value.length }}/{{ maxTitulo }}</small>
+      </div>
+
+      <span class="fo-form__etiqueta" id="tema-etiqueta">Tema</span>
+      <div class="fo-form__temas" role="radiogroup" aria-labelledby="tema-etiqueta">
+        @for (t of temas; track t.id) {
+          <button type="button" role="radio" class="fo-tema-opcion fo-tema-opcion--{{ t.id }}"
+                  [class.activo]="tema.value === t.id" [attr.aria-checked]="tema.value === t.id" (click)="elegirTema(t.id)">
+            <mat-icon>{{ t.icono }}</mat-icon> {{ t.nombre }}
+          </button>
+        }
+      </div>
+      @if (tema.touched && tema.hasError('required')) {
+        <small class="error">Elige el tema de tu consulta</small>
       }
-      <small class="contador">{{ titulo.value.length }}/{{ maxTitulo }}</small>
-    </div>
 
-    <label for="tema">Tema</label>
-    <select id="tema" formControlName="tema">
-      <option value="" disabled>Elige un tema</option>
-      @for (t of temas; track t.id) {
-        <option [value]="t.id">{{ t.nombre }}</option>
+      <label for="contenido">Contenido</label>
+      <textarea id="contenido" rows="7" formControlName="contenido" [class.invalido]="contenido.touched && contenido.invalid"
+                placeholder="Ej: Intenté derivar sen(x²) y me dio cos(x²), pero la respuesta dice 2x·cos(x²). ¿De dónde sale el 2x?"></textarea>
+      @if (contenido.touched && contenido.invalid) {
+        <small class="error">Escribe al menos 10 caracteres para que te puedan ayudar</small>
       }
-    </select>
-    @if (tema.touched && tema.hasError('required')) {
-      <small class="error">Elige el tema de tu consulta</small>
-    }
 
-    <label for="contenido">Contenido</label>
-    <textarea id="contenido" rows="7" formControlName="contenido"
-              placeholder="Describe tu duda..."></textarea>
-    @if (contenido.touched && contenido.invalid) {
-      <small class="error">Escribe al menos 10 caracteres para que te puedan ayudar</small>
-    }
+      <span class="fo-form__etiqueta">Imagen del ejercicio <small>(opcional)</small></span>
+      @if (vistaPrevia(); as src) {
+        <div class="fo-imagen">
+          <img [src]="src" alt="Vista previa de la imagen adjunta">
+          <button type="button" class="fo-imagen__quitar" (click)="quitarImagen()" aria-label="Quitar imagen">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      } @else {
+        <label class="fo-subir" [class.fo-subir--encima]="arrastrando()"
+               (dragover)="$event.preventDefault(); arrastrando.set(true)"
+               (dragleave)="arrastrando.set(false)"
+               (drop)="soltarImagen($event)">
+          <mat-icon>add_photo_alternate</mat-icon>
+          <span>Arrastra una foto de tu ejercicio o <strong>haz clic para elegirla</strong></span>
+          <small>JPG, PNG, WEBP o GIF · máximo 5 MB</small>
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" (change)="elegirImagen($event)">
+        </label>
+      }
 
-    <span class="etiqueta">Imagen del ejercicio <small>(opcional)</small></span>
-    @if (vistaPrevia(); as src) {
-      <div class="imagen">
-        <img [src]="src" alt="Vista previa de la imagen adjunta">
-        <button type="button" class="imagen__quitar" (click)="quitarImagen()" aria-label="Quitar imagen">
-          <mat-icon>close</mat-icon>
+      <div class="fo-form__acciones">
+        <a class="fo-btn fo-btn--claro" routerLink="/foro">Cancelar</a>
+        <button type="submit" class="fo-btn" [disabled]="enviando()">
+          <mat-icon>send</mat-icon>
+          {{ enviando() ? (archivo() ? 'Subiendo imagen...' : 'Publicando...') : 'Publicar' }}
         </button>
       </div>
-    } @else {
-      <label class="subir" [class.subir--encima]="arrastrando()"
-             (dragover)="$event.preventDefault(); arrastrando.set(true)"
-             (dragleave)="arrastrando.set(false)"
-             (drop)="soltarImagen($event)">
-        <mat-icon>add_photo_alternate</mat-icon>
-        <span>Arrastra una foto de tu ejercicio o <strong>haz clic para elegirla</strong></span>
-        <small>JPG, PNG, WEBP o GIF · máximo 5 MB</small>
-        <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" (change)="elegirImagen($event)">
-      </label>
-    }
+    </form>
 
-    <div class="acciones">
-      <a class="btn btn--secundario" routerLink="/foro">Cancelar</a>
-      <button type="submit" class="btn btn--primario" [disabled]="enviando()">
-        {{ enviando() ? (archivo() ? 'Subiendo imagen...' : 'Publicando...') : 'Publicar' }}
-      </button>
-    </div>
-  </form>
+    <aside class="nueva__lateral">
+      <span class="nueva__subtitulo"><mat-icon>visibility</mat-icon> Así se verá en el foro</span>
+      <div class="fo-pub fo-pub--vista fo-pub--{{ form.controls.tema.value || 'ninguno' }}" aria-hidden="true">
+        <span class="fo-avatar">Tú</span>
+        <div class="fo-pub__cuerpo">
+          <div class="fo-pub__meta"><b>Tú</b><span>· ahora</span></div>
+          <h3 [class.vacio]="!titulo.value.trim()">{{ vistaTitulo() }}</h3>
+          <p class="fo-pub__preview">{{ vistaContenido() }}</p>
+          <div class="fo-pub__pie">
+            @if (nombreTema(); as nt) {
+              <span class="fo-tema fo-tema--{{ form.controls.tema.value }}">{{ nt }}</span>
+            }
+            <span class="fo-sin-respuesta"><mat-icon>volunteer_activism</mat-icon> Esperando ayuda</span>
+          </div>
+        </div>
+        @if (vistaPrevia(); as src) {
+          <img class="fo-pub__mini" [src]="src" alt="">
+        }
+      </div>
+
+      <section class="fo-caja">
+        <h2><mat-icon>checklist</mat-icon> Una buena pregunta</h2>
+        <ul class="fo-chequeo">
+          @for (c of chequeo(); track c.texto) {
+            <li [class.ok]="c.ok"><mat-icon>{{ c.ok ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon> {{ c.texto }}</li>
+          }
+        </ul>
+      </section>
+    </aside>
+  </div>
 </div>

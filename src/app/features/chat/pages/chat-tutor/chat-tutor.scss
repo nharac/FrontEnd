@@ -1,46 +1,56 @@
+$indigo: #4f46e5;
+$texto: #1f2f3f;
+$gris: #6b7280;
+
 .chat-tutor {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  max-width: 800px;
-  margin: 0 auto;
-  height: calc(100vh - 160px);
-  min-height: 560px;
+  max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; color: $texto;
 
   &__header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    h1 { margin: 6px 0 4px; font-size: clamp(26px, 4vw, 32px); line-height: 1.15; font-weight: 800; letter-spacing: -0.5px; }
+    p { margin: 0; color: $gris; font-size: 15px; max-width: 620px; }
   }
+  &__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.6px; color: $indigo; background: #fff; padding: 5px 12px; border-radius: 999px; box-shadow: 0 6px 22px rgba(31, 50, 71, 0.07);
+    mat-icon { font-size: 16px; width: 16px; height: 16px; } }
 
-  &__badge {
-    display: inline-block;
-    align-self: center;
-    background: #e0e7ff;
-    color: #4f46e5;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 999px;
-    letter-spacing: 0.5px;
-  }
+  &__cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start;
+    @media (max-width: 1023px) { grid-template-columns: 1fr; } }
+  &__panel { height: calc(100vh - 250px); min-height: 520px; max-height: 820px; }
+  &__lateral { display: flex; flex-direction: column; gap: 14px; }
+}
 
-  &__titulo {
-    font-size: 32px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 4px 0 0;
-  }
+.ct-tarjeta {
+  background: #fff; border-radius: 20px; padding: 16px 18px; box-shadow: 0 6px 22px rgba(31, 50, 71, 0.07);
+  h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 15px; font-weight: 700; mat-icon { color: $indigo; } }
 
-  &__subtitulo {
-    color: #7f8c8d;
-    font-size: 15px;
-    margin: 0;
-  }
+  &--enlaces { padding: 8px; display: flex; flex-direction: column; gap: 2px;
+    a { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; text-decoration: none; color: inherit; transition: background 0.15s;
+      &:hover { background: #f5f7ff; }
+      mat-icon { flex: none; color: $indigo; background: #eef2ff; border-radius: 10px; padding: 6px; }
+      b { display: block; font-size: 13.5px; }
+      small { font-size: 12px; color: $gris; } } }
+}
 
-  &__panel {
-    flex: 1;
-    min-height: 0;
-  }
+.ct-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;
+  li { display: flex; gap: 10px; font-size: 13.5px; line-height: 1.4; color: #374151; }
+  mat-icon { flex: none; font-size: 20px; width: 20px; height: 20px; color: #10b981; } }
+
+.ct-tema { display: flex; flex-direction: column; gap: 6px; & + & { margin-top: 12px; }
+  &__nombre { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: $indigo;
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    &--derivadas { color: #0891b2; }
+    &--integrales { color: #7c3aed; } } }
+
+.ct-rapida { display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; font: inherit; font-size: 13px; color: $texto; background: #f9fafb; border: 1px solid #eef0f4; border-radius: 12px; padding: 8px 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  mat-icon { flex: none; font-size: 16px; width: 16px; height: 16px; color: #9ca3af; }
+  &:hover { background: #f5f7ff; border-color: #c7d2fe; mat-icon { color: $indigo; } } }
+
+@media (max-width: 600px) { .chat-tutor__panel { height: calc(100vh - 210px); min-height: 460px; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .chat-tutor__header, .chat-tutor__panel, .ct-tarjeta { animation: saesu-entrar 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .chat-tutor__panel { animation-delay: 0.08s; }
+  .ct-tarjeta:nth-child(1) { animation-delay: 0.14s; }
+  .ct-tarjeta:nth-child(2) { animation-delay: 0.2s; }
+  .ct-tarjeta:nth-child(3) { animation-delay: 0.26s; }
 }

@@ -1,9 +1,10 @@
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, map, of, switchMap } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ForoService } from '../../services/foro.service';
 import { CrearPublicacionRequest } from '../../models/foro.model';
@@ -21,7 +22,7 @@ const MAX_TITULO = 255;
  */
 @Component({
   selector: 'app-nueva-publicacion',
-  imports: [RouterLink, ReactiveFormsModule, MatIconModule, MatSnackBarModule],
+  imports: [RouterLink, ReactiveFormsModule, MatIconModule],
   templateUrl: './nueva-publicacion.html',
   styleUrl: './nueva-publicacion.scss',
 })
@@ -34,9 +35,9 @@ export class NuevaPublicacion implements OnDestroy {
 
   readonly maxTitulo = MAX_TITULO;
   readonly temas = [
-    { id: 'limites', nombre: 'Límites' },
-    { id: 'derivadas', nombre: 'Derivadas' },
-    { id: 'integrales', nombre: 'Integrales' },
+    { id: 'limites', nombre: 'Límites', icono: 'trending_flat' },
+    { id: 'derivadas', nombre: 'Derivadas', icono: 'show_chart' },
+    { id: 'integrales', nombre: 'Integrales', icono: 'functions' },
   ];
 
   enviando = signal(false);
@@ -50,6 +51,32 @@ export class NuevaPublicacion implements OnDestroy {
     tema: ['', [Validators.required]],
     contenido: ['', [Validators.required, Validators.minLength(10)]],
   });
+
+  /** Valores del formulario como signal, para la vista previa y la lista de chequeo. */
+  private valores = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+
+  vistaTitulo = computed(() => this.valores().titulo?.trim() || 'Tu pregunta aparecerá aquí');
+  vistaContenido = computed(() => {
+    const texto = this.valores().contenido?.trim() || 'Describe tu duda para que tus compañeros puedan ayudarte.';
+    return texto.length > 150 ? texto.slice(0, 150) + '…' : texto;
+  });
+  nombreTema = computed(() => this.temas.find(t => t.id === this.valores().tema)?.nombre ?? null);
+
+  /** Lista de chequeo de una buena pregunta (solo orienta; lo obligatorio lo validan los Validators). */
+  chequeo = computed(() => {
+    const v = this.valores();
+    return [
+      { ok: !!v.titulo?.trim().endsWith('?'), texto: 'El título es una pregunta concreta' },
+      { ok: !!v.tema, texto: 'Elegiste el tema' },
+      { ok: (v.contenido?.trim().length ?? 0) >= 40, texto: 'Cuentas qué intentaste (40+ caracteres)' },
+      { ok: !!this.archivo(), texto: 'Adjuntaste una foto (opcional)' },
+    ];
+  });
+
+  elegirTema(id: string): void {
+    this.tema.setValue(id);
+    this.tema.markAsTouched();
+  }
 
   get titulo() { return this.form.controls.titulo; }
   get tema() { return this.form.controls.tema; }

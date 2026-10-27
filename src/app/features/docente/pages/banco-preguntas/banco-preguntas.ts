@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subject, debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -18,7 +18,7 @@ import { colorPorcentaje } from '../../utils/colores';
  */
 @Component({
   selector: 'app-banco-preguntas',
-  imports: [RouterLink, FormsModule, MatIconModule, MatSnackBarModule],
+  imports: [RouterLink, FormsModule, MatIconModule],
   templateUrl: './banco-preguntas.html',
   styleUrl: './banco-preguntas.scss',
 })

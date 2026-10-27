@@ -1,44 +1,46 @@
-<article class="pregunta">
+<article class="pc" [class.pc--resuelta]="resuelta()">
 
-  <div class="pregunta__progreso">
-    <span>Pregunta {{ numero() }} de {{ total() }}</span>
-    <span class="pregunta__dificultad pregunta__dificultad--{{ pregunta().dificultad }}">
-      {{ etiquetaDificultad() }}
+  <header class="pc__meta">
+    <span class="pc__num">Pregunta <b>{{ numero() }}</b> de {{ total() }}</span>
+    <span class="pc__dif pc__dif--{{ pregunta().dificultad }}">{{ etiquetaDificultad() }}</span>
+    <span class="pc__vale" [class.pc__vale--baja]="!resuelta() && intentos() > 0" [class.pc__vale--ok]="resuelta()">
+      <mat-icon>{{ resuelta() ? 'stars' : 'bolt' }}</mat-icon>
+      {{ resuelta() ? (valeAhora() ? 'Ganaste +' + valeAhora() : 'Ya la habías resuelto') : 'Vale +' + valeAhora() + ' pts' }}
     </span>
-  </div>
-  <div class="barra"><div class="barra__relleno" [style.width.%]="progresoPct()"></div></div>
+  </header>
 
-  <h2 class="pregunta__enunciado">{{ pregunta().enunciado }}</h2>
+  <h2 class="pc__enunciado">{{ pregunta().enunciado }}</h2>
 
-  <div class="opciones" role="radiogroup">
+  <div class="pc__opciones" role="radiogroup" aria-label="Opciones de respuesta">
     @for (opcion of pregunta().opciones; track opcion.id) {
       <button type="button"
               role="radio"
-              class="opcion opcion--{{ estadoOpcion(opcion) }}"
+              class="pc-opcion pc-opcion--{{ estadoOpcion(opcion) }}"
               [attr.aria-checked]="seleccionada() === opcion.id"
               [disabled]="resuelta() || descartadas().includes(opcion.id)"
               (click)="elegir(opcion)">
-        <span class="opcion__letra">{{ opcion.letra }}</span>
-        <span class="opcion__texto">{{ opcion.texto }}</span>
+        <span class="pc-opcion__letra">{{ opcion.letra }}</span>
+        <span class="pc-opcion__texto">{{ opcion.texto }}</span>
         @switch (estadoOpcion(opcion)) {
-          @case ('correcta') { <mat-icon class="opcion__icono">check_circle</mat-icon> }
-          @case ('incorrecta') { <mat-icon class="opcion__icono">cancel</mat-icon> }
+          @case ('correcta') { <mat-icon class="pc-opcion__icono">check_circle</mat-icon> }
+          @case ('incorrecta') { <mat-icon class="pc-opcion__icono">cancel</mat-icon> }
+          @case ('seleccionada') { <mat-icon class="pc-opcion__icono">radio_button_checked</mat-icon> }
         }
       </button>
     }
   </div>
 
   @if (validacion(); as v) {
-    <div class="resultado" [class.resultado--ok]="v.esCorrecta" [class.resultado--error]="!v.esCorrecta">
+    <div class="pc-resultado" [class.pc-resultado--ok]="v.esCorrecta" [class.pc-resultado--error]="!v.esCorrecta" role="status">
       @if (v.esCorrecta && v.puntosGanados) {
         <span class="puntos-flotantes" aria-hidden="true">+{{ v.puntosGanados }}</span>
         <app-confeti [cantidad]="16" [alcance]="130" />
       }
-      <mat-icon>{{ v.esCorrecta ? 'celebration' : 'lightbulb' }}</mat-icon>
+      <span class="pc-resultado__icono"><mat-icon>{{ v.esCorrecta ? 'celebration' : 'psychology_alt' }}</mat-icon></span>
       <div>
         <strong>{{ v.esCorrecta ? (v.mensaje || '¡Correcto!') : 'Aún no. Intenta con otra opción.' }}</strong>
         @if (!v.esCorrecta && v.puntosEnJuego) {
-          <p class="resultado__puntos">Si aciertas ahora ganas <strong>+{{ v.puntosEnJuego }} puntos</strong>.</p>
+          <p>Si aciertas ahora ganas <b>+{{ v.puntosEnJuego }} puntos</b>.</p>
         }
         @if (v.esCorrecta && intentos() > 1) {
           <p>Lo lograste en {{ intentos() }} intentos. ¡Bien hecho por no rendirte!</p>
@@ -48,40 +50,45 @@
   }
 
   @if (pista() && !resuelta()) {
-    <div class="pista">
+    <div class="pc-pista">
       <mat-icon>tips_and_updates</mat-icon>
-      <p><strong>Pista:</strong> {{ pista() }}</p>
+      <p><strong>Pista</strong>{{ pista() }}</p>
     </div>
   }
 
-  <div class="acciones">
+  <footer class="pc__acciones">
+    <p class="pc__atajos" aria-hidden="true">
+      @if (resuelta()) {
+        <kbd>Enter</kbd> siguiente
+      } @else {
+        <kbd>A</kbd>–<kbd>D</kbd> elegir · <kbd>Enter</kbd> responder
+      }
+    </p>
     @if (!resuelta()) {
       <!-- RF-07: la pista solo se ofrece después de una respuesta incorrecta -->
       @if (intentos() > 0 && !pista()) {
-        <button type="button" class="btn btn--secundario" (click)="pedirPista()"
-                [disabled]="cargandoPista()">
+        <button type="button" class="pr-btn pr-btn--claro" (click)="pedirPista()" [disabled]="cargandoPista()">
           <mat-icon>tips_and_updates</mat-icon> {{ cargandoPista() ? 'Cargando...' : 'Ver pista' }}
         </button>
       }
-      <button type="button" class="btn btn--secundario" (click)="alternarChat()">
-        <mat-icon>smart_toy</mat-icon> {{ mostrarChat() ? 'Ocultar tutor' : 'Pedir ayuda al tutor' }}
+      <button type="button" class="pr-btn pr-btn--claro" [class.pr-btn--activo]="mostrarChat()" (click)="alternarChat()">
+        <mat-icon>smart_toy</mat-icon> {{ mostrarChat() ? 'Ocultar tutor' : 'Pedir ayuda' }}
       </button>
-      <button type="button" class="btn btn--primario" (click)="responder()"
-              [disabled]="seleccionada() === null || enviando()">
+      <button type="button" class="pr-btn" (click)="responder()" [disabled]="seleccionada() === null || enviando()">
         {{ enviando() ? 'Validando...' : 'Responder' }}
       </button>
     } @else {
-      <button type="button" class="btn btn--primario" (click)="siguiente.emit()">
+      <button type="button" class="pr-btn" (click)="siguiente.emit()">
         {{ numero() < total() ? 'Siguiente' : 'Ver resultados' }} <mat-icon>arrow_forward</mat-icon>
       </button>
     }
-  </div>
+  </footer>
 </article>
 
 @if (mostrarChat() && !resuelta()) {
   @for (id of [pregunta().id]; track id) {
-    <div class="tutor">
+    <aside class="pc-tutor" aria-label="Tutor IA de esta pregunta">
       <app-chat-panel [preguntaId]="id" />
-    </div>
+    </aside>
   }
 }

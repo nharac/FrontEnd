@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { DocenteService } from '../../services/docente.service';
@@ -22,7 +22,7 @@ type Orden = 'nombre' | 'puntos' | 'porcentaje' | 'ultima';
  */
 @Component({
   selector: 'app-estudiantes-docente',
-  imports: [RouterLink, FormsModule, MatIconModule, MatSnackBarModule, MatTooltipModule],
+  imports: [RouterLink, FormsModule, MatIconModule, MatTooltipModule],
   templateUrl: './estudiantes-docente.html',
   styleUrl: './estudiantes-docente.scss',
 })

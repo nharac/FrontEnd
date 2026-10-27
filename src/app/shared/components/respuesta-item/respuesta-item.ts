@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Respuesta } from '../../../features/foro/models/foro.model';
 import { haceCuanto } from '../../utils/tiempo';
 import { esDocente } from '../../utils/rol';
+import { colorAvatar } from '../../utils/avatar';
 
 /**
  * Una respuesta del foro con sus respuestas hijas, dibujadas con sangría.
@@ -57,6 +58,8 @@ export class RespuestaItem {
     this.puedeModerar() && !this.respuesta().oculta && !this.autorDocente());
 
   readonly haceCuanto = haceCuanto;
+  /** Color estable del avatar según el nombre (los docentes conservan su color propio). */
+  colorAutor = computed(() => colorAvatar(this.respuesta().autor.nombre));
 
   alternarRespuesta(): void {
     this.respondiendo.update(v => !v);

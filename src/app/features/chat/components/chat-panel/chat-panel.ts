@@ -11,10 +11,16 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ChatService } from '../../services/chat.service';
 import { ChatMensaje } from '../../models/chat.model';
+import { formatearMensaje } from '../../utils/formato-mensaje';
+
+/** Mensaje listo para pintar: el texto de la IA ya viene convertido a HTML seguro. */
+interface MensajeVista extends ChatMensaje {
+  html: string;
+}
 
 /** Límite de caracteres que acepta el backend (EnviarMensajeRequest). */
 const MAX_CARACTERES = 2000;
@@ -29,7 +35,7 @@ const MAX_CARACTERES = 2000;
  */
 @Component({
   selector: 'app-chat-panel',
-  imports: [DatePipe, FormsModule, MatIconModule, MatSnackBarModule],
+  imports: [DatePipe, FormsModule, MatIconModule],
   templateUrl: './chat-panel.html',
   styleUrl: './chat-panel.scss',
 })
@@ -42,6 +48,7 @@ export class ChatPanel implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   private contenedor = viewChild<ElementRef<HTMLElement>>('contenedor');
+  private entrada = viewChild<ElementRef<HTMLTextAreaElement>>('entrada');
 
   readonly maxCaracteres = MAX_CARACTERES;
 
@@ -50,6 +57,14 @@ export class ChatPanel implements OnInit {
   cargandoHistorial = signal(true);
   enviando = signal(false);
   mensajesRestantes = signal<number | null>(null);
+  /** Id del mensaje que se acaba de copiar (muestra el check unos segundos). */
+  copiado = signal<number | null>(null);
+
+  mensajesVista = computed<MensajeVista[]>(() =>
+    this.mensajes().map(m => ({ ...m, html: m.rolEmisor === 'ia' ? formatearMensaje(m.mensaje) : '' }))
+  );
+  /** Se muestra el contador cuando el mensaje se acerca al límite. */
+  cercaDelLimite = computed(() => this.texto().length > MAX_CARACTERES * 0.8);
 
   esContextual = computed(() => this.preguntaId() !== null);
   puedeEnviar = computed(() => {
@@ -60,8 +75,16 @@ export class ChatPanel implements OnInit {
   /** Sugerencias para arrancar la conversación cuando no hay mensajes. */
   sugerencias = computed(() =>
     this.esContextual()
-      ? ['No sé por dónde empezar', '¿Qué concepto necesito aquí?', 'Dame una pista']
-      : ['¿Qué es un límite?', '¿Cómo se usa la regla de la cadena?', '¿Para qué sirve una integral?']
+      ? [
+          { icono: 'explore', texto: 'No sé por dónde empezar' },
+          { icono: 'menu_book', texto: '¿Qué concepto necesito aquí?' },
+          { icono: 'help', texto: '¿Por qué mi respuesta está mal?' }
+        ]
+      : [
+          { icono: 'trending_flat', texto: '¿Qué es un límite y cómo se calcula?' },
+          { icono: 'show_chart', texto: '¿Cómo se usa la regla de la cadena?' },
+          { icono: 'functions', texto: '¿Cuándo conviene integrar por partes?' }
+        ]
   );
 
   ngOnInit(): void {
@@ -93,6 +116,22 @@ export class ChatPanel implements OnInit {
     this.enviar();
   }
 
+  /** El textarea crece con el texto (hasta 5 líneas aprox.). */
+  ajustarAltura(): void {
+    const el = this.entrada()?.nativeElement;
+    if (el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+    }
+  }
+
+  copiar(m: ChatMensaje): void {
+    navigator.clipboard?.writeText(m.mensaje).then(() => {
+      this.copiado.set(m.id);
+      setTimeout(() => this.copiado.update(id => id === m.id ? null : id), 1800);
+    }).catch(() => this.snackBar.open('No se pudo copiar el mensaje', 'Cerrar', { duration: 2500 }));
+  }
+
   /** Enter envía; Shift + Enter hace salto de línea. */
   alPresionarTecla(evento: KeyboardEvent): void {
     if (evento.key === 'Enter' && !evento.shiftKey) {
@@ -118,6 +157,7 @@ export class ChatPanel implements OnInit {
     };
     this.mensajes.update(lista => [...lista, temporal]);
     this.texto.set('');
+    setTimeout(() => this.ajustarAltura());
     this.enviando.set(true);
     this.bajarAlFinal();
 
@@ -138,6 +178,7 @@ export class ChatPanel implements OnInit {
         this.mensajes.update(lista => lista.filter(m => m.id !== temporal.id));
         this.texto.set(mensaje);
         this.enviando.set(false);
+        setTimeout(() => this.ajustarAltura());
         this.mostrarError(err, 'No se pudo enviar el mensaje');
       }
     });

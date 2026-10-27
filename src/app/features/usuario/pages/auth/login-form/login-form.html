@@ -21,7 +21,7 @@
     La contraseña debe tener mínimo 8 caracteres
   </small>
 
-  <a href="#" class="forgot-pass">¿Olvidaste tu contraseña?</a>
+  <a class="forgot-pass" routerLink="/auth/recuperar" [queryParams]="correo?.valid ? { correo: correo?.value } : {}">¿Olvidaste tu contraseña?</a>
 
   <button type="submit" class="btn" [disabled]="cargando()">
     @if (cargando()) {

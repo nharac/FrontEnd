@@ -58,4 +58,20 @@ export class AuthService {
   logout(): void {
     this.tokenService.eliminar();
   }
+
+  /**
+   * Paso 1 de "¿Olvidaste tu contraseña?": envía un código de 6 dígitos al correo.
+   * POST /api/auth/recuperar  (responde igual exista o no la cuenta)
+   */
+  solicitarRecuperacion(correo: string): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${this.API}/recuperar`, { correo });
+  }
+
+  /**
+   * Paso 2: cambia la contraseña con el código recibido.
+   * POST /api/auth/restablecer
+   */
+  restablecerPassword(datos: { correo: string; codigo: string; passwordNueva: string }): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${this.API}/restablecer`, datos);
+  }
 }

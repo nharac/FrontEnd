@@ -2,21 +2,22 @@
 
   <header class="chat__barra">
     <div class="chat__tutor">
-      <span class="chat__avatar"><mat-icon>smart_toy</mat-icon></span>
+      <span class="chat__avatar"><mat-icon>smart_toy</mat-icon><i class="chat__en-linea" aria-hidden="true"></i></span>
       <div>
         <strong>Tutor SAESU</strong>
-        <small>{{ esContextual() ? 'Te ayuda con esta pregunta' : 'Pregúntale lo que quieras de cálculo' }}</small>
+        <small>{{ enviando() ? 'Escribiendo...' : (esContextual() ? 'Te ayuda con esta pregunta' : 'En línea · cálculo diferencial e integral') }}</small>
       </div>
     </div>
 
     <div class="chat__acciones">
       @if (mensajesRestantes() !== null) {
-        <span class="chat__contador" [class.chat__contador--agotado]="mensajesRestantes() === 0">
-          {{ mensajesRestantes() }} mensajes hoy
+        <span class="chat__contador" [class.chat__contador--agotado]="mensajesRestantes() === 0"
+              title="Mensajes que te quedan hoy">
+          <mat-icon>bolt</mat-icon> {{ mensajesRestantes() }}
         </span>
       }
       @if (!esContextual()) {
-        <button type="button" class="chat__boton-icono" title="Borrar historial"
+        <button type="button" class="chat__boton-icono" title="Borrar historial" aria-label="Borrar historial"
                 [disabled]="mensajes().length === 0 || enviando()"
                 (click)="limpiarHistorial()">
           <mat-icon>delete_sweep</mat-icon>
@@ -25,60 +26,95 @@
     </div>
   </header>
 
-  <div class="chat__mensajes" #contenedor>
+  <div class="chat__mensajes" #contenedor aria-live="polite">
     @if (cargandoHistorial()) {
-      <p class="chat__estado">Cargando conversación...</p>
+      <div class="chat__estado">
+        <span class="chat__esqueleto"></span><span class="chat__esqueleto chat__esqueleto--der"></span><span class="chat__esqueleto"></span>
+      </div>
     } @else if (mensajes().length === 0) {
       <div class="chat__vacio">
-        <mat-icon>forum</mat-icon>
+        <span class="chat__vacio-icono"><mat-icon>waving_hand</mat-icon></span>
+        <strong>{{ esContextual() ? '¿En qué parte te atascaste?' : '¡Hola! Soy tu tutor de cálculo' }}</strong>
         <p>
           {{ esContextual()
-              ? 'Cuéntale al tutor en qué parte te atascaste. Te guiará con preguntas, sin darte la respuesta.'
-              : 'Escribe tu duda de límites, derivadas o integrales. El tutor te guiará paso a paso.' }}
+              ? 'Cuéntame qué intentaste. Te guiaré con preguntas, sin darte la respuesta.'
+              : 'Pregúntame de límites, derivadas o integrales. Te guío paso a paso para que llegues tú a la respuesta.' }}
         </p>
         <div class="chat__sugerencias">
-          @for (s of sugerencias(); track s) {
-            <button type="button" (click)="usarSugerencia(s)">{{ s }}</button>
+          @for (s of sugerencias(); track s.texto) {
+            <button type="button" (click)="usarSugerencia(s.texto)" [disabled]="mensajesRestantes() === 0">
+              <mat-icon>{{ s.icono }}</mat-icon> {{ s.texto }}
+            </button>
           }
         </div>
       </div>
     } @else {
-      @for (m of mensajes(); track m.id) {
-        <div class="burbuja" [class.burbuja--usuario]="m.rolEmisor === 'usuario'"
-             [class.burbuja--ia]="m.rolEmisor === 'ia'">
-          <p class="burbuja__texto">{{ m.mensaje }}</p>
-          <time class="burbuja__hora">{{ m.fechaHora | date: 'shortTime' }}</time>
-        </div>
+      @for (m of mensajesVista(); track m.id) {
+        @if (m.rolEmisor === 'ia') {
+          <div class="fila fila--ia">
+            <span class="fila__avatar" aria-hidden="true"><mat-icon>smart_toy</mat-icon></span>
+            <div class="burbuja burbuja--ia">
+              <div class="burbuja__texto burbuja__texto--rico" [innerHTML]="m.html"></div>
+              <div class="burbuja__pie">
+                <time>{{ m.fechaHora | date: 'shortTime' }}</time>
+                <button type="button" class="burbuja__copiar" (click)="copiar(m)"
+                        [attr.aria-label]="copiado() === m.id ? 'Copiado' : 'Copiar respuesta'"
+                        [title]="copiado() === m.id ? 'Copiado' : 'Copiar'">
+                  <mat-icon>{{ copiado() === m.id ? 'check' : 'content_copy' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="fila fila--usuario">
+            <div class="burbuja burbuja--usuario">
+              <p class="burbuja__texto">{{ m.mensaje }}</p>
+              <div class="burbuja__pie"><time>{{ m.fechaHora | date: 'shortTime' }}</time></div>
+            </div>
+          </div>
+        }
       }
     }
 
     @if (enviando()) {
-      <div class="burbuja burbuja--ia burbuja--escribiendo" aria-label="El tutor está escribiendo">
-        <span></span><span></span><span></span>
+      <div class="fila fila--ia">
+        <span class="fila__avatar" aria-hidden="true"><mat-icon>smart_toy</mat-icon></span>
+        <div class="burbuja burbuja--ia burbuja--escribiendo" aria-label="El tutor está escribiendo">
+          <span></span><span></span><span></span>
+        </div>
       </div>
     }
   </div>
 
   <form class="chat__entrada" (ngSubmit)="enviar()">
-    <textarea
-      rows="1"
-      name="texto"
-      placeholder="Escribe tu duda..."
-      [ngModel]="texto()"
-      (ngModelChange)="texto.set($event)"
-      (keydown)="alPresionarTecla($event)"
-      [disabled]="mensajesRestantes() === 0"
-      [attr.maxlength]="maxCaracteres"></textarea>
-    <button type="submit" class="chat__enviar" [disabled]="!puedeEnviar()" title="Enviar">
+    <div class="chat__caja">
+      <textarea
+        #entrada
+        rows="1"
+        name="texto"
+        [placeholder]="mensajesRestantes() === 0 ? 'Llegaste al límite de hoy' : 'Escribe tu duda...'"
+        title="Enter envía · Shift + Enter hace un salto de línea"
+        [ngModel]="texto()"
+        (ngModelChange)="texto.set($event)"
+        (input)="ajustarAltura()"
+        (keydown)="alPresionarTecla($event)"
+        [disabled]="mensajesRestantes() === 0"
+        [attr.maxlength]="maxCaracteres"
+        aria-label="Mensaje para el tutor"></textarea>
+      @if (cercaDelLimite()) {
+        <small class="chat__caracteres">{{ texto().length }}/{{ maxCaracteres }}</small>
+      }
+    </div>
+    <button type="submit" class="chat__enviar" [disabled]="!puedeEnviar()" title="Enviar" aria-label="Enviar">
       <mat-icon>send</mat-icon>
     </button>
   </form>
 
   <p class="chat__aviso">
     @if (mensajesRestantes() === 0) {
-      Alcanzaste el límite de mensajes de hoy. Vuelve mañana.
+      <mat-icon>schedule</mat-icon> Alcanzaste el límite de mensajes de hoy. Vuelve mañana.
     } @else {
-      El tutor no te dará la respuesta final: te ayuda a llegar a ella.
+      <mat-icon>verified_user</mat-icon> El tutor no te dará la respuesta final: te ayuda a llegar a ella.
     }
   </p>
 </section>

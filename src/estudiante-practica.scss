@@ -1,0 +1,333 @@
+// ============================================
+// Práctica del estudiante: selección de tema, sesión de preguntas y resumen.
+// Va global (acotado a app-dashboard-practica y app-pregunta-card) para no pasar
+// el límite de 8 kB por componente.
+// ============================================
+$pr-indigo: #4f46e5;
+$pr-indigo-suave: #eef2ff;
+$pr-texto: #1f2f3f;
+$pr-gris: #6b7280;
+$pr-borde: #e5e7eb;
+$pr-verde: #059669;
+$pr-ambar: #d97706;
+$pr-rojo: #dc2626;
+$pr-sombra: 0 6px 22px rgba(31, 50, 71, 0.07);
+$pr-suave: cubic-bezier(0.22, 1, 0.36, 1);
+
+// ---------- Piezas compartidas (botones y anillos) ----------
+app-dashboard-practica, app-pregunta-card {
+  .pr-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font: inherit; font-size: 14.5px; font-weight: 600; text-decoration: none;
+    border: 0; border-radius: 12px; padding: 11px 20px; cursor: pointer;
+    background: $pr-indigo; color: #fff;
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.28);
+    mat-icon { font-size: 19px; width: 19px; height: 19px; }
+    &:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+    &--claro { background: #fff; color: $pr-texto; border: 1.5px solid $pr-borde; box-shadow: none; mat-icon { color: $pr-indigo; } }
+    &--claro:hover:not(:disabled) { border-color: #c7d2fe; }
+    &--activo { background: $pr-indigo-suave; border-color: #c7d2fe; color: $pr-indigo; }
+  }
+
+  .pr-anillo {
+    width: 64px; height: 64px; flex: none;
+    transform: rotate(-90deg);
+    circle { fill: none; stroke-width: 6; }
+    &__fondo { stroke: #eef2ff; }
+    &__valor { stroke: $pr-indigo; stroke-linecap: round; transition: stroke-dashoffset 0.9s $pr-suave; }
+    text { transform: rotate(90deg); transform-origin: 32px 32px; font-size: 13px; font-weight: 700; fill: $pr-texto; }
+    &--grande { width: 132px; height: 132px; circle { stroke-width: 5; } text { font-size: 14px; } }
+  }
+}
+
+app-dashboard-practica {
+  display: block;
+
+  .practica {
+    max-width: 1040px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 22px;
+    color: $pr-texto;
+  }
+
+  // ---------- Cabecera ----------
+  .pr-hero {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    &__badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.6px;
+      color: $pr-indigo; background: #fff; padding: 5px 12px; border-radius: 999px; box-shadow: $pr-sombra;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    }
+    h1 { margin: 12px 0 6px; font-size: clamp(26px, 4vw, 34px); line-height: 1.15; font-weight: 800; letter-spacing: -0.5px; }
+    p { margin: 0; color: $pr-gris; font-size: 15px; max-width: 560px; }
+    &__cifras {
+      display: flex; gap: 10px;
+      div { background: #fff; border-radius: 16px; padding: 12px 18px; box-shadow: $pr-sombra; min-width: 104px; }
+      strong { display: block; font-size: 22px; font-weight: 800; }
+      span { font-size: 12px; color: $pr-gris; }
+    }
+  }
+
+  // ---------- Temas ----------
+  .pr-temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; @media (max-width: 820px) { grid-template-columns: 1fr; } }
+
+  .pr-tema {
+    --color: #{$pr-indigo}; --suave: #{$pr-indigo-suave};
+    &--derivadas { --color: #0891b2; --suave: #e0f7fa; }
+    &--integrales { --color: #7c3aed; --suave: #f3e8ff; }
+
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; gap: 6px; text-align: left;
+    font: inherit; color: inherit; cursor: pointer;
+    background: #fff; border: 2px solid transparent; border-radius: 22px; padding: 20px;
+    box-shadow: $pr-sombra;
+    &::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: var(--color); opacity: 0.85; }
+    &:hover { border-color: color-mix(in srgb, var(--color) 30%, transparent); }
+
+    &__arriba { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    &__icono { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--suave); color: var(--color); mat-icon { font-size: 26px; width: 26px; height: 26px; } }
+    .pr-anillo__valor { stroke: var(--color); }
+    .pr-anillo__fondo { stroke: var(--suave); }
+    h3 { margin: 0; font-size: 18px; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 0; }
+    p { margin: 0; font-size: 13.5px; color: $pr-gris; line-height: 1.45; flex: 1; }
+    &__dato { display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 12.5px; color: $pr-gris; mat-icon { font-size: 16px; width: 16px; height: 16px; color: var(--color); } }
+
+    &__recomendado {
+      display: inline-flex; vertical-align: middle; margin-left: 6px; align-items: center; gap: 3px; font-size: 11px; font-weight: 700;
+      padding: 3px 9px; border-radius: 999px; background: #fef3c7; color: #b45309;
+      mat-icon { font-size: 13px; width: 13px; height: 13px; }
+    }
+    &__check {
+      position: absolute; top: 12px; left: 12px; width: 22px; height: 22px; border-radius: 50%;
+      display: grid; place-items: center; background: var(--color); color: #fff;
+      transform: scale(0); transition: transform 0.25s $pr-suave;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    }
+    &--activo {
+      border-color: var(--color);
+      box-shadow: 0 10px 28px color-mix(in srgb, var(--color) 22%, transparent);
+      .pr-tema__check { transform: scale(1); }
+    }
+  }
+
+  // ---------- Dificultad + empezar ----------
+  .pr-config {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+    background: #fff; border-radius: 20px; padding: 16px 20px; box-shadow: $pr-sombra;
+    &__dificultad { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; small { color: $pr-gris; font-size: 12.5px; } }
+    &__titulo { font-weight: 600; font-size: 14px; }
+  }
+  .pr-segmentado {
+    display: inline-flex; background: #f3f4f6; border-radius: 12px; padding: 4px; max-width: 100%; overflow-x: auto;
+    button {
+      font: inherit; font-size: 13.5px; font-weight: 500; border: 0; background: transparent; color: #4b5563;
+      padding: 7px 14px; border-radius: 9px; cursor: pointer; white-space: nowrap;
+      &.activo { background: #fff; color: $pr-indigo; font-weight: 600; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+    }
+    @media (max-width: 520px) { display: flex; width: 100%; button { flex: 1; padding: 7px 4px; font-size: 13px; } }
+  }
+  .pr-empezar {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: 15px; font-weight: 700; color: #fff; border: 0; cursor: pointer;
+    padding: 13px 22px; border-radius: 14px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    box-shadow: 0 10px 22px rgba(79, 70, 229, 0.32);
+    &:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+    @media (max-width: 640px) { width: 100%; justify-content: center; }
+  }
+  .pr-aviso { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 16px; border-radius: 14px; background: #fef3c7; color: #92400e; font-size: 14px; }
+
+  // ---------- Cómo funciona ----------
+  .pr-como {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    @media (max-width: 820px) { grid-template-columns: repeat(2, 1fr); }
+    div { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.6); border: 1px dashed #c7d2fe; }
+    mat-icon { grid-row: span 2; color: $pr-indigo; }
+    b { font-size: 14px; }
+    span { font-size: 12px; color: $pr-gris; line-height: 1.35; }
+  }
+
+  // ---------- Cargando ----------
+  .pr-cargando {
+    display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 80px 0; color: $pr-gris;
+    &__icono { width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center; background: #fff; color: $pr-indigo; box-shadow: $pr-sombra; mat-icon { font-size: 32px; width: 32px; height: 32px; } }
+    p { margin: 0; }
+  }
+
+  // ---------- Barra de la sesión ----------
+  .pr-barra {
+    position: sticky; top: 76px; z-index: 5;
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px);
+    border-radius: 16px; padding: 10px 14px; box-shadow: $pr-sombra;
+    &__volver { display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 13.5px; font-weight: 600; color: $pr-gris; background: none; border: 0; cursor: pointer; padding: 4px 6px; border-radius: 8px; &:hover { color: $pr-indigo; } }
+    &__tema { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; white-space: nowrap; mat-icon { color: $pr-indigo; font-size: 20px; width: 20px; height: 20px; } }
+    &__pts { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-weight: 800; color: #b45309; background: #fef3c7; padding: 5px 12px; border-radius: 999px; mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+    @media (max-width: 640px) { flex-wrap: wrap; top: 64px; &__volver span { display: none; } .pr-puntos { order: 3; flex: 1 1 100%; max-width: none; } }
+  }
+
+  .pr-puntos {
+    list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex: 1; max-width: 420px;
+    &__p { flex: 1; height: 8px; border-radius: 999px; background: #e5e7eb; transition: background 0.3s, transform 0.3s; }
+    &__p--actual { background: #c7d2fe; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px $pr-indigo; }
+    &__p--primer { background: #10b981; }
+    &__p--reintento { background: #f59e0b; }
+    &--resumen { max-width: 360px; width: 100%; flex: none; }
+  }
+
+  // Con el tutor abierto la sesión aprovecha todo el ancho
+  .practica--sesion { max-width: 1180px; }
+
+  // ---------- Resumen ----------
+  .pr-resumen {
+    position: relative; max-width: 680px; width: 100%; margin: 0 auto; box-sizing: border-box;
+    display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+    background: #fff; border-radius: 28px; padding: 36px 28px; box-shadow: 0 16px 40px rgba(79, 70, 229, 0.12);
+    h1 { margin: 4px 0 0; font-size: 26px; line-height: 1.2; font-weight: 800; }
+    &__mensaje { margin: 0; color: $pr-gris; max-width: 460px; }
+    &__nota { margin: 0; font-size: 13px; color: $pr-gris; }
+    &__cifras {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; margin-top: 6px;
+      @media (max-width: 520px) { grid-template-columns: 1fr; }
+      div { border-radius: 18px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+      .verde { background: #ecfdf5; color: $pr-verde; }
+      .ambar { background: #fffbeb; color: $pr-ambar; }
+      .indigo { background: $pr-indigo-suave; color: $pr-indigo; }
+      strong { font-size: 24px; font-weight: 800; }
+      span { font-size: 12.5px; color: $pr-gris; }
+    }
+    &__acciones { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; @media (max-width: 520px) { .pr-btn { width: 100%; } } }
+  }
+}
+
+// ============================================
+// Tarjeta de pregunta
+// ============================================
+app-pregunta-card {
+  &.con-tutor {
+    @media (min-width: 1024px) {
+      grid-template-columns: minmax(0, 1fr) 400px;
+      .pc-tutor { position: sticky; top: 150px; height: calc(100vh - 180px); max-height: 640px; }
+    }
+  }
+  &:not(.con-tutor) .pc { max-width: 820px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+
+  .pc-tutor { height: 480px; min-width: 0; app-chat-panel { height: 100%; } }
+
+  .pc {
+    background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 12px 34px rgba(79, 70, 229, 0.09);
+    display: flex; flex-direction: column; gap: 18px; color: $pr-texto; min-width: 0;
+    @media (max-width: 600px) { padding: 20px 16px; border-radius: 20px; }
+
+    &__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: $pr-gris; }
+    &__num { margin-right: auto; b { color: $pr-texto; } }
+    &__dif {
+      font-weight: 600; padding: 4px 10px; border-radius: 999px; background: $pr-indigo-suave; color: $pr-indigo;
+      &--basico { background: #dcfce7; color: #15803d; }
+      &--avanzado { background: #fee2e2; color: #b91c1c; }
+    }
+    &__vale {
+      display: inline-flex; align-items: center; gap: 3px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #fef3c7; color: #b45309;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      &--baja { background: #ffedd5; color: #c2410c; }
+      &--ok { background: #d1fae5; color: #047857; }
+    }
+    &__enunciado { margin: 0; font-size: clamp(18px, 2.4vw, 22px); line-height: 1.45; font-weight: 700; overflow-wrap: anywhere; }
+    &__opciones { display: grid; gap: 10px; }
+
+    &__acciones {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px;
+      border-top: 1px solid #f3f4f6; padding-top: 16px;
+      @media (max-width: 600px) { .pr-btn { flex: 1; } }
+    }
+    &__atajos {
+      margin: 0 auto 0 0; font-size: 12px; color: #9ca3af;
+      kbd { font: inherit; font-size: 11px; font-weight: 600; color: #4b5563; background: #f3f4f6; border: 1px solid $pr-borde; border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px; }
+      @media (hover: none), (max-width: 700px) { display: none; }
+    }
+  }
+
+  .pc-opcion {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    padding: 14px 16px; border: 2px solid $pr-borde; border-radius: 16px;
+    background: #fff; color: $pr-texto; font: inherit; font-size: 15.5px; text-align: left; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.15s $pr-suave, box-shadow 0.15s;
+    &:hover:not(:disabled) { border-color: #c7d2fe; background: #fafaff; }
+    &:focus-visible { outline: 3px solid rgba(79, 70, 229, 0.35); outline-offset: 2px; }
+    &:disabled { cursor: default; }
+
+    &__letra { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 11px; background: #f3f4f6; font-weight: 700; transition: background 0.15s, color 0.15s; }
+    &__texto { flex: 1; overflow-wrap: anywhere; }
+    &__icono { flex: none; }
+
+    &--seleccionada {
+      border-color: $pr-indigo; background: #f5f7ff; box-shadow: 0 6px 16px rgba(79, 70, 229, 0.12);
+      .pc-opcion__letra { background: $pr-indigo; color: #fff; }
+      .pc-opcion__icono { color: $pr-indigo; }
+    }
+    &--correcta {
+      border-color: #10b981; background: #ecfdf5;
+      .pc-opcion__letra { background: #10b981; color: #fff; }
+      .pc-opcion__icono { color: $pr-verde; }
+    }
+    &--incorrecta {
+      border-color: #fecaca; background: #fef2f2; opacity: 0.7;
+      .pc-opcion__texto { text-decoration: line-through; text-decoration-color: rgba(220, 38, 38, 0.4); }
+      .pc-opcion__letra { background: $pr-rojo; color: #fff; }
+      .pc-opcion__icono { color: $pr-rojo; }
+    }
+  }
+
+  .pc-resultado, .pc-pista {
+    position: relative; display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px; border-radius: 16px; font-size: 14.5px;
+    p { margin: 3px 0 0; }
+  }
+  .pc-resultado {
+    &__icono { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.7); }
+    &--ok { background: #ecfdf5; color: #065f46; }
+    &--error { background: #fef2f2; color: #991b1b; b { color: #b45309; } }
+  }
+  .pc-pista {
+    background: linear-gradient(135deg, #fffbeb, #fff7ed); color: #92400e; border: 1px solid #fde68a;
+    p strong { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  }
+
+  .puntos-flotantes {
+    position: absolute; top: -6px; left: 50%; z-index: 3; padding: 2px 10px; border-radius: 999px;
+    background: $pr-verde; color: #fff; font-weight: 800; font-size: 16px; opacity: 0; pointer-events: none;
+    animation: saesu-flotar 1.6s ease-out forwards;
+  }
+}
+
+// ---------- Animaciones (solo si el usuario no pidió reducir movimiento) ----------
+@media (prefers-reduced-motion: no-preference) {
+  app-dashboard-practica {
+    .pr-hero, .pr-config, .pr-como, .pr-cargando { animation: saesu-entrar 0.45s $pr-suave backwards; }
+    .pr-config { animation-delay: 0.2s; }
+    .pr-como { animation-delay: 0.28s; }
+    .pr-tema { animation: saesu-entrar 0.45s $pr-suave backwards; transition: transform 0.2s $pr-suave, border-color 0.2s, box-shadow 0.2s; }
+    .pr-tema:hover { transform: translateY(-4px); }
+    .pr-tema__recomendado mat-icon { animation: saesu-latido 1.8s ease-in-out infinite; }
+    .pr-cargando__icono { animation: saesu-latido 1s ease-in-out infinite; }
+    .pr-puntos__p--actual { animation: saesu-latido 1.6s ease-in-out infinite; }
+    .pr-puntos__p--primer, .pr-puntos__p--reintento { animation: saesu-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .pr-resumen { animation: saesu-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+    .pr-resumen > :not(app-confeti) { animation: saesu-entrar 0.5s $pr-suave backwards; }
+    @for $i from 2 through 8 { .pr-resumen > :nth-child(#{$i}) { animation-delay: #{$i * 0.08}s; } }
+    .pr-resumen .pr-anillo__valor { animation: pr-anillo 1.2s $pr-suave 0.3s backwards; }
+  }
+  app-pregunta-card {
+    .pc { animation: saesu-entrar 0.4s $pr-suave backwards; }
+    .pc-opcion { animation: saesu-entrar 0.4s $pr-suave backwards; }
+    @for $i from 1 through 4 { .pc-opcion:nth-child(#{$i}) { animation-delay: #{0.05 + $i * 0.05}s; } }
+    .pc-opcion:hover:not(:disabled) { transform: translateX(4px); }
+    .pc-opcion--seleccionada .pc-opcion__letra { animation: saesu-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .pc-opcion--correcta { animation: saesu-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) !important; }
+    .pc-opcion--incorrecta { animation: saesu-temblor 0.45s ease !important; }
+    .pc-resultado, .pc-pista { animation: saesu-entrar 0.35s $pr-suave backwards; }
+    .pc-resultado--ok .pc-resultado__icono { animation: saesu-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+    .pc-tutor { animation: saesu-entrar 0.4s $pr-suave backwards; }
+  }
+}
+
+@keyframes pr-anillo { from { stroke-dashoffset: 163.4; } }

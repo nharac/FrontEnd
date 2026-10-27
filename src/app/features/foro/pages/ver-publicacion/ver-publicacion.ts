@@ -2,13 +2,14 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ForoService } from '../../services/foro.service';
 import { NOMBRES_TEMA, PublicacionDetalle, Respuesta } from '../../models/foro.model';
 import { RespuestaItem } from '../../../../shared/components/respuesta-item/respuesta-item';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
 import { esDocente } from '../../../../shared/utils/rol';
+import { colorAvatar } from '../../../../shared/utils/avatar';
 
 /**
  * /foro/:id — una publicación con sus respuestas anidadas.
@@ -17,7 +18,7 @@ import { esDocente } from '../../../../shared/utils/rol';
  */
 @Component({
   selector: 'app-ver-publicacion',
-  imports: [RouterLink, FormsModule, MatIconModule, MatSnackBarModule, RespuestaItem],
+  imports: [RouterLink, FormsModule, MatIconModule, RespuestaItem],
   templateUrl: './ver-publicacion.html',
   styleUrl: './ver-publicacion.scss',
 })
@@ -40,6 +41,7 @@ export class VerPublicacion implements OnInit {
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
   readonly esDocente = esDocente;
+  readonly colorAvatar = colorAvatar;
 
   private id = 0;
 

@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DocenteService } from '../../services/docente.service';
 import { NOMBRES_TEMA, PublicacionResumen } from '../../../foro/models/foro.model';
@@ -19,7 +19,7 @@ type Estado = 'sin-respuestas' | 'sin-oficial' | 'oficial';
  */
 @Component({
   selector: 'app-publicaciones-docente',
-  imports: [MatIconModule, MatSnackBarModule],
+  imports: [MatIconModule],
   templateUrl: './publicaciones-docente.html',
   styleUrl: './publicaciones-docente.scss',
 })

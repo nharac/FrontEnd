@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { PosicionRanking } from '../models/ranking.model';
+import { MiPosicion, PeriodoRanking, PosicionRanking } from '../models/ranking.model';
 
 /** Gamificación: ranking de estudiantes por puntos. Requiere JWT. */
 @Injectable({
@@ -20,16 +20,27 @@ export class RankingService {
   private cargado = false;
 
   /**
-   * Top 10 de estudiantes con más puntos, ya ordenado.
-   * GET /api/ranking
+   * Top 10 de estudiantes con más puntos en el periodo, ya ordenado.
+   * GET /api/ranking?periodo=total|semana|mes
+   * Solo el histórico actualiza `top` (de ahí salen las medallas de la barra y el perfil).
    */
-  obtenerTop(): Observable<PosicionRanking[]> {
-    return this.http.get<PosicionRanking[]>(this.API).pipe(
+  obtenerTop(periodo: PeriodoRanking = 'total'): Observable<PosicionRanking[]> {
+    return this.http.get<PosicionRanking[]>(this.API, { params: { periodo } }).pipe(
       tap(lista => {
-        this.top.set(lista ?? []);
-        this.cargado = true;
+        if (periodo === 'total') {
+          this.top.set(lista ?? []);
+          this.cargado = true;
+        }
       })
     );
+  }
+
+  /**
+   * Posición del estudiante actual aunque no esté en el top 10.
+   * GET /api/ranking/yo?periodo=
+   */
+  miPosicion(periodo: PeriodoRanking = 'total'): Observable<MiPosicion> {
+    return this.http.get<MiPosicion>(`${this.API}/yo`, { params: { periodo } });
   }
 
   /** Carga el top una sola vez (para mostrar medallas sin repetir la petición). */

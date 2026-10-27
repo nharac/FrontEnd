@@ -2,12 +2,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ForoService } from '../../services/foro.service';
 import { NOMBRES_TEMA, OrdenForo, PublicacionResumen } from '../../models/foro.model';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
 import { esDocente } from '../../../../shared/utils/rol';
+import { colorAvatar } from '../../../../shared/utils/avatar';
 
 /** Publicaciones por página (el backend pagina con page/size). */
 const TAMANO_PAGINA = 10;
@@ -17,7 +18,7 @@ const TAMANO_PAGINA = 10;
  * Búsqueda, filtro por tema, orden y "Cargar más".
  */
 @Component({
-  imports: [RouterLink, FormsModule, MatIconModule, MatSnackBarModule],
+  imports: [RouterLink, FormsModule, MatIconModule],
   selector: 'app-lista-publicaciones',
   styleUrl: './lista-publicaciones.scss',
   templateUrl: './lista-publicaciones.html',
@@ -38,10 +39,16 @@ export class ListaPublicaciones implements OnInit {
   orden = signal<OrdenForo>('reciente');
 
   readonly temas = [
-    { id: null, nombre: 'Todos' },
-    { id: 'limites', nombre: 'Límites' },
-    { id: 'derivadas', nombre: 'Derivadas' },
-    { id: 'integrales', nombre: 'Integrales' },
+    { id: null, nombre: 'Todos', icono: 'apps' },
+    { id: 'limites', nombre: 'Límites', icono: 'trending_flat' },
+    { id: 'derivadas', nombre: 'Derivadas', icono: 'show_chart' },
+    { id: 'integrales', nombre: 'Integrales', icono: 'functions' },
+  ];
+  readonly consejos = [
+    'Usa un título que sea una pregunta concreta.',
+    'Cuenta qué intentaste y en qué paso te atascaste.',
+    'Adjunta una foto del ejercicio si ayuda.',
+    'Marca el tema correcto para que te encuentren.',
   ];
   readonly ordenes: { id: OrdenForo; nombre: string }[] = [
     { id: 'reciente', nombre: 'Más recientes' },
@@ -51,6 +58,7 @@ export class ListaPublicaciones implements OnInit {
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
   readonly esDocente = esDocente;
+  readonly colorAvatar = colorAvatar;
 
   private pagina = 0;
 

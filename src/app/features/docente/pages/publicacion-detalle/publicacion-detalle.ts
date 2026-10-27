@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DocenteService } from '../../services/docente.service';
 import { RespuestaItem } from '../../../../shared/components/respuesta-item/respuesta-item';
@@ -16,7 +16,7 @@ import { haceCuanto } from '../../../../shared/utils/tiempo';
  */
 @Component({
   selector: 'app-publicacion-detalle',
-  imports: [RouterLink, FormsModule, MatIconModule, MatSnackBarModule, RespuestaItem],
+  imports: [RouterLink, FormsModule, MatIconModule, RespuestaItem],
   templateUrl: './publicacion-detalle.html',
   styleUrl: './publicacion-detalle.scss',
 })

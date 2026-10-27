@@ -1,81 +1,119 @@
 <div class="foro">
-  <header class="foro__header">
+  <header class="fo-cabecera">
     <div>
-      <span class="foro__badge">FORO COLABORATIVO</span>
+      <span class="fo-badge"><mat-icon>groups</mat-icon> FORO COLABORATIVO</span>
       <h1>Foro</h1>
       <p>Pregunta, responde y aprende con tus compañeros. Los docentes marcan las respuestas oficiales.</p>
     </div>
-    <a class="btn" routerLink="/foro/nueva"><mat-icon>add</mat-icon> Nueva publicación</a>
+    <a class="fo-btn" routerLink="/foro/nueva"><mat-icon>add</mat-icon> Nueva publicación</a>
   </header>
 
-  <section class="controles">
-    <form class="buscador" (ngSubmit)="buscar()">
-      <mat-icon>search</mat-icon>
-      <input type="search" name="busqueda" placeholder="Buscar en el foro..."
-             [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)">
-      @if (busqueda()) {
-        <button type="button" class="buscador__limpiar" title="Limpiar" (click)="limpiarBusqueda()">
-          <mat-icon>close</mat-icon>
-        </button>
-      }
-    </form>
-
-    <select class="orden" [ngModel]="orden()" (ngModelChange)="cambiarOrden($event)" name="orden">
-      @for (o of ordenes; track o.id) {
-        <option [value]="o.id">{{ o.nombre }}</option>
-      }
-    </select>
-  </section>
-
-  <div class="filtros">
-    @for (t of temas; track t.nombre) {
-      <button type="button" class="chip" [class.chip--activo]="tema() === t.id" (click)="elegirTema(t.id)">
-        {{ t.nombre }}
-      </button>
-    }
-  </div>
-
-  @if (cargando()) {
-    <p class="vacio">Cargando publicaciones...</p>
-  } @else {
-    @for (p of publicaciones(); track p.id) {
-      <button type="button" class="pub" (click)="abrir(p)">
-        <div class="pub__arriba">
-          <span class="tema">{{ nombresTema[p.tema] || p.tema }}</span>
-          <time>{{ haceCuanto(p.fechaCreacion) }}</time>
-        </div>
-        <h3>{{ p.titulo }}</h3>
-        <p class="pub__preview">{{ p.contenidoPreview }}</p>
-        @if (p.imagenUrl) {
-          <img class="saesu-miniatura" [src]="p.imagenUrl" alt="Imagen adjunta a la publicación" loading="lazy">
-        }
-        <div class="pub__abajo">
-          <span class="avatar" [class.avatar--docente]="esDocente(p.autor.rol)">{{ p.autor.iniciales }}</span>
-          <span>{{ p.autor.nombre }}</span>
-          @if (esDocente(p.autor.rol)) {
-            <span class="etiqueta">Docente</span>
+  <div class="fo-layout">
+    <main class="fo-principal">
+      <section class="fo-controles">
+        <form class="fo-buscador" (ngSubmit)="buscar()" role="search">
+          <mat-icon>search</mat-icon>
+          <input type="search" name="busqueda" placeholder="Buscar por título o contenido..." aria-label="Buscar en el foro"
+                 [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)">
+          @if (busqueda()) {
+            <button type="button" class="fo-buscador__limpiar" title="Limpiar" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda()">
+              <mat-icon>close</mat-icon>
+            </button>
           }
-          <span class="pub__respuestas">
-            <mat-icon>chat_bubble_outline</mat-icon>
-            {{ p.respuestasCount }} {{ p.respuestasCount === 1 ? 'respuesta' : 'respuestas' }}
-          </span>
+        </form>
+        <label class="fo-orden">
+          <mat-icon>sort</mat-icon>
+          <select [ngModel]="orden()" (ngModelChange)="cambiarOrden($event)" name="orden" aria-label="Ordenar">
+            @for (o of ordenes; track o.id) {
+              <option [value]="o.id">{{ o.nombre }}</option>
+            }
+          </select>
+        </label>
+        <div class="fo-temas" role="tablist" aria-label="Filtrar por tema">
+          @for (t of temas; track t.nombre) {
+            <button type="button" role="tab" class="fo-tema-chip fo-tema-chip--{{ t.id ?? 'todos' }}"
+                    [class.activo]="tema() === t.id" [attr.aria-selected]="tema() === t.id" (click)="elegirTema(t.id)">
+              <mat-icon>{{ t.icono }}</mat-icon> {{ t.nombre }}
+            </button>
+          }
         </div>
-      </button>
-    } @empty {
-      <div class="vacio">
-        <mat-icon>forum</mat-icon>
-        @if (busqueda() || tema()) {
-          <p>No hay publicaciones con esos filtros.</p>
-        } @else {
-          <p>Todavía no hay publicaciones. ¡Sé el primero en preguntar!</p>
-        }
-      </div>
-    }
+      </section>
 
-    @if (hayMas()) {
-      <button type="button" class="mas" (click)="cargarMas()" [disabled]="cargandoMas()">
-        {{ cargandoMas() ? 'Cargando...' : 'Cargar más' }}
-      </button>
-    }
-  }
+      @if (cargando()) {
+        @for (i of [1, 2, 3]; track i) {
+          <div class="fo-esqueleto" aria-hidden="true"><span></span><span></span><span></span></div>
+        }
+      } @else {
+        @for (p of publicaciones(); track p.id) {
+          @let color = colorAvatar(p.autor.nombre);
+          <button type="button" class="fo-pub fo-pub--{{ p.tema }}" (click)="abrir(p)">
+            <span class="fo-avatar" [class.fo-avatar--docente]="esDocente(p.autor.rol)"
+                  [style.background]="esDocente(p.autor.rol) ? null : color.fondo"
+                  [style.color]="esDocente(p.autor.rol) ? null : color.texto">{{ p.autor.iniciales }}</span>
+            <div class="fo-pub__cuerpo">
+              <div class="fo-pub__meta">
+                <b>{{ p.autor.nombre }}</b>
+                @if (esDocente(p.autor.rol)) { <span class="fo-etiqueta">Docente</span> }
+                <span>· {{ haceCuanto(p.fechaCreacion) }}</span>
+              </div>
+              <h3>{{ p.titulo }}</h3>
+              <p class="fo-pub__preview">{{ p.contenidoPreview }}</p>
+              <div class="fo-pub__pie">
+                <span class="fo-tema fo-tema--{{ p.tema }}">{{ nombresTema[p.tema] || p.tema }}</span>
+                @if (p.respuestasCount === 0) {
+                  <span class="fo-sin-respuesta"><mat-icon>volunteer_activism</mat-icon> Sé el primero en ayudar</span>
+                } @else {
+                  <span class="fo-respuestas"><mat-icon>chat_bubble</mat-icon> {{ p.respuestasCount }} {{ p.respuestasCount === 1 ? 'respuesta' : 'respuestas' }}</span>
+                }
+                @if (p.imagenUrl) {
+                  <span class="fo-adjunto"><mat-icon>image</mat-icon> Imagen</span>
+                }
+              </div>
+            </div>
+            @if (p.imagenUrl) {
+              <img class="fo-pub__mini" [src]="p.imagenUrl" alt="" loading="lazy">
+            }
+          </button>
+        } @empty {
+          <div class="fo-vacio">
+            <span class="fo-vacio__icono"><mat-icon>{{ busqueda() || tema() ? 'search_off' : 'forum' }}</mat-icon></span>
+            @if (busqueda() || tema()) {
+              <strong>No encontramos publicaciones</strong>
+              <p>Prueba con otras palabras o quita el filtro de tema.</p>
+            } @else {
+              <strong>Todavía no hay publicaciones</strong>
+              <p>¡Sé el primero en preguntar! Tus compañeros y docentes te ayudarán.</p>
+              <a class="fo-btn" routerLink="/foro/nueva"><mat-icon>add</mat-icon> Crear publicación</a>
+            }
+          </div>
+        }
+
+        @if (hayMas()) {
+          <button type="button" class="fo-mas" (click)="cargarMas()" [disabled]="cargandoMas()">
+            <mat-icon>expand_more</mat-icon> {{ cargandoMas() ? 'Cargando...' : 'Cargar más publicaciones' }}
+          </button>
+        }
+      }
+    </main>
+
+    <aside class="fo-lateral">
+      <section class="fo-cta">
+        <mat-icon>lightbulb</mat-icon>
+        <strong>¿Tienes una duda?</strong>
+        <p>Publícala y recibe ayuda de tus compañeros y docentes.</p>
+        <a routerLink="/foro/nueva">Preguntar ahora <mat-icon>arrow_forward</mat-icon></a>
+      </section>
+      <section class="fo-caja">
+        <h2><mat-icon>checklist</mat-icon> Cómo preguntar bien</h2>
+        <ol class="fo-consejos">
+          @for (c of consejos; track c) { <li>{{ c }}</li> }
+        </ol>
+      </section>
+      <a class="fo-caja fo-tutor" routerLink="/chat">
+        <mat-icon>smart_toy</mat-icon>
+        <span><b>¿Necesitas ayuda ya?</b><small>El tutor IA responde al instante</small></span>
+        <mat-icon class="fo-tutor__flecha">chevron_right</mat-icon>
+      </a>
+    </aside>
+  </div>
 </div>

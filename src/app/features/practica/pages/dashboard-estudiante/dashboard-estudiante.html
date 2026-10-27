@@ -1,139 +1,175 @@
-<div class="dashboard">
+<div class="inicio">
 
-  <!-- Encabezado -->
-  <header class="dashboard__header">
-    <span class="dashboard__badge">SAESU Focus Mode</span>
-    <h1 class="dashboard__titulo">Hola{{ nombre() ? ', ' + nombre() : '' }}.</h1>
-    <p class="dashboard__subtitulo">Tu única meta académica clave por hoy:</p>
+  <!-- ===== Saludo ===== -->
+  <header class="hero">
+    <div class="hero__texto">
+      <span class="hero__fecha">{{ hoy }}</span>
+      <h1>{{ saludo }}{{ nombre() ? ', ' + nombre() : '' }} <span class="hero__mano" aria-hidden="true">👋</span></h1>
+      <p>
+        @if (racha()) { Llevas una racha de {{ racha() }} {{ racha() === 1 ? 'día' : 'días' }}. ¡No la dejes caer hoy! }
+        @else { Practica hoy y empieza una racha de días seguidos. }
+      </p>
+    </div>
+    <div class="hero__racha" [class.hero__racha--activa]="racha()" [attr.aria-label]="(racha() ?? 0) + ' días de racha'">
+      <mat-icon>local_fire_department</mat-icon>
+      <strong [appContador]="racha() ?? 0"></strong>
+      <small>{{ racha() === 1 ? 'día' : 'días' }}</small>
+    </div>
   </header>
 
-  <!-- Card principal de práctica -->
-  <section class="card-principal">
-    <div class="card-principal__icono">
-      <mat-icon>play_arrow</mat-icon>
+  <!-- ===== Cifras ===== -->
+  <section class="cifras">
+    <a class="cifra cifra--ambar" routerLink="/ranking">
+      <span class="cifra__icono"><mat-icon>stars</mat-icon></span>
+      <div><strong [appContador]="puntos()"></strong><small>Puntos</small></div>
+    </a>
+    <div class="cifra cifra--verde">
+      <span class="cifra__icono"><mat-icon>task_alt</mat-icon></span>
+      <div><strong><span [appContador]="totales().porcentaje"></span>%</strong><small>Aciertos ({{ totales().correctas }}/{{ totales().respondidas }})</small></div>
     </div>
-
-    @if (recomendado(); as r) {
-      <h2 class="card-principal__titulo">Práctica de {{ r.tema.nombre }}</h2>
-      <p class="card-principal__descripcion">
-        @if (r.respondidas === 0) {
-          Aún no has practicado este tema: {{ r.tema.descripcion }}.
-        } @else if (r.porcentaje >= 100) {
-          ¡Dominas los tres temas! Repasa cuando quieras para no perder la racha.
-        } @else {
-          Llevas <strong><span [appContador]="r.porcentaje"></span>%</strong> de aciertos en {{ r.tema.nombre }}. ¡Vamos a subirlo!
-        }
-      </p>
-    } @else {
-      <h2 class="card-principal__titulo">Práctica de Cálculo</h2>
-      <p class="card-principal__descripcion">Límites, derivadas e integrales tipo ICFES, con pistas y tutor IA.</p>
-    }
-
-    <button class="card-principal__btn" (click)="irAPractica()">
-      <span>{{ recomendado() ? 'Practicar ' + recomendado()!.tema.nombre : 'Continuar Práctica de Hoy' }}</span>
-      <mat-icon>arrow_forward</mat-icon>
-    </button>
-
-    <div class="card-principal__meta">
-      <span class="meta-item">
-        <mat-icon class="meta-icono meta-icono--fuego">local_fire_department</mat-icon>
-        @if (racha(); as dias) {
-          {{ dias }} {{ dias === 1 ? 'día' : 'días' }} de racha
-        } @else {
-          Practica hoy para sumar a tu racha
-        }
-      </span>
-      <span class="meta-separador">·</span>
-      <span class="meta-item">
-        <mat-icon class="meta-icono">schedule</mat-icon>
-        ~{{ minutosEstimados }} minutos
-      </span>
-    </div>
+    <a class="cifra cifra--morado" routerLink="/perfil">
+      <span class="cifra__icono"><mat-icon>emoji_events</mat-icon></span>
+      <div><strong>{{ logrosObtenidos() }}<span class="cifra__de">/{{ logros().length || 11 }}</span></strong><small>Logros</small></div>
+    </a>
+    <a class="cifra" routerLink="/ranking">
+      <span class="cifra__icono"><mat-icon>leaderboard</mat-icon></span>
+      <div><strong>{{ miLugar() ? '#' + miLugar() : '—' }}</strong><small>{{ miLugar() ? 'En el ranking' : 'Fuera del top 10' }}</small></div>
+    </a>
   </section>
 
-  <!-- Mini ranking -->
-  @if (rankingCargado() && top3().length) {
-    <section class="mini-ranking">
-      <div class="mini-ranking__cabecera">
-        <h3><mat-icon>leaderboard</mat-icon> Ranking</h3>
-        <a routerLink="/ranking">Ver completo <mat-icon>arrow_forward</mat-icon></a>
-      </div>
-      <ol>
-        @for (p of top3(); track p.usuarioId; let i = $index) {
-          <li>
-            <span class="mini-ranking__lugar mini-ranking__lugar--{{ i + 1 }}">{{ i + 1 }}</span>
-            <span class="mini-ranking__caja">
-              @if (p.fotoPerfilUrl) {
-                <img class="mini-ranking__avatar" [src]="p.fotoPerfilUrl" alt="">
-              } @else {
-                <span class="mini-ranking__avatar">{{ inicialesDe(p.nombre) }}</span>
-              }
-              <app-medalla [lugar]="i + 1" tamano="sm" />
-            </span>
-            <span class="mini-ranking__nombre">{{ p.nombre }}</span>
-            <strong>{{ p.puntosTotales }} pts</strong>
-          </li>
-        }
-      </ol>
-      <p class="mini-ranking__yo">
-        @if (miLugar(); as lugar) {
-          Vas en el puesto <strong>#{{ lugar }}</strong> del top 10.
+  <div class="columnas">
+    <div class="columnas__principal">
+
+      <!-- ===== Práctica recomendada ===== -->
+      <section class="hoy">
+        <span class="hoy__etiqueta"><mat-icon>bolt</mat-icon> Tu práctica de hoy</span>
+        @if (recomendado(); as r) {
+          <div class="hoy__cuerpo">
+            <span class="hoy__icono"><mat-icon>{{ r.tema.icono }}</mat-icon></span>
+            <div>
+              <h2>{{ r.tema.nombre }}</h2>
+              <p>
+                @if (r.respondidas === 0) { Aún no lo has practicado: {{ r.tema.descripcion | lowercase }}. }
+                @else if (r.porcentaje >= 100) { ¡Dominas los tres temas! Repasa para no perder la racha. }
+                @else { Llevas <b>{{ r.porcentaje | number: '1.0-0' }}%</b> de aciertos. Es tu tema con más por mejorar. }
+              </p>
+            </div>
+          </div>
         } @else {
-          Aún no estás en el top 10. ¡Cada acierto suma 20 puntos!
+          <div class="hoy__cuerpo">
+            <span class="hoy__icono"><mat-icon>functions</mat-icon></span>
+            <div><h2>Práctica de cálculo</h2><p>Límites, derivadas e integrales tipo ICFES, con pistas y tutor IA.</p></div>
+          </div>
         }
-      </p>
-    </section>
-  }
+        <div class="hoy__pie">
+          <span><mat-icon>schedule</mat-icon> ~{{ minutosEstimados }} min · hasta 20 pts por pregunta</span>
+          <button type="button" class="hoy__btn" (click)="irAPractica()">
+            Empezar <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </section>
 
-  <!-- Accesos secundarios -->
-  <section class="accesos-rapidos">
-    <h3 class="accesos-rapidos__titulo">También puedes:</h3>
+      <!-- ===== Progreso por tema ===== -->
+      <section class="bloque">
+        <div class="bloque__cabecera">
+          <h3><mat-icon>insights</mat-icon> Tu progreso por tema</h3>
+          <a routerLink="/perfil">Ver detalle <mat-icon>arrow_forward</mat-icon></a>
+        </div>
+        <div class="temas">
+          @for (t of temas; track t.id; let i = $index) {
+            @let pt = progresoDe(t.id);
+            <button type="button" class="tema" (click)="practicar(t.id)" [style.animation-delay.ms]="i * 80"
+                    [class.tema--bien]="pt.respondidas && pt.porcentaje >= 70"
+                    [class.tema--medio]="pt.respondidas && pt.porcentaje >= 50 && pt.porcentaje < 70"
+                    [class.tema--bajo]="pt.respondidas && pt.porcentaje < 50">
+              <svg class="anillo" viewBox="0 0 80 80" aria-hidden="true">
+                <circle class="anillo__fondo" cx="40" cy="40" r="34" />
+                <circle class="anillo__valor" cx="40" cy="40" r="34"
+                        [attr.stroke-dasharray]="circunferencia"
+                        [attr.stroke-dashoffset]="circunferencia * (1 - pt.porcentaje / 100)" />
+              </svg>
+              <span class="tema__pct">{{ pt.respondidas ? pt.porcentaje + '%' : '—' }}</span>
+              <strong>{{ t.nombre }}</strong>
+              <small>{{ estadoTema(pt.porcentaje, pt.respondidas) }} · {{ pt.correctas }}/{{ pt.respondidas }}</small>
+              <span class="tema__ir">Practicar <mat-icon>arrow_forward</mat-icon></span>
+            </button>
+          }
+        </div>
+      </section>
 
-    <div class="accesos-rapidos__grid">
-      <a class="acceso-card" routerLink="/chat">
-        <div class="acceso-card__icono">
-          <mat-icon>smart_toy</mat-icon>
-        </div>
-        <div class="acceso-card__texto">
-          <h4>Chat Tutor</h4>
-          <p>Pregúntale al tutor IA</p>
-        </div>
-        <mat-icon class="acceso-card__flecha">arrow_forward</mat-icon>
-      </a>
-
-      <a class="acceso-card" routerLink="/foro">
-        <div class="acceso-card__icono">
-          <mat-icon>forum</mat-icon>
-        </div>
-        <div class="acceso-card__texto">
-          <h4>Foro</h4>
-          <p>Dudas con tus compañeros</p>
-        </div>
-        <mat-icon class="acceso-card__flecha">arrow_forward</mat-icon>
-      </a>
-
-      <a class="acceso-card" routerLink="/ranking">
-        <div class="acceso-card__icono">
-          <mat-icon>emoji_events</mat-icon>
-        </div>
-        <div class="acceso-card__texto">
-          <h4>Ranking</h4>
-          <p>Tu posición y puntos</p>
-        </div>
-        <mat-icon class="acceso-card__flecha">arrow_forward</mat-icon>
-      </a>
-
-      <a class="acceso-card" routerLink="/perfil">
-        <div class="acceso-card__icono">
-          <mat-icon>person</mat-icon>
-        </div>
-        <div class="acceso-card__texto">
-          <h4>Mi Perfil</h4>
-          <p>Progreso y configuración</p>
-        </div>
-        <mat-icon class="acceso-card__flecha">arrow_forward</mat-icon>
-      </a>
+      <!-- ===== Accesos ===== -->
+      <section class="accesos">
+        <a routerLink="/chat"><mat-icon>smart_toy</mat-icon><span><b>Chat Tutor</b><small>Pregúntale a la IA</small></span></a>
+        <a routerLink="/foro/nueva"><mat-icon>edit_square</mat-icon><span><b>Preguntar en el foro</b><small>Compañeros y docentes</small></span></a>
+        <a routerLink="/perfil"><mat-icon>person</mat-icon><span><b>Mi perfil</b><small>Foto y contraseña</small></span></a>
+      </section>
     </div>
-  </section>
 
+    <aside class="columnas__lateral">
+      <!-- ===== Próximo logro ===== -->
+      @if (proximoLogro(); as l) {
+        <section class="bloque logro">
+          <span class="logro__icono"><mat-icon>{{ l.icono }}</mat-icon></span>
+          <div>
+            <small>Próximo logro</small>
+            <strong>{{ l.nombre }}</strong>
+            <p>{{ l.descripcion }}</p>
+          </div>
+        </section>
+      } @else if (logros().length) {
+        <section class="bloque logro logro--todos">
+          <span class="logro__icono"><mat-icon>military_tech</mat-icon></span>
+          <div><small>¡Increíble!</small><strong>Tienes todos los logros</strong></div>
+        </section>
+      }
+
+      <!-- ===== Mini ranking ===== -->
+      @if (rankingCargado() && top3().length) {
+        <section class="bloque ranking">
+          <div class="bloque__cabecera">
+            <h3><mat-icon>leaderboard</mat-icon> Ranking</h3>
+            <a routerLink="/ranking">Ver todo <mat-icon>arrow_forward</mat-icon></a>
+          </div>
+          <ol>
+            @for (p of top3(); track p.usuarioId; let i = $index) {
+              <li [class.yo]="miLugar() === i + 1">
+                <span class="ranking__lugar ranking__lugar--{{ i + 1 }}">{{ i + 1 }}</span>
+                <span class="ranking__caja">
+                  @if (p.fotoPerfilUrl) {
+                    <img class="ranking__avatar" [src]="p.fotoPerfilUrl" alt="">
+                  } @else {
+                    <span class="ranking__avatar">{{ inicialesDe(p.nombre) }}</span>
+                  }
+                  <app-medalla [lugar]="i + 1" tamano="sm" />
+                </span>
+                <span class="ranking__nombre">{{ p.nombre }}</span>
+                <b>{{ p.puntosTotales }}</b>
+              </li>
+            }
+          </ol>
+          <p class="ranking__yo">
+            @if (miLugar(); as lugar) { Vas en el puesto <b>#{{ lugar }}</b>. ¡Sigue así! }
+            @else { Aún no estás en el top 10. ¡Cada acierto suma! }
+          </p>
+        </section>
+      }
+
+      <!-- ===== Foro ===== -->
+      <section class="bloque foro">
+        <div class="bloque__cabecera">
+          <h3><mat-icon>forum</mat-icon> Lo último en el foro</h3>
+          <a routerLink="/foro">Ver foro <mat-icon>arrow_forward</mat-icon></a>
+        </div>
+        @for (f of foroReciente(); track f.id) {
+          <a class="foro__item" [routerLink]="['/foro', f.id]">
+            <span class="foro__tema">{{ nombresTema[f.tema] || f.tema }}</span>
+            <strong>{{ f.titulo }}</strong>
+            <small>{{ f.autor.nombre }} · {{ haceCuanto(f.fechaCreacion) }} · {{ f.respuestasCount }} <mat-icon>chat_bubble_outline</mat-icon></small>
+          </a>
+        } @empty {
+          <p class="foro__vacio">Nadie ha preguntado todavía. <a routerLink="/foro/nueva">¡Sé el primero!</a></p>
+        }
+      </section>
+    </aside>
+  </div>
 </div>

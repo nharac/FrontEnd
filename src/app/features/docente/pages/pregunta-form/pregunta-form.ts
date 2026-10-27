@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DocenteService } from '../../services/docente.service';
 import { Dificultad, LETRAS, Letra, NOMBRES_DIFICULTAD, PreguntaDocenteRequest } from '../../models/docente.model';
@@ -15,7 +15,7 @@ import { NOMBRES_TEMA, TemaForo } from '../../../foro/models/foro.model';
  */
 @Component({
   selector: 'app-pregunta-form',
-  imports: [RouterLink, FormsModule, MatIconModule, MatSnackBarModule],
+  imports: [RouterLink, FormsModule, MatIconModule],
   templateUrl: './pregunta-form.html',
   styleUrl: './pregunta-form.scss',
 })

@@ -1,61 +1,114 @@
-<div class="practica">
+<div class="practica" [class.practica--sesion]="vista() === 'sesion'">
 
   @switch (vista()) {
 
     @case ('seleccion') {
       <!-- ============ 1. Selección de tema ============ -->
-      <header class="practica__header">
-        <span class="practica__badge">PRÁCTICA ICFES</span>
-        <h1 class="practica__titulo">¿Qué quieres practicar hoy?</h1>
-        <p class="practica__subtitulo">Elige un tema. Si te equivocas, recibirás una pista y el tutor IA te ayudará.</p>
+      <header class="pr-hero">
+        <div>
+          <span class="pr-hero__badge"><mat-icon>school</mat-icon> PRÁCTICA ICFES</span>
+          <h1>¿Qué quieres practicar hoy?</h1>
+          <p>Elige un tema y responde 10 preguntas. Si te equivocas, recibes una pista y el tutor IA te acompaña.</p>
+        </div>
+        @if (totalGeneral(); as t) {
+          <div class="pr-hero__cifras">
+            <div><strong>{{ t.respondidas }}</strong><span>respondidas</span></div>
+            <div><strong>{{ t.porcentaje }}%</strong><span>de acierto</span></div>
+          </div>
+        }
       </header>
 
-      <section class="temas">
-        @for (tema of temas; track tema.id) {
-          <button type="button" class="tema" [class.tema--activo]="temaElegido() === tema.id"
+      <section class="pr-temas" aria-label="Temas">
+        @for (tema of temas; track tema.id; let i = $index) {
+          @let p = progresoDe(tema);
+          <button type="button" class="pr-tema pr-tema--{{ tema.id }}" [class.pr-tema--activo]="temaElegido() === tema.id"
+                  [attr.aria-pressed]="temaElegido() === tema.id" [style.animation-delay.ms]="i * 70"
                   (click)="elegirTema(tema.id)">
-            <span class="tema__icono"><mat-icon>{{ tema.icono }}</mat-icon></span>
-            <h3>{{ tema.nombre }}</h3>
+            <span class="pr-tema__check"><mat-icon>check</mat-icon></span>
+            <div class="pr-tema__arriba">
+              <span class="pr-tema__icono"><mat-icon>{{ tema.icono }}</mat-icon></span>
+              <svg class="pr-anillo" viewBox="0 0 64 64" aria-hidden="true">
+                <circle cx="32" cy="32" r="26" class="pr-anillo__fondo" />
+                <circle cx="32" cy="32" r="26" class="pr-anillo__valor"
+                        [attr.stroke-dasharray]="perimetro" [attr.stroke-dashoffset]="trazo(p?.porcentaje ?? 0)" />
+                <text x="32" y="36" text-anchor="middle">{{ (p?.porcentaje ?? 0) | number: '1.0-0' }}%</text>
+              </svg>
+            </div>
+            <h3>
+              {{ tema.nombre }}
+              @if (recomendado() === tema.id) {
+                <span class="pr-tema__recomendado"><mat-icon>auto_awesome</mat-icon> Recomendado</span>
+              }
+            </h3>
             <p>{{ tema.descripcion }}</p>
-            @if (progresoDe(tema); as p) {
-              <div class="tema__progreso">
-                <div class="barra"><div class="barra__relleno" [style.width.%]="p.porcentaje"></div></div>
-                <small>{{ p.correctas }} de {{ p.respondidas }} correctas · {{ p.porcentaje | number: '1.0-0' }}%</small>
-              </div>
-            }
+            <small class="pr-tema__dato">
+              @if (p && p.respondidas > 0) {
+                <mat-icon>check_circle</mat-icon> {{ p.correctas }} de {{ p.respondidas }} correctas
+              } @else {
+                <mat-icon>flag</mat-icon> Aún no lo has practicado
+              }
+            </small>
           </button>
         }
       </section>
 
-      <section class="filtro">
-        <span>Dificultad:</span>
-        @for (d of dificultades; track d.nombre) {
-          <button type="button" class="chip" [class.chip--activo]="dificultadElegida() === d.id"
-                  (click)="elegirDificultad(d.id)">{{ d.nombre }}</button>
-        }
+      <section class="pr-config">
+        <div class="pr-config__dificultad">
+          <span class="pr-config__titulo">Dificultad</span>
+          <div class="pr-segmentado" role="radiogroup" aria-label="Dificultad">
+            @for (d of dificultades; track d.nombre) {
+              <button type="button" role="radio" [attr.aria-checked]="dificultadElegida() === d.id"
+                      [class.activo]="dificultadElegida() === d.id" (click)="elegirDificultad(d.id)">{{ d.nombre }}</button>
+            }
+          </div>
+          <small>{{ descripcionDificultad[dificultadElegida() ?? 'todas'] }}</small>
+        </div>
+
+        <button type="button" class="pr-empezar" [disabled]="!temaElegido()" (click)="empezar()">
+          @if (infoTema(); as t) {
+            <span>Empezar {{ t.nombre }}</span>
+          } @else {
+            <span>Elige un tema</span>
+          }
+          <mat-icon>play_arrow</mat-icon>
+        </button>
       </section>
 
       @if (sinPreguntas()) {
-        <p class="aviso">No hay preguntas para ese tema y dificultad. Prueba con otra combinación.</p>
+        <p class="pr-aviso"><mat-icon>info</mat-icon> No hay preguntas para ese tema y dificultad. Prueba con otra combinación.</p>
       }
 
-      <button type="button" class="btn-empezar" [disabled]="!temaElegido()" (click)="empezar()">
-        Empezar práctica <mat-icon>play_arrow</mat-icon>
-      </button>
+      <section class="pr-como" aria-label="Cómo funciona">
+        <div><mat-icon>bolt</mat-icon><b>+20 pts</b><span>si aciertas al primer intento</span></div>
+        <div><mat-icon>trending_down</mat-icon><b>15 · 10 · 5</b><span>lo que vale después de cada fallo</span></div>
+        <div><mat-icon>tips_and_updates</mat-icon><b>Pista</b><span>se desbloquea cuando te equivocas</span></div>
+        <div><mat-icon>smart_toy</mat-icon><b>Tutor IA</b><span>te guía sin darte la respuesta</span></div>
+      </section>
     }
 
     @case ('cargando') {
       <!-- ============ Cargando ============ -->
-      <p class="practica__estado">Cargando preguntas...</p>
+      <div class="pr-cargando" role="status">
+        <span class="pr-cargando__icono"><mat-icon>{{ infoTema()?.icono }}</mat-icon></span>
+        <p>Preparando tus preguntas de {{ infoTema()?.nombre }}...</p>
+      </div>
     }
 
     @case ('sesion') {
       <!-- ============ 2. Sesión de preguntas ============ -->
-      <div class="sesion__barra">
-        <button type="button" class="enlace" (click)="volverASeleccion()">
-          <mat-icon>arrow_back</mat-icon> Cambiar tema
+      <div class="pr-barra">
+        <button type="button" class="pr-barra__volver" (click)="volverASeleccion()" title="Cambiar tema">
+          <mat-icon>arrow_back</mat-icon><span>Salir</span>
         </button>
-        <strong>{{ infoTema()?.nombre }}</strong>
+        <span class="pr-barra__tema"><mat-icon>{{ infoTema()?.icono }}</mat-icon> {{ infoTema()?.nombre }}</span>
+        <ol class="pr-puntos" [attr.aria-label]="'Pregunta ' + (indice() + 1) + ' de ' + preguntas().length">
+          @for (r of resultados(); track $index; let i = $index) {
+            <li [class]="'pr-puntos__p' + (r ? ' pr-puntos__p--' + r : '') + (i === indice() ? ' pr-puntos__p--actual' : '')"></li>
+          }
+        </ol>
+        <span class="pr-barra__pts" [title]="'Puntos ganados en esta práctica'">
+          <mat-icon>stars</mat-icon> <span [appContador]="puntosSesion()"></span>
+        </span>
       </div>
 
       @if (preguntaActual(); as p) {
@@ -70,33 +123,44 @@
 
     @case ('resumen') {
       <!-- ============ 3. Resumen ============ -->
-      <section class="resumen">
+      <section class="pr-resumen">
         @if (puntosSesion() > 0 || porcentajeSesion() >= 80) {
           <app-confeti [cantidad]="40" [alcance]="260" />
         }
-        <mat-icon class="resumen__icono">emoji_events</mat-icon>
-        <h1>¡Terminaste la práctica de {{ infoTema()?.nombre }}!</h1>
-        <p class="resumen__dato">
-          Acertaste <strong>{{ aciertosPrimerIntento() }} de {{ preguntas().length }}</strong> al primer intento
-          ({{ porcentajeSesion() }}%).
-        </p>
-        <p class="resumen__dato">
-          @if (puntosSesion() > 0) {
-            Ganaste <strong>+<span [appContador]="puntosSesion()" [retraso]="500"></span> puntos</strong> en esta práctica.
-          } @else {
-            Esta vez no sumaste puntos: solo cuenta la primera vez que resuelves cada pregunta.
-          }
-        </p>
-        <p class="resumen__mensaje">
+        <svg class="pr-anillo pr-anillo--grande" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="26" class="pr-anillo__fondo" />
+          <circle cx="32" cy="32" r="26" class="pr-anillo__valor"
+                  [attr.stroke-dasharray]="perimetro" [attr.stroke-dashoffset]="trazo(porcentajeSesion())" />
+          <text x="32" y="36" text-anchor="middle">{{ porcentajeSesion() }}%</text>
+        </svg>
+        <h1>¡Terminaste {{ infoTema()?.nombre }}!</h1>
+        <p class="pr-resumen__mensaje">
           {{ porcentajeSesion() >= 80
               ? 'Excelente dominio del tema. ¡Sigue así!'
               : porcentajeSesion() >= 50
                 ? 'Vas bien. Repasa las preguntas donde necesitaste pistas.'
                 : 'Este tema necesita más práctica. Apóyate en el tutor IA y vuelve a intentarlo.' }}
         </p>
-        <div class="resumen__acciones">
-          <button type="button" class="btn-secundario" (click)="volverASeleccion()">Elegir otro tema</button>
-          <button type="button" class="btn-empezar" (click)="empezar()">Practicar de nuevo</button>
+
+        <div class="pr-resumen__cifras">
+          <div class="verde"><mat-icon>bolt</mat-icon><strong>{{ aciertosPrimerIntento() }}/{{ preguntas().length }}</strong><span>al primer intento</span></div>
+          <div class="ambar"><mat-icon>replay</mat-icon><strong>{{ reintentos() }}</strong><span>con reintentos</span></div>
+          <div class="indigo"><mat-icon>stars</mat-icon><strong>+<span [appContador]="puntosSesion()" [retraso]="500"></span></strong><span>puntos ganados</span></div>
+        </div>
+
+        <ol class="pr-puntos pr-puntos--resumen" aria-hidden="true">
+          @for (r of resultados(); track $index) {
+            <li [class]="'pr-puntos__p' + (r ? ' pr-puntos__p--' + r : '')"></li>
+          }
+        </ol>
+        @if (puntosSesion() === 0) {
+          <p class="pr-resumen__nota">Esta vez no sumaste puntos: solo cuenta la primera vez que resuelves cada pregunta.</p>
+        }
+
+        <div class="pr-resumen__acciones">
+          <button type="button" class="pr-btn pr-btn--claro" (click)="volverASeleccion()"><mat-icon>grid_view</mat-icon> Otro tema</button>
+          <a class="pr-btn pr-btn--claro" routerLink="/chat"><mat-icon>smart_toy</mat-icon> Hablar con el tutor</a>
+          <button type="button" class="pr-btn" (click)="empezar()"><mat-icon>replay</mat-icon> Practicar de nuevo</button>
         </div>
       </section>
     }

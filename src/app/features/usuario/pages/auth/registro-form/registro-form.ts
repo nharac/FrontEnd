@@ -1,3 +1,5 @@
+import { Aviso } from '../../../../../shared/components/aviso/aviso';
+import { DatosAviso } from '../../../../../shared/components/aviso/aviso.model';
 import { OjoPassword } from '../../../../../shared/components/ojo-password/ojo-password';
 import { Logo } from '../../../../../shared/components/logo/logo';
 import { Component, EventEmitter, Output, signal } from '@angular/core';
@@ -13,7 +15,7 @@ import {
   Validators
 } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../../services/auth.service';
 import { RegistroRequest } from '../../../models';
@@ -30,8 +32,7 @@ const PASSWORD_SEGURA = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/
   imports: [OjoPassword, Logo, 
     CommonModule,
     ReactiveFormsModule,
-    MatIconModule,
-    MatSnackBarModule
+    MatIconModule
   ],
   styleUrl: './registro-form.scss',
   templateUrl: './registro-form.html',
@@ -105,8 +106,15 @@ export class RegistroForm {
     this.authService.registro(request).subscribe({
       next: (res) => {
         this.cargando.set(false);
-        this.snackBar.open(`Registro exitoso, ${res.usuario.nombre}`, 'Cerrar', {
-          duration: 3000
+        this.snackBar.openFromComponent(Aviso, {
+          data: {
+            tipo: 'bienvenida',
+            mensaje: 'Tu cuenta está lista. ¡Empieza a practicar!',
+            nombre: res.usuario.nombre
+          } satisfies DatosAviso,
+          duration: 5000,
+          verticalPosition: 'top',
+          horizontalPosition: 'end'
         });
 
         // Redirige según el rol

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DocenteService } from '../../services/docente.service';
 import { ContenidoOculto } from '../../models/docente.model';
@@ -13,7 +13,7 @@ import { haceCuanto } from '../../../../shared/utils/tiempo';
  */
 @Component({
   selector: 'app-moderacion-docente',
-  imports: [RouterLink, MatIconModule, MatSnackBarModule],
+  imports: [RouterLink, MatIconModule],
   templateUrl: './moderacion-docente.html',
   styleUrl: './moderacion-docente.scss',
 })
