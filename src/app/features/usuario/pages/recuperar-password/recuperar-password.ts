@@ -7,13 +7,14 @@ import { AuthService } from '../../services/auth.service';
 import { Logo } from '../../../../shared/components/logo/logo';
 import { OjoPassword } from '../../../../shared/components/ojo-password/ojo-password';
 
-type Paso = 'correo' | 'codigo' | 'listo';
+type Paso = 'correo' | 'codigo' | 'password' | 'listo';
 
 /**
  * /auth/recuperar — "¿Olvidaste tu contraseña?"
  *  1. El usuario escribe su correo y el backend le envía un código de 6 dígitos (vence en 15 min).
- *  2. Escribe el código y su nueva contraseña (mismas reglas del registro).
- *  3. Listo: vuelve a iniciar sesión.
+ *  2. Escribe el código y el backend comprueba que sea válido (sin gastarlo).
+ *  3. Solo con un código válido aparece el formulario de la contraseña nueva (mismas reglas del registro).
+ *  4. Listo: vuelve a iniciar sesión.
  */
 @Component({
   selector: 'app-recuperar-password',
@@ -73,7 +74,7 @@ export class RecuperarPassword implements OnInit, OnDestroy {
 
   passwordValida = computed(() => this.reglas().every(r => r.ok));
   coinciden = computed(() => this.confirmar().length > 0 && this.confirmar() === this.password());
-  puedeCambiar = computed(() => this.codigo().length === 6 && this.passwordValida() && this.coinciden());
+  puedeCambiar = computed(() => this.passwordValida() && this.coinciden());
 
   ngOnInit(): void {
     const correo = this.route.snapshot.queryParamMap.get('correo');
@@ -143,6 +144,9 @@ export class RecuperarPassword implements OnInit, OnDestroy {
     if (solo && i < 5) {
       this.enfocar(i + 1);
     }
+    if (this.codigo().length === 6) {
+      this.validarCodigo();
+    }
   }
 
   teclaDigito(i: number, evento: KeyboardEvent): void {
@@ -173,6 +177,9 @@ export class RecuperarPassword implements OnInit, OnDestroy {
     this.digitos.set(d);
     this.cajas().forEach((c, j) => (c.nativeElement.value = d[j]));
     this.enfocar(Math.min(5, desde + texto.length));
+    if (this.codigo().length === 6) {
+      this.validarCodigo();
+    }
   }
 
   private enfocar(i: number): void {
@@ -181,11 +188,38 @@ export class RecuperarPassword implements OnInit, OnDestroy {
     caja?.select();
   }
 
+  /** Paso 2: comprueba el código; si es válido, pasa al formulario de la contraseña nueva. */
+  validarCodigo(): void {
+    this.error.set('');
+    this.aviso.set('');
+    if (this.codigo().length < 6) {
+      this.fallar('Escribe los 6 dígitos del código.');
+      return;
+    }
+    if (this.enviando()) return;
+    this.enviando.set(true);
+    this.authService.validarCodigoRecuperacion(this.correo().trim(), this.codigo()).subscribe({
+      next: () => {
+        this.enviando.set(false);
+        this.paso.set('password');
+      },
+      error: (err) => {
+        this.enviando.set(false);
+        this.fallar(err?.status === 429
+          ? 'Hiciste muchos intentos. Espera un minuto e intenta de nuevo.'
+          : err?.message || 'No se pudo comprobar el código.');
+        this.digitos.set(['', '', '', '', '', '']);
+        this.cajas().forEach(c => (c.nativeElement.value = ''));
+        setTimeout(() => this.enfocar(0), 50);
+      }
+    });
+  }
+
   cambiarPassword(): void {
     this.error.set('');
     this.aviso.set('');
     if (!this.puedeCambiar()) {
-      this.fallar(this.codigo().length < 6 ? 'Escribe los 6 dígitos del código.' : 'Revisa la nueva contraseña.');
+      this.fallar('Revisa la nueva contraseña.');
       return;
     }
     this.enviando.set(true);
@@ -204,9 +238,10 @@ export class RecuperarPassword implements OnInit, OnDestroy {
         this.fallar(err?.status === 429
           ? 'Hiciste muchos intentos. Espera un minuto e intenta de nuevo.'
           : err?.message || 'No se pudo cambiar la contraseña.');
+        // El código venció mientras escribía la contraseña: vuelve al paso del código
         if (/código/i.test(err?.message ?? '')) {
           this.digitos.set(['', '', '', '', '', '']);
-          this.cajas().forEach(c => (c.nativeElement.value = ''));
+          this.paso.set('codigo');
           setTimeout(() => this.enfocar(0), 50);
         }
       }

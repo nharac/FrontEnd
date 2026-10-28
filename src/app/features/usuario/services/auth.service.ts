@@ -7,7 +7,8 @@ import { environment } from '../../../../environments/environment';
 import {
   LoginRequest,
   RegistroRequest,
-  AuthResponse
+  AuthResponse,
+  RegistroResponse
 } from '../models';
 import { TokenService } from '../../../core/services/token.service';
 
@@ -40,18 +41,35 @@ export class AuthService {
   }
 
   /**
-   * Registra un nuevo estudiante.
+   * Registra un nuevo estudiante. La cuenta queda pendiente: llega un código de 6 dígitos al correo
+   * y la sesión se abre al verificarlo (doble verificación).
    * POST /api/auth/registro
    */
-  registro(request: RegistroRequest): Observable<AuthResponse> {
+  registro(request: RegistroRequest): Observable<RegistroResponse> {
+    return this.http.post<RegistroResponse>(`${this.API}/registro`, request);
+  }
+
+  /**
+   * Activa la cuenta con el código del correo y abre la sesión (igual que el login).
+   * POST /api/auth/verificar-correo
+   */
+  verificarCorreo(correo: string, codigo: string): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${this.API}/registro`, request)
+      .post<AuthResponse>(`${this.API}/verificar-correo`, { correo, codigo })
       .pipe(
         tap(res => {
           this.tokenService.guardar(res.token);
           this.tokenService.guardarRol(res.usuario.rol);
         })
       );
+  }
+
+  /**
+   * Pide otro código de verificación (máximo uno por minuto; responde igual exista o no la cuenta).
+   * POST /api/auth/reenviar-verificacion
+   */
+  reenviarVerificacion(correo: string): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${this.API}/reenviar-verificacion`, { correo });
   }
 
   /** Cierra la sesión. */
@@ -68,7 +86,15 @@ export class AuthService {
   }
 
   /**
-   * Paso 2: cambia la contraseña con el código recibido.
+   * Paso 2: comprueba el código sin gastarlo (un código malo cuenta como intento).
+   * POST /api/auth/recuperar/validar
+   */
+  validarCodigoRecuperacion(correo: string, codigo: string): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${this.API}/recuperar/validar`, { correo, codigo });
+  }
+
+  /**
+   * Paso 3: cambia la contraseña con el código ya validado (el backend lo vuelve a comprobar).
    * POST /api/auth/restablecer
    */
   restablecerPassword(datos: { correo: string; codigo: string; passwordNueva: string }): Observable<{ mensaje: string }> {

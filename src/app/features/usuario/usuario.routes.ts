@@ -13,6 +13,12 @@ export const USUARIO_ROUTES: Routes = [
       import('./pages/recuperar-password/recuperar-password').then(m => m.RecuperarPassword)
   },
   {
+    // Doble verificación al crear la cuenta → /auth/verificar?correo=...
+    path: 'verificar',
+    loadComponent: () =>
+      import('./pages/verificar-correo/verificar-correo').then(m => m.VerificarCorreo)
+  },
+  {
     path: '',
     redirectTo: 'auth',
     pathMatch: 'full'

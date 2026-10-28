@@ -1,0 +1,65 @@
+<!-- Fondo decorativo: el mismo del login -->
+<div class="auth-fondo" aria-hidden="true">
+  <span class="auth-mancha auth-mancha--1"></span>
+  <span class="auth-mancha auth-mancha--2"></span>
+  <span class="auth-mancha auth-mancha--3"></span>
+  @for (s of simbolos; track $index) {
+    <span class="auth-simbolo">{{ s }}</span>
+  }
+</div>
+
+<main class="tarjeta" [class.tarjeta--sacudir]="sacudir()">
+  <ol class="pasos" aria-label="Progreso">
+    <li class="hecho"><span>1</span> Datos</li>
+    <li [class.activo]="!listo()" [class.hecho]="listo()"><span>2</span> Código</li>
+    <li [class.activo]="listo()"><span>3</span> Listo</li>
+  </ol>
+
+  @if (!listo()) {
+    <form class="paso" (ngSubmit)="verificar()" novalidate>
+      <span class="sobre" aria-hidden="true"><mat-icon>mark_email_unread</mat-icon></span>
+      <h1>Confirma tu correo</h1>
+      <p class="subtitulo">
+        Te enviamos un código de 6 dígitos a <b>{{ correoOculto() }}</b>. Tu cuenta se crea cuando lo escribas. Vence en 15 minutos.
+      </p>
+
+      <div class="codigo" (paste)="pegar($event)" role="group" aria-label="Código de 6 dígitos">
+        @for (i of posiciones; track i) {
+          <input #caja class="digito" [class.digito--lleno]="digitos()[i]" type="text" inputmode="numeric"
+                 maxlength="6" [attr.autocomplete]="i === 0 ? 'one-time-code' : 'off'"
+                 [attr.aria-label]="'Dígito ' + (i + 1)" [value]="digitos()[i]"
+                 (input)="escribirDigito(i, $event)" (keydown)="teclaDigito(i, $event)" (focus)="$any($event.target).select()">
+        }
+      </div>
+
+      @if (aviso()) { <p class="aviso" role="status"><mat-icon>info</mat-icon> {{ aviso() }}</p> }
+      @if (error()) { <p class="error" role="alert"><mat-icon>error</mat-icon> {{ error() }}</p> }
+
+      <button type="submit" class="btn" [disabled]="enviando()">
+        @if (enviando()) { <span class="btn__spinner" aria-hidden="true"></span> Verificando… }
+        @else { Crear mi cuenta <mat-icon>verified</mat-icon> }
+      </button>
+
+      <p class="reenviar">
+        ¿No te llegó? Revisa la carpeta de spam o
+        @if (espera() > 0) {
+          <span>pide otro en {{ espera() }} s</span>
+        } @else {
+          <button type="button" class="enlace" [disabled]="enviando()" (click)="reenviar()">envía un código nuevo</button>
+        }
+      </p>
+    </form>
+  } @else {
+    <div class="paso listo">
+      <span class="listo__check" aria-hidden="true">
+        <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" /><path d="M15 27 l7 7 l15 -16" /></svg>
+      </span>
+      <h1>¡Cuenta creada!</h1>
+      <p class="subtitulo">Tu correo quedó verificado y tu cuenta está lista. Te llevamos a SAESU…</p>
+    </div>
+  }
+
+  @if (!listo()) {
+    <a class="volver" routerLink="/auth"><mat-icon>arrow_back</mat-icon> Volver a iniciar sesión</a>
+  }
+</main>

@@ -1,5 +1,3 @@
-import { Aviso } from '../../../../../shared/components/aviso/aviso';
-import { DatosAviso } from '../../../../../shared/components/aviso/aviso.model';
 import { OjoPassword } from '../../../../../shared/components/ojo-password/ojo-password';
 import { Logo } from '../../../../../shared/components/logo/logo';
 import { Component, EventEmitter, Output, signal } from '@angular/core';
@@ -19,7 +17,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../../services/auth.service';
 import { RegistroRequest } from '../../../models';
-import { esDocente } from '../../../../../shared/utils/rol';
 
 /** Solo se aceptan correos institucionales (mismo patrón que valida el backend). */
 const CORREO_INSTITUCIONAL = /^[a-zA-Z0-9._%+-]+@ucundinamarca\.edu\.co$/;
@@ -106,23 +103,8 @@ export class RegistroForm {
     this.authService.registro(request).subscribe({
       next: (res) => {
         this.cargando.set(false);
-        this.snackBar.openFromComponent(Aviso, {
-          data: {
-            tipo: 'bienvenida',
-            mensaje: 'Tu cuenta está lista. ¡Empieza a practicar!',
-            nombre: res.usuario.nombre
-          } satisfies DatosAviso,
-          duration: 5000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end'
-        });
-
-        // Redirige según el rol
-        if (esDocente(res.usuario.rol)) {
-          this.router.navigate(['/docente']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
+        // Doble verificación: la cuenta se activa con el código que llegó al correo institucional
+        this.router.navigate(['/auth/verificar'], { queryParams: { correo: res.correo } });
       },
       error: (err) => {
         this.cargando.set(false);
