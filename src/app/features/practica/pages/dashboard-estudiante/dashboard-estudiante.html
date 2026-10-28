@@ -63,9 +63,12 @@
         }
         <div class="hoy__pie">
           <span><mat-icon>schedule</mat-icon> ~{{ minutosEstimados }} min · hasta 20 pts por pregunta</span>
-          <button type="button" class="hoy__btn" (click)="irAPractica()">
-            Empezar <mat-icon>arrow_forward</mat-icon>
-          </button>
+          <div class="hoy__acciones">
+            <a class="hoy__quiz" routerLink="/quiz"><mat-icon>timer</mat-icon> Hacer un quiz</a>
+            <button type="button" class="hoy__btn" (click)="irAPractica()">
+              Empezar <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
         </div>
       </section>
 

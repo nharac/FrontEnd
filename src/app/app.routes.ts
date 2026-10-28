@@ -72,6 +72,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/gamificacion/pages/ranking/ranking')
             .then(m => m.Ranking)
+      },
+      {
+        path: 'quiz',
+        loadComponent: () =>
+          import('./features/quiz/pages/quiz/quiz')
+            .then(m => m.Quiz)
       }
     ]
   },

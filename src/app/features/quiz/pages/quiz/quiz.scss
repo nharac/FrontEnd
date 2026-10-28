@@ -1,0 +1,3 @@
+// Los estilos del quiz están en src/estudiante-quiz.scss (globales, acotados a app-quiz)
+// para no pasar el límite de 8 kB por componente.
+:host { display: block; }
