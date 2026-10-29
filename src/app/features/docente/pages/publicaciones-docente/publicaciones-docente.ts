@@ -1,3 +1,4 @@
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -19,7 +20,7 @@ type Estado = 'sin-respuestas' | 'sin-oficial' | 'oficial';
  */
 @Component({
   selector: 'app-publicaciones-docente',
-  imports: [MatIconModule],
+  imports: [MatIconModule, SumiDice],
   templateUrl: './publicaciones-docente.html',
   styleUrl: './publicaciones-docente.scss',
 })

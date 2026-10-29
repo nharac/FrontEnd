@@ -182,3 +182,6 @@ app-ranking {
     @for $i from 1 through 6 { .rk-movimientos li:nth-child(#{$i}) { animation-delay: #{0.2 + $i * 0.05}s; } }
   }
 }
+
+// Sumi en el ranking
+app-ranking .rk-sumi { margin-top: 4px; }

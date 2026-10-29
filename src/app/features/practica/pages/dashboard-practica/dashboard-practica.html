@@ -18,6 +18,9 @@
         }
       </header>
 
+      <app-sumi-dice class="pr-sumi" estado="pensando" accesorio="lapiz" [tamano]="78" compacto
+                     titulo="¡Vamos a practicar!" [mensajes]="consejosPractica" />
+
       <section class="pr-temas" aria-label="Temas">
         @for (tema of temas; track tema.id; let i = $index) {
           @let p = progresoDe(tema);
@@ -134,13 +137,14 @@
           <text x="32" y="36" text-anchor="middle">{{ porcentajeSesion() }}%</text>
         </svg>
         <h1>¡Terminaste {{ infoTema()?.nombre }}!</h1>
-        <p class="pr-resumen__mensaje">
-          {{ porcentajeSesion() >= 80
-              ? 'Excelente dominio del tema. ¡Sigue así!'
-              : porcentajeSesion() >= 50
-                ? 'Vas bien. Repasa las preguntas donde necesitaste pistas.'
-                : 'Este tema necesita más práctica. Apóyate en el tutor IA y vuelve a intentarlo.' }}
-        </p>
+        @let reaccion = reaccionSesion();
+        <app-sumi-dice class="pr-resumen__sumi" [estado]="reaccion.estado" [tono]="reaccion.tono"
+                       [accesorio]="porcentajeSesion() >= 80 ? 'trofeo' : 'lapiz'" [tamano]="96"
+                       [mensajes]="porcentajeSesion() >= 80
+                         ? 'Excelente dominio del tema. ¡Sigue así!'
+                         : porcentajeSesion() >= 50
+                           ? 'Vas bien. Repasa las preguntas donde necesitaste pistas.'
+                           : 'Este tema necesita más práctica. Apóyate en el tutor y vuelve a intentarlo: ¡yo te acompaño!'" />
 
         <div class="pr-resumen__cifras">
           <div class="verde"><mat-icon>bolt</mat-icon><strong>{{ aciertosPrimerIntento() }}/{{ preguntas().length }}</strong><span>al primer intento</span></div>

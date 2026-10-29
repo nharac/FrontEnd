@@ -97,12 +97,10 @@
     </main>
 
     <aside class="fo-lateral">
-      <section class="fo-cta">
-        <mat-icon>lightbulb</mat-icon>
-        <strong>¿Tienes una duda?</strong>
-        <p>Publícala y recibe ayuda de tus compañeros y docentes.</p>
-        <a routerLink="/foro/nueva">Preguntar ahora <mat-icon>arrow_forward</mat-icon></a>
-      </section>
+      <app-sumi-dice class="fo-sumi" estado="saludo" accesorio="lupa" [tamano]="80" compacto
+                     titulo="¿Tienes una duda?" [mensajes]="dialogosForo">
+        <a class="fo-sumi__ir" routerLink="/foro/nueva">Preguntar ahora <mat-icon>arrow_forward</mat-icon></a>
+      </app-sumi-dice>
       <section class="fo-caja">
         <h2><mat-icon>checklist</mat-icon> Cómo preguntar bien</h2>
         <ol class="fo-consejos">

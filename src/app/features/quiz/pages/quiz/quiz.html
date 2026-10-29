@@ -4,10 +4,13 @@
 
     <!-- ================= Inicio ================= -->
     @case ('inicio') {
-      <header class="qz-cabecera">
-        <span class="qz-badge"><mat-icon>timer</mat-icon> Evaluación cronometrada</span>
-        <h1>Quiz</h1>
-        <p>Preguntas al azar del banco, con tiempo. Al final ves tu puntaje y la explicación de cada una.</p>
+      <header class="qz-hero">
+        <div class="qz-hero__texto">
+          <h1>Quiz</h1>
+          <p>Preguntas al azar del banco, contra el reloj. Al final ves tu puntaje y por qué era cada respuesta.</p>
+        </div>
+        <app-sumi-dice class="qz-hero__sumi" estado="saludo" accesorio="cronometro" lado="derecha" [tamano]="112"
+                       [titulo]="saludoSumi().titulo" [mensajes]="saludoSumi().texto" />
       </header>
 
       <div class="qz-layout">
@@ -15,20 +18,21 @@
           <h2 id="qz-config-titulo" class="qz-sr">Configura tu quiz</h2>
 
           <div class="qz-campo">
-            <span class="qz-campo__titulo">Tema</span>
+            <span class="qz-campo__titulo">Elige el tema</span>
             <div class="qz-temas" role="radiogroup" aria-label="Tema">
               @for (t of temas; track t.nombre) {
                 <button type="button" role="radio" class="qz-tema" [class.activo]="tema() === t.id"
                         [attr.aria-checked]="tema() === t.id" (click)="tema.set(t.id)">
-                  <mat-icon>{{ t.icono }}</mat-icon>
-                  <span>{{ t.nombre }}</span>
+                  <span class="qz-tema__simbolo" aria-hidden="true">{{ t.simbolo }}</span>
+                  <span class="qz-tema__nombre">{{ t.nombre }}</span>
+                  <span class="qz-tema__desc">{{ t.descripcion }}</span>
                 </button>
               }
             </div>
           </div>
 
           <div class="qz-campo">
-            <span class="qz-campo__titulo">Preguntas</span>
+            <span class="qz-campo__titulo">¿Cuántas preguntas?</span>
             <div class="qz-cantidades" role="radiogroup" aria-label="Cantidad de preguntas">
               @for (c of cantidades; track c) {
                 <button type="button" role="radio" [class.activo]="cantidad() === c"
@@ -59,9 +63,17 @@
               <div><strong>{{ h.promedio }}%</strong><small>promedio</small></div>
               <div><strong>{{ h.mejor }}%</strong><small>mejor</small></div>
             </div>
+            @if (tendencia().length > 1) {
+              <div class="qz-tendencia" role="img" [attr.aria-label]="'Tus últimos resultados: ' + tendencia().map(t => t.porcentaje + '%').join(', ')">
+                @for (t of tendencia(); track t.id) {
+                  <span [style.height.%]="t.porcentaje < 4 ? 4 : t.porcentaje"
+                        [class.alto]="t.porcentaje >= 80" [class.bajo]="t.porcentaje < 50" [title]="t.porcentaje + '%'"></span>
+                }
+              </div>
+            }
             @if (h.ultimos.length) {
               <ul class="qz-ultimos">
-                @for (i of h.ultimos; track i.id) {
+                @for (i of h.ultimos.slice(0, 5); track i.id) {
                   <li>
                     <button type="button" (click)="verAnterior(i.id)" [attr.aria-label]="'Ver revisión: ' + nombreTema(i.tema) + ', ' + i.porcentaje + '%'">
                       <span class="qz-pct" [class.qz-pct--alto]="i.porcentaje >= 80" [class.qz-pct--bajo]="i.porcentaje < 50">{{ i.porcentaje }}%</span>
@@ -76,8 +88,7 @@
               </ul>
             } @else {
               <div class="qz-vacio">
-                <mat-icon>quiz</mat-icon>
-                <p>Aún no has hecho ningún quiz. ¡El primero marca tu punto de partida!</p>
+                <p>Aún no has hecho ningún quiz. El primero marca tu punto de partida.</p>
               </div>
             }
           } @else {
@@ -91,8 +102,9 @@
     @case ('en-curso') {
       @if (quiz(); as q) {
         <div class="qz-barra" [class.qz-barra--poco]="poco()">
+          <app-mascota class="qz-barra__sumi" [estado]="estadoEnCurso()" accesorio="cronometro" [tamano]="46" />
           <div class="qz-barra__info">
-            <span class="qz-barra__tema"><mat-icon>quiz</mat-icon> {{ nombreTema(q.tema) }}</span>
+            <span class="qz-barra__tema">{{ nombreTema(q.tema) }}</span>
             <span class="qz-barra__progreso">{{ respondidas() }}/{{ q.cantidad }}<span> respondidas</span></span>
           </div>
           <div class="qz-reloj" role="timer" [attr.aria-label]="'Tiempo restante ' + reloj(restante())">
@@ -162,7 +174,7 @@
       @if (resultado(); as r) {
         <section class="qz-caja qz-res">
           @if (celebrar()) { <app-confeti [cantidad]="36" /> }
-          <div class="qz-anillo" role="img" [attr.aria-label]="r.porcentaje + ' por ciento'">
+          <div class="qz-anillo" role="img" [attr.aria-label]="r.porcentaje + ' por ciento, ' + r.correctas + ' de ' + r.total">
             <svg viewBox="0 0 120 120" aria-hidden="true">
               <circle cx="60" cy="60" r="52" class="qz-anillo__fondo" />
               <circle cx="60" cy="60" r="52" class="qz-anillo__valor"
@@ -171,14 +183,15 @@
                       [style.stroke-dasharray]="circunferencia"
                       [style.stroke-dashoffset]="circunferencia * (1 - r.porcentaje / 100)" />
             </svg>
-            <div class="qz-anillo__txt"><strong>{{ r.porcentaje }}%</strong><small>{{ r.correctas }} de {{ r.total }}</small></div>
+            <div class="qz-anillo__txt" aria-hidden="true"><strong><span [appContador]="r.porcentaje" [duracion]="1100"></span>%</strong><small>{{ r.correctas }} de {{ r.total }}</small></div>
           </div>
+
           <div class="qz-res__txt">
-            @if (r.mejorMarca) { <span class="qz-badge qz-badge--oro"><mat-icon>emoji_events</mat-icon> ¡Nueva mejor marca!</span> }
+            @if (r.mejorMarca) { <span class="qz-badge qz-badge--oro"><mat-icon>emoji_events</mat-icon> Nueva mejor marca</span> }
             <h1>{{ mensaje().titulo }}</h1>
             <p>{{ mensaje().texto }}</p>
             <ul class="qz-res__datos">
-              <li><mat-icon>quiz</mat-icon> {{ nombreTema(r.tema) }}</li>
+              <li><mat-icon>menu_book</mat-icon> {{ nombreTema(r.tema) }}</li>
               <li><mat-icon>schedule</mat-icon> {{ duracion(r.duracionSegundos) }}</li>
               @if (r.fueraDeTiempo) { <li class="qz-tarde"><mat-icon>timer_off</mat-icon> Entregado fuera de tiempo</li> }
             </ul>
@@ -197,6 +210,8 @@
               <button type="button" class="qz-btn qz-btn--claro" (click)="volverAlInicio()"><mat-icon>tune</mat-icon> Cambiar tema</button>
             </div>
           </div>
+
+          <app-mascota class="qz-res__sumi" [estado]="estadoResultado()" [accesorio]="r.mejorMarca || r.porcentaje === 100 ? 'trofeo' : (r.porcentaje < 50 ? 'libro' : 'ninguno')" [tamano]="130" />
         </section>
 
         <section class="qz-revision" aria-labelledby="qz-rev-titulo">

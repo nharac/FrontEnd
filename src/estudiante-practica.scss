@@ -283,7 +283,9 @@ app-pregunta-card {
     p { margin: 3px 0 0; }
   }
   .pc-resultado {
-    &__icono { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.7); }
+    align-items: center;
+    &__sumi { margin: -10px -2px -14px -6px; }
+    strong { font-size: 15px; }
     &--ok { background: #ecfdf5; color: #065f46; }
     &--error { background: #fef2f2; color: #991b1b; b { color: #b45309; } }
   }
@@ -331,3 +333,9 @@ app-pregunta-card {
 }
 
 @keyframes pr-anillo { from { stroke-dashoffset: 163.4; } }
+
+// Sumi en la práctica (selección de tema y resumen de la sesión)
+app-dashboard-practica {
+  .pr-sumi { margin: -6px 0 -4px; }
+  .pr-resumen__sumi { justify-content: center; text-align: left; max-width: 520px; margin: 4px auto 6px; }
+}

@@ -1,4 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { PRACTICA_INICIO, reaccionResultado } from '../../../../shared/components/sumi-dice/dialogos';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,7 +38,7 @@ const PREGUNTAS_POR_SESION = 10;
  * 3. Al final ve un resumen de la sesión.
  */
 @Component({
-  imports: [DecimalPipe, RouterLink, MatIconModule, PreguntaCard, Confeti, ContadorDirective, LogroAviso],
+  imports: [DecimalPipe, RouterLink, MatIconModule, PreguntaCard, Confeti, ContadorDirective, LogroAviso, SumiDice],
   selector: 'app-dashboard-practica',
   styleUrl: './dashboard-practica.scss',
   templateUrl: './dashboard-practica.html',
@@ -66,6 +68,8 @@ export class DashboardPractica implements OnInit {
 
   preguntas = signal<Pregunta[]>([]);
   indice = signal(0);
+  readonly consejosPractica = PRACTICA_INICIO;
+  reaccionSesion = computed(() => reaccionResultado(this.porcentajeSesion()));
   aciertosPrimerIntento = signal(0);
   /** Puntos ganados en esta sesión (los da el backend al acertar). */
   puntosSesion = signal(0);

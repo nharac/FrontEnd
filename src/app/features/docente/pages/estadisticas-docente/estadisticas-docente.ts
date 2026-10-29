@@ -1,4 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { mensajeEstadisticas } from '../../../../shared/components/sumi-dice/dialogos';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -16,7 +18,7 @@ import { colorPorcentaje } from '../../utils/colores';
  */
 @Component({
   selector: 'app-estadisticas-docente',
-  imports: [RouterLink, MatIconModule, ActividadChart, ContadorDirective],
+  imports: [RouterLink, MatIconModule, ActividadChart, ContadorDirective, SumiDice],
   templateUrl: './estadisticas-docente.html',
   styleUrl: './estadisticas-docente.scss',
 })
@@ -26,6 +28,13 @@ export class EstadisticasDocente implements OnInit {
 
   datos = signal<EstadisticasGrupo | null>(null);
   error = signal(false);
+  /** Comentarios de Sumi: el tema con menos aciertos y consejos generales. */
+  consejosGrupo = computed(() => {
+    const temas = (this.datos()?.porTema ?? []).filter(t => t.intentos > 0);
+    const bajo = temas.length ? temas.reduce((a, b) => (b.porcentaje < a.porcentaje ? b : a)) : null;
+    const nombres: Record<string, string> = { limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales' };
+    return mensajeEstadisticas(bajo ? nombres[bajo.tema] ?? bajo.tema : null, bajo ? Math.round(bajo.porcentaje) : null);
+  });
 
   readonly nombresTema = NOMBRES_TEMA;
   readonly nombresDificultad = NOMBRES_DIFICULTAD;

@@ -1,0 +1,245 @@
+// ============================================
+// Sumi, la mascota de SAESU (shared/components/mascota).
+// Un frailejón del páramo de Sumapaz. Cada estado muestra u oculta partes del mismo SVG.
+// ============================================
+$sumi-tinta: #1f2f3f;
+
+app-mascota.sumi {
+  display: inline-block;
+  width: var(--sumi-tamano, 120px);
+  aspect-ratio: 160 / 180;
+  line-height: 0;
+  flex: none;
+
+  svg { width: 100%; height: 100%; overflow: visible; }
+
+  .sumi__sombra { fill: rgba(31, 47, 63, 0.13); }
+  .sumi__tallo { fill: none; stroke: #6f9369; stroke-width: 3; stroke-linecap: round; }
+  .sumi__hojita { fill: #8fb489; }
+  .sumi__flor ellipse { fill: #f7c948; stroke: #e9ab1f; stroke-width: 0.8; }
+  .sumi__flor-centro { fill: #e08a12; }
+  .sumi__hojas-atras path { fill: #6e9a6a; stroke: #5d8759; stroke-width: 1; }
+  .sumi__hojas-frente path:first-child { fill: #a9caa1; stroke: #e4efdf; stroke-width: 1.8; }
+  .sumi__nervio { fill: none; stroke: #e9f3e5; stroke-width: 1.4; stroke-linecap: round; opacity: 0.95; }
+  .sumi__pies ellipse { fill: #8c6a47; }
+  .sumi__pies .sumi__pie-brillo { fill: #b08a62; }
+  .sumi__cuerpo { fill: #f3e5ca; stroke: #dcc49c; stroke-width: 2; }
+  .sumi__cuerpo-sombra { fill: #e6d2ad; opacity: 0.8; }
+  .sumi__panza { fill: #fbf3e3; }
+  .sumi__lana { fill: none; stroke: #dcc49c; stroke-width: 1.8; opacity: 0.8; stroke-linecap: round; stroke-linejoin: round; }
+  .sumi__bufanda { fill: #4f46e5; }
+  .sumi__bufanda-raya { fill: none; stroke: #818cf8; stroke-width: 2.2; stroke-linecap: round; }
+  .sumi__bufanda-punta { fill: #6366f1; }
+  .sumi__bufanda-punta--2 { fill: #4338ca; }
+  .sumi__bufanda-nudo { fill: #4338ca; }
+  .sumi__integral { fill: #fff; font: italic 700 14px/1 Georgia, 'Times New Roman', serif; }
+  .sumi__cachete { fill: #f4a09d; opacity: 0.55; }
+  .sumi__ojo ellipse { fill: $sumi-tinta; }
+  .sumi__ojo circle { fill: #fff; }
+  .sumi__ojos-felices,
+  .sumi__cejas,
+  .sumi__boca--sonrisa,
+  .sumi__boca--nervios { fill: none; stroke: $sumi-tinta; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .sumi__boca--abierta path:first-child { fill: $sumi-tinta; }
+  .sumi__lengua { fill: #f08b8b; }
+  .sumi__boca--o { fill: $sumi-tinta; }
+  .sumi__brazo path:first-child { fill: #93b88c; stroke: #7da676; stroke-width: 1; }
+  .sumi__brazo--izq { transform-origin: 46px 128px; transform: rotate(8deg); }
+  .sumi__brazo--der { transform-origin: 114px 128px; transform: rotate(-8deg); }
+  .sumi__brazo { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .sumi__pensamiento circle, .sumi__pensamiento ellipse { fill: #fff; stroke: #c7d2fe; stroke-width: 2; }
+  .sumi__pensamiento text { fill: #4f46e5; font: 800 17px/1 system-ui, sans-serif; }
+  .sumi__gota { fill: #7dd3fc; }
+  .sumi__brillos path { fill: #f6c443; }
+  .sumi__brillos path:nth-child(even) { fill: #818cf8; }
+
+  // ---------- Accesorios ----------
+  .sumi__acc { display: none; }
+  @each $acc in gafas, birrete, lapiz, cronometro, lupa, trofeo, libro {
+    &.sumi--con-#{$acc} .sumi__acc--#{$acc} { display: inline; }
+  }
+  // Con algo en la mano, el brazo derecho lo sostiene (si el estado no lo mueve)
+  &.sumi--con-lapiz, &.sumi--con-cronometro, &.sumi--con-lupa, &.sumi--con-trofeo, &.sumi--con-libro {
+    &.sumi--feliz, &.sumi--pensando, &.sumi--nervioso { .sumi__brazo--der { transform: rotate(-38deg); } }
+  }
+  &.sumi--con-birrete .sumi__flor { display: none; }
+
+  .sumi__acc--gafas circle { fill: rgba(255, 255, 255, 0.25); stroke: #1f2f3f; stroke-width: 2.4; }
+  .sumi__acc--gafas path { fill: none; stroke: #1f2f3f; stroke-width: 2.4; stroke-linecap: round; }
+  .sumi__birrete-base { fill: #312e81; }
+  .sumi__birrete-tapa { fill: #4338ca; stroke: #312e81; stroke-width: 1.5; stroke-linejoin: round; }
+  .sumi__birrete-borla { fill: none; stroke: #f6c443; stroke-width: 2.2; stroke-linecap: round; }
+  .sumi__birrete-pompon { fill: #f6c443; }
+  .sumi__lapiz-cuerpo { fill: #f6c443; stroke: #d99a14; stroke-width: 1; }
+  .sumi__lapiz-borrador { fill: #f49aa5; }
+  .sumi__lapiz-punta { fill: #f3dcb4; }
+  .sumi__lapiz-mina { fill: #374151; }
+  .sumi__crono-boton { fill: #9ca3af; }
+  .sumi__crono-cuerpo { fill: #4f46e5; }
+  .sumi__crono-cara { fill: #fff; }
+  .sumi__crono-aguja { fill: none; stroke: #1f2f3f; stroke-width: 2; stroke-linecap: round; }
+  .sumi__lupa-mango { fill: none; stroke: #8c6a47; stroke-width: 5; stroke-linecap: round; }
+  .sumi__lupa-aro { fill: none; stroke: #4f46e5; stroke-width: 4; }
+  .sumi__lupa-vidrio { fill: rgba(191, 219, 254, 0.55); }
+  .sumi__trofeo-asas { fill: none; stroke: #e0a412; stroke-width: 2.6; }
+  .sumi__trofeo-copa, .sumi__trofeo-pie { fill: #f6c443; }
+  .sumi__trofeo-base { fill: #8c6a47; }
+  .sumi__trofeo-estrella { fill: #fff7d6; }
+  .sumi__libro-tapa { fill: #10b981; }
+  .sumi__libro-hojas { fill: #fff; }
+  .sumi__libro-texto { fill: #4f46e5; font: italic 700 9px/1 Georgia, serif; }
+
+  // Lo que depende del estado: por defecto, ojos abiertos y sonrisa
+  .sumi__ojos-felices, .sumi__cejas, .sumi__boca, .sumi__pensamiento, .sumi__gota, .sumi__brillos { display: none; }
+  .sumi__boca--sonrisa { display: inline; }
+
+  &.sumi--saludo {
+    .sumi__brazo--der { transform: rotate(-140deg); }
+  }
+  &.sumi--pensando {
+    .sumi__boca--sonrisa { display: none; }
+    .sumi__boca--o, .sumi__pensamiento { display: inline; }
+    .sumi__ojo { transform: translate(2px, -2px); }
+    .sumi__brazo--der { transform: rotate(-112deg); }
+  }
+  &.sumi--celebra {
+    .sumi__ojos, .sumi__boca--sonrisa { display: none; }
+    .sumi__ojos-felices, .sumi__boca--abierta, .sumi__brillos { display: inline; }
+    .sumi__brazo--izq { transform: rotate(150deg); }
+    .sumi__brazo--der { transform: rotate(-150deg); }
+  }
+  &.sumi--nervioso {
+    .sumi__boca--sonrisa { display: none; }
+    .sumi__boca--nervios, .sumi__cejas--preocupado, .sumi__gota { display: inline; }
+    .sumi__brazo--izq { transform: rotate(-6deg); }
+    .sumi__brazo--der { transform: rotate(6deg); }
+  }
+  &.sumi--animo {
+    .sumi__cejas--animo { display: inline; }
+    .sumi__brazo--der { transform: rotate(-140deg); }
+  }
+
+  // ---------- Movimiento ----------
+  &.sumi--animada {
+    .sumi__todo { animation: sumi-respira 3.2s ease-in-out infinite; transform-origin: 80px 170px; }
+    .sumi__flor { animation: sumi-flor 2.6s ease-in-out infinite; transform-origin: 90px 50px; }
+    .sumi__ojos { animation: sumi-parpadeo 4.5s infinite; transform-box: fill-box; transform-origin: center; }
+    &.sumi--saludo .sumi__brazo--der { animation: sumi-saluda 1.1s ease-in-out 2; }
+    &.sumi--celebra .sumi__todo { animation: sumi-salta 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 3; }
+    &.sumi--celebra .sumi__brillos path { animation: sumi-brillo 1.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    &.sumi--celebra .sumi__brillos path:nth-child(2n) { animation-delay: 0.4s; }
+    &.sumi--nervioso .sumi__todo { animation: sumi-tiembla 0.35s ease-in-out infinite; }
+    &.sumi--pensando .sumi__pensamiento { animation: sumi-flota 2.4s ease-in-out infinite; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+}
+
+@keyframes sumi-respira { 50% { transform: translateY(-3px) scale(1.01, 0.995); } }
+@keyframes sumi-flor { 50% { transform: rotate(7deg); } }
+@keyframes sumi-parpadeo { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes sumi-saluda { 0%, 100% { transform: rotate(-140deg); } 50% { transform: rotate(-110deg); } }
+@keyframes sumi-salta { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-14px); } }
+@keyframes sumi-brillo { 50% { transform: scale(0.5) rotate(20deg); opacity: 0.5; } }
+@keyframes sumi-tiembla { 25% { transform: translateX(-1px); } 75% { transform: translateX(1px); } }
+@keyframes sumi-flota { 50% { transform: translateY(-3px); } }
+
+// Sumi como avatar del tutor en el chat
+app-chat-panel {
+  .chat__avatar.chat__avatar--sumi { background: #eef2ff !important; overflow: visible; align-items: end; app-mascota { margin-bottom: -2px; } }
+  .fila__avatar--sumi { background: #eef2ff; overflow: hidden; align-items: end; }
+  .chat__vacio-sumi { margin-bottom: 2px; }
+}
+
+// Sumi en el panel de bienvenida del inicio de sesión / registro
+.toggle-panel__sumi { margin-bottom: 6px; filter: drop-shadow(0 8px 14px rgba(30, 20, 90, 0.25)); .sumi__sombra { display: none; } }
+
+// ============================================
+// Sumi hablando (shared/components/sumi-dice): mascota + globo de texto
+// ============================================
+app-sumi-dice.sd {
+  --sd-acento: #4f46e5;
+  --sd-suave: #eef2ff;
+  --sd-borde: #e0e7ff;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 0;
+
+  &.sd--exito { --sd-acento: #059669; --sd-suave: #ecfdf5; --sd-borde: #bbf7d0; }
+  &.sd--alerta { --sd-acento: #d97706; --sd-suave: #fffbeb; --sd-borde: #fde68a; }
+  &.sd--info { --sd-acento: #0284c7; --sd-suave: #f0f9ff; --sd-borde: #bae6fd; }
+  &.sd--derecha { flex-direction: row-reverse; }
+
+  .sd__sumi { margin-bottom: -4px; }
+
+  .sd__globo {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    max-width: 460px;
+    margin-bottom: 34px;
+    padding: 12px 16px 13px;
+    background: #fff;
+    border: 1.5px solid var(--sd-borde);
+    border-radius: 20px 20px 20px 6px;
+    box-shadow: 0 10px 26px rgba(31, 50, 71, 0.08);
+    color: #374151;
+    font-size: 14px;
+    line-height: 1.5;
+    transform-origin: 0 100%;
+    animation: sd-aparece 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    // Colita del globo apuntando a Sumi
+    &::before, &::after {
+      content: '';
+      position: absolute;
+      bottom: 10px;
+      left: -9px;
+      border: 8px solid transparent;
+      border-right-color: var(--sd-borde);
+      border-left-width: 0;
+    }
+    &::after { left: -6.5px; border-right-color: #fff; }
+  }
+  &.sd--derecha .sd__globo {
+    border-radius: 20px 20px 6px 20px;
+    transform-origin: 100% 100%;
+    &::before, &::after { left: auto; right: -9px; border-right-width: 0; border-left-width: 8px; border-right-color: transparent; border-left-color: var(--sd-borde); }
+    &::after { right: -6.5px; border-left-color: #fff; }
+  }
+
+  .sd__titulo { display: block; margin-bottom: 2px; font-size: 14.5px; font-weight: 700; color: var(--sd-acento); }
+  .sd__texto { margin: 0; }
+  .sd__otro {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; padding: 4px 10px;
+    font: inherit; font-size: 12.5px; font-weight: 600; color: var(--sd-acento);
+    background: var(--sd-suave); border: 0; border-radius: 999px; cursor: pointer;
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    &:hover { filter: brightness(0.97); }
+    &:focus-visible { outline: 2px solid var(--sd-acento); outline-offset: 2px; }
+  }
+  .sd__escribiendo { display: inline-flex; gap: 4px; padding: 6px 2px;
+    i { width: 7px; height: 7px; border-radius: 50%; background: var(--sd-acento); opacity: 0.35; animation: sd-punto 1s infinite; }
+    i:nth-child(2) { animation-delay: 0.15s; }
+    i:nth-child(3) { animation-delay: 0.3s; } }
+
+  &.sd--compacto {
+    .sd__globo { margin-bottom: 22px; padding: 9px 13px 10px; font-size: 13.5px; border-radius: 16px 16px 16px 5px; }
+    &.sd--derecha .sd__globo { border-radius: 16px 16px 5px 16px; }
+    .sd__titulo { font-size: 14px; }
+  }
+
+  @media (max-width: 560px) {
+    .sd__sumi { --sumi-tamano: 66px !important; }
+    .sd__globo { margin-bottom: 22px; font-size: 13.5px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sd__globo, .sd__escribiendo i { animation: none; }
+  }
+}
+
+@keyframes sd-aparece { from { opacity: 0; transform: scale(0.85); } }
+@keyframes sd-punto { 50% { opacity: 1; transform: translateY(-2px); } }

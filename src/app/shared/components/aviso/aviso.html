@@ -13,7 +13,17 @@
   </div>
 } @else {
   <span class="aviso__icono"><mat-icon>{{ icono() }}</mat-icon></span>
-  <p class="aviso__texto">{{ datos.mensaje }}</p>
+  <div class="aviso__texto">
+    @if (datos.titulo) {
+      <strong>{{ datos.titulo }}</strong>
+      <small>{{ datos.mensaje }}</small>
+    } @else {
+      {{ datos.mensaje }}
+    }
+    @if (datos.archivo) {
+      <span class="aviso__archivo"><mat-icon>attach_file</mat-icon>{{ datos.archivo }}</span>
+    }
+  </div>
 }
 
 @if (accionTexto()) {

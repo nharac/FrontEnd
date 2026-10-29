@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, shareReplay } from 'rxjs';
 
+import { ResultadoQuiz } from '../../quiz/models/quiz.model';
 import { environment } from '../../../../environments/environment';
 import { Usuario } from '../../usuario/models/usuario.model';
 import {
@@ -138,9 +139,13 @@ export class DocenteService {
   }
 
   /**
-   * GET /api/docente/estudiantes/exportar
+   * GET /api/docente/estudiantes/exportar (Excel .xlsx)
    * Se pide como Blob (y no con un enlace normal) porque necesita el JWT.
    */
+  quizDeEstudiante(estudianteId: number, intentoId: number): Observable<ResultadoQuiz> {
+    return this.http.get<ResultadoQuiz>(`${this.API}/docente/estudiantes/${estudianteId}/quices/${intentoId}`);
+  }
+
   exportarEstudiantes(): Observable<Blob> {
     return this.http.get(`${this.API}/docente/estudiantes/exportar`, { responseType: 'blob' });
   }

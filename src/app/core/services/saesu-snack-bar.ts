@@ -14,7 +14,7 @@ import { DatosAviso } from '../../shared/components/aviso/aviso.model';
 export class SaesuSnackBar extends MatSnackBar {
 
   override open(message: string, action = '', config?: MatSnackBarConfig): MatSnackBarRef<TextOnlySnackBar> {
-    const datos: DatosAviso = { mensaje: message, accion: action, ...(config?.data ?? {}) };
+    const datos: DatosAviso = { ...separar(message), accion: action, ...(config?.data ?? {}) };
     const ref = this.openFromComponent(Aviso, { ...config, data: datos, panelClass: unir(config?.panelClass) });
     // Quien llama solo usa onAction()/dismiss(), que existen igual en cualquier MatSnackBarRef
     return ref as unknown as MatSnackBarRef<TextOnlySnackBar>;
@@ -26,6 +26,18 @@ export class SaesuSnackBar extends MatSnackBar {
       panelClass: component === (Aviso as unknown) ? unir(config?.panelClass) : config?.panelClass,
     });
   }
+}
+
+/**
+ * "Pregunta creada: ya aparece en la práctica" → título "Pregunta creada" + detalle "Ya aparece en la práctica".
+ * Igual con "Publicación oculta. La encuentras en Moderación.". Así todos los avisos de ese estilo
+ * quedan con título y detalle sin cambiar cada llamada. Los textos cortos o sin separador quedan igual.
+ */
+export function separar(mensaje: string): Pick<DatosAviso, 'titulo' | 'mensaje'> {
+  const m = /^([^:.]{3,40})(?::|\.)\s+(.{3,})$/s.exec(mensaje.trim());
+  if (!m) return { mensaje };
+  const detalle = m[2].trim();
+  return { titulo: m[1].trim(), mensaje: detalle.charAt(0).toUpperCase() + detalle.slice(1) };
 }
 
 function unir(panelClass?: string | string[]): string[] {

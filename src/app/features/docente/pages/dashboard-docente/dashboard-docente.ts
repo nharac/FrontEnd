@@ -1,3 +1,5 @@
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { saludoDocente } from '../../../../shared/components/sumi-dice/dialogos';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -14,7 +16,7 @@ import { diasDesde, haceCuanto } from '../../../../shared/utils/tiempo';
 @Component({
   selector: 'app-dashboard-docente',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule],
+  imports: [CommonModule, RouterLink, MatIconModule, SumiDice],
   templateUrl: './dashboard-docente.html',
   styleUrl: './dashboard-docente.scss',
 })
@@ -33,6 +35,7 @@ export class DashboardDocente implements OnInit {
   readonly haceCuanto = haceCuanto;
 
   /** Pendientes sin ninguna respuesta (ni de estudiantes). */
+  sumiDocente = computed(() => saludoDocente(this.nombreDocente(), this.cargando() || this.error() ? null : this.pendientes().length));
   sinRespuestas = computed(() => this.pendientes().filter(p => p.respuestasCount === 0).length);
 
   /** Días que lleva esperando la consulta pendiente más antigua. */

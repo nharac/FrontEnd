@@ -1,3 +1,5 @@
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { BANCO_PREGUNTAS } from '../../../../shared/components/sumi-dice/dialogos';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -18,11 +20,12 @@ import { colorPorcentaje } from '../../utils/colores';
  */
 @Component({
   selector: 'app-banco-preguntas',
-  imports: [RouterLink, FormsModule, MatIconModule],
+  imports: [RouterLink, FormsModule, MatIconModule, SumiDice],
   templateUrl: './banco-preguntas.html',
   styleUrl: './banco-preguntas.scss',
 })
 export class BancoPreguntas implements OnInit {
+  readonly consejosBanco = BANCO_PREGUNTAS;
 
   private docenteService = inject(DocenteService);
   private snackBar = inject(MatSnackBar);

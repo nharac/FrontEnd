@@ -36,14 +36,14 @@
         <span class="puntos-flotantes" aria-hidden="true">+{{ v.puntosGanados }}</span>
         <app-confeti [cantidad]="16" [alcance]="130" />
       }
-      <span class="pc-resultado__icono"><mat-icon>{{ v.esCorrecta ? 'celebration' : 'psychology_alt' }}</mat-icon></span>
+      @if (reaccion(); as r) {
+        <app-mascota class="pc-resultado__sumi" [estado]="r.estado" [accesorio]="v.esCorrecta ? 'ninguno' : 'lapiz'" [tamano]="62" />
+      }
       <div>
-        <strong>{{ v.esCorrecta ? (v.mensaje || '¡Correcto!') : 'Aún no. Intenta con otra opción.' }}</strong>
+        <strong>{{ reaccion()?.titulo }}</strong>
+        <p>{{ reaccion()?.texto }}</p>
         @if (!v.esCorrecta && v.puntosEnJuego) {
           <p>Si aciertas ahora ganas <b>+{{ v.puntosEnJuego }} puntos</b>.</p>
-        }
-        @if (v.esCorrecta && intentos() > 1) {
-          <p>Lo lograste en {{ intentos() }} intentos. ¡Bien hecho por no rendirte!</p>
         }
       </div>
     </div>

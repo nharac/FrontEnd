@@ -19,6 +19,9 @@ import {
   veredicto
 } from '../../models/quiz.model';
 import { Confeti } from '../../../../shared/components/confeti/confeti';
+import { EstadoMascota, Mascota } from '../../../../shared/components/mascota/mascota';
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { ContadorDirective } from '../../../../shared/directives/contador.directive';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
 
 type Etapa = 'inicio' | 'en-curso' | 'resultado';
@@ -43,7 +46,7 @@ interface EnCurso {
  */
 @Component({
   selector: 'app-quiz',
-  imports: [RouterLink, MatIconModule, Confeti],
+  imports: [RouterLink, MatIconModule, Confeti, Mascota, ContadorDirective, SumiDice],
   templateUrl: './quiz.html',
   styleUrl: './quiz.scss',
 })
@@ -68,6 +71,16 @@ export class Quiz implements OnInit, OnDestroy {
   historial = signal<HistorialQuiz | null>(null);
   empezando = signal(false);
   minutos = computed(() => Math.round(this.cantidad() * SEGUNDOS_POR_PREGUNTA / 60));
+  /** Lo que dice Sumi al entrar. */
+  saludoSumi = computed(() => {
+    const h = this.historial();
+    if (!h) return { titulo: '¡Hola!', texto: 'Dame un segundo, estoy buscando tus resultados…' };
+    if (!h.intentos) return { titulo: '¡Hola, soy Sumi!', texto: 'Elige un tema y te pongo a prueba. Sin puntos, sin presión.' };
+    if (h.mejor === 100) return { titulo: '¡Ya sacaste 100 %!', texto: '¿Lo repites con más preguntas o con otro tema?' };
+    return { titulo: `Tu mejor resultado: ${h.mejor} %`, texto: '¿Lo superamos hoy? Yo llevo el tiempo.' };
+  });
+  /** Últimos resultados en orden de fecha (el más viejo a la izquierda). */
+  tendencia = computed(() => [...(this.historial()?.ultimos ?? [])].reverse());
 
   // ---------- En curso ----------
   quiz = signal<QuizIniciado | null>(null);
@@ -89,11 +102,16 @@ export class Quiz implements OnInit, OnDestroy {
     return Math.max(0, Math.min(1, this.restante() / total));
   });
   poco = computed(() => this.restante() <= 60);
+  estadoEnCurso = computed<EstadoMascota>(() => this.poco() ? 'nervioso' : 'pensando');
 
   // ---------- Resultado ----------
   resultado = signal<ResultadoQuiz | null>(null);
   soloErrores = signal(false);
   mensaje = computed(() => veredicto(this.resultado()?.porcentaje ?? 0));
+  estadoResultado = computed<EstadoMascota>(() => {
+    const p = this.resultado()?.porcentaje ?? 0;
+    return p >= 80 ? 'celebra' : p >= 50 ? 'feliz' : 'animo';
+  });
   detalleVisible = computed<DetalleQuiz[]>(() => {
     const d = this.resultado()?.detalle ?? [];
     return this.soloErrores() ? d.filter(x => !x.correcta) : d;

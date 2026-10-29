@@ -1,3 +1,5 @@
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { mensajeRanking } from '../../../../shared/components/sumi-dice/dialogos';
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,7 +35,7 @@ const CLAVE_PERIODO = 'saesu_ranking_periodo';
  */
 @Component({
   selector: 'app-ranking',
-  imports: [RouterLink, MatIconModule, Confeti, ContadorDirective, Medalla],
+  imports: [RouterLink, MatIconModule, Confeti, ContadorDirective, Medalla, SumiDice],
   templateUrl: './ranking.html',
   styleUrl: './ranking.scss',
 })
@@ -53,6 +55,11 @@ export class Ranking implements OnInit, OnDestroy {
   periodo = signal<PeriodoRanking>(this.leerPeriodo());
   posiciones = signal<PosicionRanking[]>([]);
   yo = signal<MiPosicion | null>(null);
+  /** Lo que dice Sumi según la posición (null mientras carga). */
+  sumiRanking = computed(() => {
+    const y = this.yo();
+    return y ? mensajeRanking(y.posicion, y.puntosParaSubir, y.siguienteNombre) : null;
+  });
   cargando = signal(true);
   error = signal(false);
   /** El confeti sale cuando el podio termina de subir. */

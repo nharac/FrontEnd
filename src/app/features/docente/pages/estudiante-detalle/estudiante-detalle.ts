@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ResultadoQuiz, duracion, nombreTemaQuiz } from '../../../quiz/models/quiz.model';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -39,6 +40,31 @@ export class EstudianteDetallePage implements OnInit {
     this.docenteService.estudiante(id).subscribe({
       next: (d) => this.datos.set(d),
       error: () => this.error.set(true)
+    });
+  }
+
+  /** Quiz abierto para ver sus respuestas (uno a la vez). */
+  quizAbierto = signal<number | null>(null);
+  revision = signal<ResultadoQuiz | null>(null);
+  cargandoRevision = signal(false);
+  readonly nombreQuiz = nombreTemaQuiz;
+  readonly duracion = duracion;
+
+  promedioQuiz = computed(() => this.datos()?.resumen.promedioQuiz ?? null);
+
+  verQuiz(intentoId: number): void {
+    if (this.quizAbierto() === intentoId) {
+      this.quizAbierto.set(null);
+      return;
+    }
+    const estudiante = this.datos()?.resumen.id;
+    if (!estudiante) return;
+    this.quizAbierto.set(intentoId);
+    this.revision.set(null);
+    this.cargandoRevision.set(true);
+    this.docenteService.quizDeEstudiante(estudiante, intentoId).subscribe({
+      next: (r) => { this.revision.set(r); this.cargandoRevision.set(false); },
+      error: () => { this.cargandoRevision.set(false); this.quizAbierto.set(null); }
     });
   }
 

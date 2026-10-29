@@ -5,12 +5,19 @@
       <p>
         {{ estudiantes().length }} estudiante{{ estudiantes().length === 1 ? '' : 's' }}
         @if (enRiesgo()) { · <b class="riesgo-texto">{{ enRiesgo() }} en riesgo</b> }
+        @if (nuevos()) { · {{ nuevos() }} {{ nuevos() === 1 ? 'nuevo' : 'nuevos' }} }
       </p>
     </div>
     <button type="button" class="dp-btn" [disabled]="exportando() || !estudiantes().length" (click)="exportar()">
-      <mat-icon>download</mat-icon> {{ exportando() ? 'Exportando…' : 'Exportar a Excel (CSV)' }}
+      <mat-icon>{{ exportando() ? 'hourglass_top' : 'download' }}</mat-icon> {{ exportando() ? 'Preparando Excel…' : 'Descargar Excel' }}
     </button>
   </header>
+
+  @if (!cargando() && !error() && estudiantes().length) {
+    @let sumi = sumiEstudiantes();
+    <app-sumi-dice class="dp-sumi" [estado]="sumi.estado" accesorio="lupa" [tamano]="78" compacto
+                   [tono]="sumi.tono" [titulo]="sumi.titulo" [mensajes]="sumi.texto" />
+  }
 
   <section class="dp-tarjeta">
     <div class="dp-filtros barra">
@@ -23,6 +30,7 @@
         <button type="button" [class.activo]="filtro() === 'todos'" (click)="cambiarFiltro('todos')">Todos</button>
         <button type="button" [class.activo]="filtro() === 'riesgo'" (click)="cambiarFiltro('riesgo')">En riesgo ({{ enRiesgo() }})</button>
         <button type="button" [class.activo]="filtro() === 'aldia'" (click)="cambiarFiltro('aldia')">Al día</button>
+        <button type="button" [class.activo]="filtro() === 'nuevos'" (click)="cambiarFiltro('nuevos')">Nuevos ({{ nuevos() }})</button>
       </div>
     </div>
 
@@ -38,7 +46,8 @@
               <th><button type="button" (click)="ordenarPor('nombre')">Estudiante <mat-icon>{{ iconoOrden('nombre') }}</mat-icon></button></th>
               <th><button type="button" (click)="ordenarPor('puntos')">Puntos <mat-icon>{{ iconoOrden('puntos') }}</mat-icon></button></th>
               <th><button type="button" (click)="ordenarPor('porcentaje')">Aciertos <mat-icon>{{ iconoOrden('porcentaje') }}</mat-icon></button></th>
-              @for (t of temas; track t) { <th class="col-tema">{{ nombresTema[t] }}</th> }
+              <th class="col-tema">Por tema</th>
+              <th><button type="button" (click)="ordenarPor('quiz')">Quiz <mat-icon>{{ iconoOrden('quiz') }}</mat-icon></button></th>
               <th><button type="button" (click)="ordenarPor('ultima')">Última actividad <mat-icon>{{ iconoOrden('ultima') }}</mat-icon></button></th>
               <th>Estado</th>
             </tr>
@@ -68,18 +77,30 @@
                     </div>
                   } @else { <span class="nada">—</span> }
                 </td>
-                @for (t of temas; track t) {
-                  @let tp = temaDe(e, t);
-                  <td class="col-tema">
-                    @if (tp && tp.intentos) {
-                      <span class="tema-pct" [class]="'tema-pct tema-pct--' + color(tp.porcentaje)"
-                            [matTooltip]="tp.resueltas + ' de ' + tp.totalPreguntas + ' preguntas resueltas'">{{ tp.porcentaje }} %</span>
-                    } @else { <span class="nada">—</span> }
-                  </td>
-                }
+                <td class="col-tema">
+                  <div class="temas-mini">
+                    @for (t of temas; track t) {
+                      @let tp = temaDe(e, t);
+                      @if (tp && tp.intentos) {
+                        <span class="tema-pct" [class]="'tema-pct tema-pct--' + color(tp.porcentaje)"
+                              [matTooltip]="nombresTema[t] + ': ' + tp.porcentaje + ' % de aciertos · ' + tp.resueltas + ' de ' + tp.totalPreguntas + ' resueltas'"><i>{{ nombresTema[t][0] }}</i>{{ tp.porcentaje | number: '1.0-0' }}</span>
+                      } @else {
+                        <span class="tema-pct tema-pct--vacio" [matTooltip]="nombresTema[t] + ': sin practicar'"><i>{{ nombresTema[t][0] }}</i>—</span>
+                      }
+                    }
+                  </div>
+                </td>
+                <td class="col-tema">
+                  @if (e.promedioQuiz !== null) {
+                    <span class="tema-pct" [class]="'tema-pct tema-pct--' + color(e.promedioQuiz)"
+                          [matTooltip]="e.quices + (e.quices === 1 ? ' quiz' : ' quices') + ' · promedio'">{{ e.promedioQuiz }} %</span>
+                  } @else { <span class="nada">—</span> }
+                </td>
                 <td class="ultima">{{ e.ultimaActividad ? haceCuanto(e.ultimaActividad) : 'Nunca' }}</td>
                 <td>
-                  @if (e.enRiesgo) {
+                  @if (e.estado === 'nuevo') {
+                    <span class="dp-chip dp-chip--indigo" [matTooltip]="'Recién registrado: tiene ' + e.diasDeGracia + (e.diasDeGracia === 1 ? ' día' : ' días') + ' para empezar a practicar o hacer un quiz'"><mat-icon>fiber_new</mat-icon> Nuevo</span>
+                  } @else if (e.enRiesgo) {
                     <span class="dp-chip dp-chip--rojo" [matTooltip]="e.motivosRiesgo.join(' · ')"><mat-icon>warning</mat-icon> En riesgo</span>
                   } @else {
                     <span class="dp-chip dp-chip--verde"><mat-icon>check_circle</mat-icon> Al día</span>
@@ -87,14 +108,14 @@
                 </td>
               </tr>
             } @empty {
-              <tr class="sin-filas"><td colspan="8">
+              <tr class="sin-filas"><td colspan="7">
                 <div class="dp-vacio"><mat-icon>person_search</mat-icon><p>No hay estudiantes con ese filtro.</p></div>
               </td></tr>
             }
           </tbody>
         </table>
       </div>
-      <p class="nota"><mat-icon>info</mat-icon> "En riesgo": más de 7 días sin practicar, o menos del 50 % de aciertos con al menos 5 intentos.</p>
+      <p class="nota"><mat-icon>info</mat-icon> "Nuevo": se registró hace menos de 7 días y aún no ha practicado; tiene ese tiempo para empezar. "En riesgo": después de eso, más de 7 días sin practicar ni hacer quices, o menos del 50 % de aciertos con al menos 5 intentos.</p>
     }
   </section>
 </div>

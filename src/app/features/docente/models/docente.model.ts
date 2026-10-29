@@ -84,6 +84,25 @@ export interface EstudianteResumen {
   enRiesgo: boolean;
   motivosRiesgo: string[];
   porTema: TemaProgreso[];
+  /** nuevo = recién registrado y sin actividad todavía (tiene unos días antes de contar como riesgo). */
+  estado: 'nuevo' | 'al-dia' | 'en-riesgo';
+  /** Si es nuevo: días que le quedan para empezar. */
+  diasDeGracia: number | null;
+  quices: number;
+  /** Promedio de sus quices (0-100); null si no ha hecho ninguno. */
+  promedioQuiz: number | null;
+}
+
+/** Quiz entregado por un estudiante (detalle del docente). */
+export interface QuizRealizado {
+  id: number;
+  tema: 'limites' | 'derivadas' | 'integrales' | null;
+  correctas: number;
+  total: number;
+  porcentaje: number;
+  duracionSegundos: number;
+  fueraDeTiempo: boolean;
+  fecha: string;
 }
 
 export interface IntentoReciente {
@@ -113,6 +132,7 @@ export interface EstudianteDetalle {
   ultimosIntentos: IntentoReciente[];
   preguntasConMasFallos: PreguntaConFallos[];
   actividad: ActividadDia[];
+  quices: QuizRealizado[];
 }
 
 // ============================================

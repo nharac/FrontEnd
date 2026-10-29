@@ -1,4 +1,5 @@
 import { MatIconModule } from '@angular/material/icon';
+import { Mascota } from '../../../../shared/components/mascota/mascota';
 import { Component, ElementRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -8,7 +9,7 @@ import { RegistroForm } from './registro-form/registro-form';
 
 @Component({
   selector: 'app-auth',
-  imports: [CommonModule, MatIconModule, LoginForm, RegistroForm],
+  imports: [CommonModule, MatIconModule, LoginForm, RegistroForm, Mascota],
   styleUrl: './auth.scss',
   templateUrl: './auth.html',
   host: {

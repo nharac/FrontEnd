@@ -90,11 +90,11 @@ export interface HistorialQuiz {
   ultimos: IntentoHistorial[];
 }
 
-export const OPCIONES_TEMA: { id: TemaQuiz; nombre: string; icono: string }[] = [
-  { id: null, nombre: 'Mixto', icono: 'shuffle' },
-  { id: 'limites', nombre: 'Límites', icono: 'trending_flat' },
-  { id: 'derivadas', nombre: 'Derivadas', icono: 'show_chart' },
-  { id: 'integrales', nombre: 'Integrales', icono: 'functions' },
+export const OPCIONES_TEMA: { id: TemaQuiz; nombre: string; simbolo: string; descripcion: string }[] = [
+  { id: null, nombre: 'Mixto', simbolo: '∑', descripcion: 'Un poco de los tres temas' },
+  { id: 'limites', nombre: 'Límites', simbolo: 'lim', descripcion: 'Indeterminaciones y al infinito' },
+  { id: 'derivadas', nombre: 'Derivadas', simbolo: 'f′', descripcion: 'Reglas, cadena y aplicaciones' },
+  { id: 'integrales', nombre: 'Integrales', simbolo: '∫', descripcion: 'Inmediatas, sustitución y partes' },
 ];
 
 export const CANTIDADES = [5, 10, 15, 20];

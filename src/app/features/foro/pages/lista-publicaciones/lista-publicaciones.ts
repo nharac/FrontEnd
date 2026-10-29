@@ -1,3 +1,5 @@
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { FORO } from '../../../../shared/components/sumi-dice/dialogos';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -18,12 +20,13 @@ const TAMANO_PAGINA = 10;
  * Búsqueda, filtro por tema, orden y "Cargar más".
  */
 @Component({
-  imports: [RouterLink, FormsModule, MatIconModule],
+  imports: [RouterLink, FormsModule, MatIconModule, SumiDice],
   selector: 'app-lista-publicaciones',
   styleUrl: './lista-publicaciones.scss',
   templateUrl: './lista-publicaciones.html',
 })
 export class ListaPublicaciones implements OnInit {
+  readonly dialogosForo = FORO;
 
   private foroService = inject(ForoService);
   private router = inject(Router);

@@ -317,3 +317,8 @@ $dp-rojo-suave: #fee2e2;
   .dp-btn:active:not(:disabled) { transform: scale(0.97); }
   .dp-tabla tbody tr { animation: saesu-aparecer 0.35s ease backwards; }
 }
+
+// Sumi en el panel docente
+app-sumi-dice.dp-sumi { max-width: 640px; margin: -4px 0 2px; }
+app-sumi-dice.dp-sumi--vacio { margin: 24px auto; justify-content: center; }
+app-dashboard-docente app-sumi-dice.dd-sumi { max-width: 560px; margin: 12px auto 6px; text-align: left; }

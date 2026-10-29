@@ -1,4 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { CONSEJOS_CALCULO, saludoInicio } from '../../../../shared/components/sumi-dice/dialogos';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,7 +23,7 @@ import { saludoSegunHora } from '../../../../shared/components/aviso/aviso.model
 @Component({
   selector: 'app-dashboard-estudiante',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective, Medalla],
+  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective, Medalla, SumiDice],
   templateUrl: './dashboard-estudiante.html',
   styleUrl: './dashboard-estudiante.scss',
 })
@@ -46,6 +48,8 @@ export class DashboardEstudiante implements OnInit {
 
   /** Logros (GET /api/logros) y últimas publicaciones del foro. */
   logros = signal<Logro[]>([]);
+  readonly consejos = CONSEJOS_CALCULO;
+  saludoSumi = computed(() => saludoInicio(this.racha(), false));
   foroReciente = signal<PublicacionResumen[]>([]);
 
   logrosObtenidos = computed(() => this.logros().filter(l => l.obtenido).length);

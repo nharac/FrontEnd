@@ -282,3 +282,10 @@ app-nueva-publicacion {
     .fo-oficial mat-icon { animation: saesu-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
   }
 }
+
+// Sumi en el foro (reemplaza la tarjeta "¿Tienes una duda?")
+app-lista-publicaciones {
+  .fo-sumi { margin-top: 4px; }
+  .fo-sumi__ir { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-weight: 700; font-size: 13.5px; color: #4f46e5; text-decoration: none;
+    mat-icon { font-size: 17px; width: 17px; height: 17px; } }
+}

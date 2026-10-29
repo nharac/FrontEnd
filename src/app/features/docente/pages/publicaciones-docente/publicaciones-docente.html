@@ -46,10 +46,10 @@
         </div>
       </button>
     } @empty {
-      <div class="vacio">
-        <mat-icon>task_alt</mat-icon>
-        <p>{{ modo() === 'pendientes' ? '¡Todo al día! No hay consultas pendientes.' : 'No hay publicaciones todavía.' }}</p>
-      </div>
+      <app-sumi-dice class="dp-sumi dp-sumi--vacio" [estado]="modo() === 'pendientes' ? 'celebra' : 'feliz'" accesorio="birrete"
+                     [tono]="modo() === 'pendientes' ? 'exito' : 'normal'" [tamano]="92"
+                     [titulo]="modo() === 'pendientes' ? '¡Todo al día!' : 'El foro está tranquilo'"
+                     [mensajes]="modo() === 'pendientes' ? 'No hay consultas pendientes: todas tienen respuesta oficial.' : 'Todavía no hay publicaciones. Cuando un estudiante pregunte, aparecerá aquí.'" />
     }
   }
 </div>

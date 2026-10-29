@@ -15,6 +15,8 @@
     <p class="dp-vacio">Cargando estadísticas…</p>
   } @else {
     @let d = datos()!;
+    <app-sumi-dice class="dp-sumi" estado="pensando" accesorio="gafas" [tamano]="78" compacto
+                   titulo="Lo que veo en el grupo" [mensajes]="consejosGrupo()" [aleatorio]="false" />
 
     <section class="dp-kpis">
       <a class="dp-kpi" routerLink="/docente/estudiantes">

@@ -27,7 +27,7 @@
       <span class="burbuja-panel burbuja-panel--2" aria-hidden="true"></span>
       <span class="burbuja-panel burbuja-panel--3" aria-hidden="true"></span>
       <div class="toggle-panel toggle-left">
-        <span class="toggle-panel__icono" aria-hidden="true">∫</span>
+        <app-mascota class="toggle-panel__sumi" estado="feliz" [tamano]="96" />
         <h2>¡Hola de nuevo!</h2>
         <p>Si ya tienes una cuenta, inicia sesión aquí</p>
         <button type="button" class="btn btn-transparent" (click)="toggleModo()">
@@ -35,7 +35,7 @@
         </button>
       </div>
       <div class="toggle-panel toggle-right">
-        <span class="toggle-panel__icono" aria-hidden="true">∂</span>
+        <app-mascota class="toggle-panel__sumi" estado="saludo" [tamano]="96" />
         <h2>¡Bienvenido a SAESU!</h2>
         <p>Regístrate con tu correo institucional para comenzar</p>
         <button type="button" class="btn btn-transparent" (click)="toggleModo()">

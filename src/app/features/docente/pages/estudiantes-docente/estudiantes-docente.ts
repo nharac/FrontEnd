@@ -1,3 +1,6 @@
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { mensajeEstudiantes } from '../../../../shared/components/sumi-dice/dialogos';
+import { DecimalPipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,18 +14,18 @@ import { NOMBRES_TEMA } from '../../../foro/models/foro.model';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
 import { colorPorcentaje, iniciales } from '../../utils/colores';
 
-type Filtro = 'todos' | 'riesgo' | 'aldia';
-type Orden = 'nombre' | 'puntos' | 'porcentaje' | 'ultima';
+type Filtro = 'todos' | 'riesgo' | 'aldia' | 'nuevos';
+type Orden = 'nombre' | 'puntos' | 'porcentaje' | 'ultima' | 'quiz';
 
 /**
  * /docente/estudiantes
  * Tabla con el progreso de cada estudiante. Marca "En riesgo" a quien lleva más de
  * 7 días sin practicar o acierta menos del 50 % (con al menos 5 intentos).
- * Se puede exportar a CSV para abrir en Excel.
+ * Se puede descargar en Excel (.xlsx) con formato y una hoja de resumen.
  */
 @Component({
   selector: 'app-estudiantes-docente',
-  imports: [RouterLink, FormsModule, MatIconModule, MatTooltipModule],
+  imports: [RouterLink, FormsModule, MatIconModule, MatTooltipModule, DecimalPipe, SumiDice],
   templateUrl: './estudiantes-docente.html',
   styleUrl: './estudiantes-docente.scss',
 })
@@ -49,13 +52,18 @@ export class EstudiantesDocente implements OnInit {
   readonly iniciales = iniciales;
   readonly color = colorPorcentaje;
 
-  enRiesgo = computed(() => this.estudiantes().filter(e => e.enRiesgo).length);
+  enRiesgo = computed(() => this.estudiantes().filter(e => e.estado === 'en-riesgo').length);
+  nuevos = computed(() => this.estudiantes().filter(e => e.estado === 'nuevo').length);
+  sumiEstudiantes = computed(() => mensajeEstudiantes(this.enRiesgo(), this.nuevos()));
 
   visibles = computed(() => {
     const texto = this.busqueda().trim().toLowerCase();
     const filtro = this.filtro();
     const lista = this.estudiantes().filter(e =>
-      (filtro === 'todos' || (filtro === 'riesgo') === e.enRiesgo) &&
+      (filtro === 'todos'
+        || (filtro === 'riesgo' && e.estado === 'en-riesgo')
+        || (filtro === 'aldia' && e.estado === 'al-dia')
+        || (filtro === 'nuevos' && e.estado === 'nuevo')) &&
       (!texto || e.nombre.toLowerCase().includes(texto) || e.correo.toLowerCase().includes(texto)));
 
     const signo = this.descendente() ? -1 : 1;
@@ -64,6 +72,7 @@ export class EstudiantesDocente implements OnInit {
       switch (clave) {
         case 'puntos': return signo * (a.puntos - b.puntos);
         case 'porcentaje': return signo * (a.porcentaje - b.porcentaje);
+        case 'quiz': return signo * ((a.promedioQuiz ?? -1) - (b.promedioQuiz ?? -1));
         case 'ultima': return signo * (tiempo(a.ultimaActividad) - tiempo(b.ultimaActividad));
         default: return signo * a.nombre.localeCompare(b.nombre, 'es');
       }
@@ -116,21 +125,27 @@ export class EstudiantesDocente implements OnInit {
   }
 
   exportar(): void {
+    if (this.exportando()) return;
     this.exportando.set(true);
     this.docenteService.exportarEstudiantes().subscribe({
       next: (blob) => {
+        const archivo = `progreso-estudiantes-${new Date().toLocaleDateString('en-CA')}.xlsx`;
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `progreso-estudiantes-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.download = archivo;
         a.click();
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
         this.exportando.set(false);
-        this.snackBar.open('Archivo descargado: ábrelo con Excel', 'Cerrar', { duration: 3500 });
+        const n = this.estudiantes().length;
+        this.snackBar.open(
+          `Incluye ${n} ${n === 1 ? 'estudiante' : 'estudiantes'} y una hoja con el resumen del grupo.`, 'Cerrar',
+          { duration: 6000, data: { titulo: 'Excel descargado', icono: 'table_view', tipo: 'exito', archivo } });
       },
       error: () => {
         this.exportando.set(false);
-        this.snackBar.open('No se pudo exportar el archivo', 'Cerrar', { duration: 3500 });
+        this.snackBar.open('Revisa tu conexión e inténtalo de nuevo.', 'Cerrar',
+          { duration: 5000, data: { titulo: 'No se pudo descargar el Excel', tipo: 'error' } });
       }
     });
   }

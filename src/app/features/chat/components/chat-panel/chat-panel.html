@@ -2,7 +2,7 @@
 
   <header class="chat__barra">
     <div class="chat__tutor">
-      <span class="chat__avatar"><mat-icon>smart_toy</mat-icon><i class="chat__en-linea" aria-hidden="true"></i></span>
+      <span class="chat__avatar chat__avatar--sumi"><app-mascota [tamano]="40" [animada]="false" /><i class="chat__en-linea" aria-hidden="true"></i></span>
       <div>
         <strong>Tutor SAESU</strong>
         <small>{{ enviando() ? 'Escribiendo...' : (esContextual() ? 'Te ayuda con esta pregunta' : 'En línea · cálculo diferencial e integral') }}</small>
@@ -33,8 +33,8 @@
       </div>
     } @else if (mensajes().length === 0) {
       <div class="chat__vacio">
-        <span class="chat__vacio-icono"><mat-icon>waving_hand</mat-icon></span>
-        <strong>{{ esContextual() ? '¿En qué parte te atascaste?' : '¡Hola! Soy tu tutor de cálculo' }}</strong>
+        <app-mascota class="chat__vacio-sumi" [estado]="esContextual() ? 'pensando' : 'saludo'" [tamano]="esContextual() ? 84 : 108" etiqueta="Sumi, la mascota de SAESU" />
+        <strong>{{ esContextual() ? '¿En qué parte te atascaste?' : '¡Hola! Soy Sumi, tu tutor de cálculo' }}</strong>
         <p>
           {{ esContextual()
               ? 'Cuéntame qué intentaste. Te guiaré con preguntas, sin darte la respuesta.'
@@ -52,7 +52,7 @@
       @for (m of mensajesVista(); track m.id) {
         @if (m.rolEmisor === 'ia') {
           <div class="fila fila--ia">
-            <span class="fila__avatar" aria-hidden="true"><mat-icon>smart_toy</mat-icon></span>
+            <span class="fila__avatar fila__avatar--sumi" aria-hidden="true"><app-mascota [tamano]="30" [animada]="false" /></span>
             <div class="burbuja burbuja--ia">
               <div class="burbuja__texto burbuja__texto--rico" [innerHTML]="m.html"></div>
               <div class="burbuja__pie">
@@ -78,7 +78,7 @@
 
     @if (enviando()) {
       <div class="fila fila--ia">
-        <span class="fila__avatar" aria-hidden="true"><mat-icon>smart_toy</mat-icon></span>
+        <span class="fila__avatar fila__avatar--sumi" aria-hidden="true"><app-mascota [tamano]="30" [animada]="false" /></span>
         <div class="burbuja burbuja--ia burbuja--escribiendo" aria-label="El tutor está escribiendo">
           <span></span><span></span><span></span>
         </div>

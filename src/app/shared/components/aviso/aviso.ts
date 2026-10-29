@@ -31,8 +31,8 @@ export class Aviso {
   private ref = inject<MatSnackBarRef<Aviso>>(MatSnackBarRef);
   readonly datos = inject<DatosAviso>(MAT_SNACK_BAR_DATA);
 
-  tipo = computed<TipoAviso>(() => this.datos.tipo ?? inferirTipo(this.datos.mensaje));
-  icono = computed(() => ICONOS[this.tipo()]);
+  tipo = computed<TipoAviso>(() => this.datos.tipo ?? inferirTipo(this.datos.mensaje, this.datos.titulo));
+  icono = computed(() => this.datos.icono || ICONOS[this.tipo()]);
 
   /** "Cerrar" se muestra como ✕; otras acciones (ej. "Deshacer") como botón de texto. */
   accionTexto = computed(() => {

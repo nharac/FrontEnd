@@ -26,7 +26,10 @@
         </div>
       </div>
       <div class="perfil__estado">
-        @if (e.enRiesgo) {
+        @if (e.estado === 'nuevo') {
+          <span class="dp-chip dp-chip--indigo"><mat-icon>fiber_new</mat-icon> Nuevo</span>
+          <small>Tiene {{ e.diasDeGracia }} {{ e.diasDeGracia === 1 ? 'día' : 'días' }} para empezar a practicar o hacer un quiz</small>
+        } @else if (e.enRiesgo) {
           <span class="dp-chip dp-chip--rojo"><mat-icon>warning</mat-icon> En riesgo</span>
           @for (m of e.motivosRiesgo; track m) { <small>{{ m }}</small> }
         } @else {
@@ -40,6 +43,7 @@
       <div class="dp-kpi"><span class="dp-kpi__icono"><mat-icon>edit_note</mat-icon></span><div><strong>{{ e.intentos }}</strong><span>Intentos</span></div></div>
       <div class="dp-kpi dp-kpi--verde"><span class="dp-kpi__icono"><mat-icon>task_alt</mat-icon></span><div><strong>{{ e.porcentaje }} %</strong><span>Aciertos</span></div></div>
       <div class="dp-kpi dp-kpi--ambar"><span class="dp-kpi__icono"><mat-icon>forum</mat-icon></span><div><strong>{{ d.publicaciones + d.respuestasForo }}</strong><span>Aportes en el foro</span></div></div>
+      <div class="dp-kpi"><span class="dp-kpi__icono"><mat-icon>timer</mat-icon></span><div><strong>{{ promedioQuiz() !== null ? promedioQuiz() + ' %' : '—' }}</strong><span>Promedio en quices ({{ e.quices }})</span></div></div>
       <div class="dp-kpi"><span class="dp-kpi__icono"><mat-icon>verified</mat-icon></span><div><strong>{{ d.respuestasOficiales }}</strong><span>Respuestas oficiales</span></div></div>
     </section>
 
@@ -102,5 +106,44 @@
         }
       </section>
     </div>
+
+    <section class="dp-tarjeta">
+      <h2><mat-icon>timer</mat-icon> Resultados de sus quices</h2>
+      @for (q of d.quices; track q.id) {
+        <div class="quiz" [class.quiz--abierto]="quizAbierto() === q.id">
+          <button type="button" class="quiz__fila" (click)="verQuiz(q.id)" [attr.aria-expanded]="quizAbierto() === q.id">
+            <span class="quiz__pct quiz__pct--{{ color(q.porcentaje, q.total) }}">{{ q.porcentaje }} %</span>
+            <span class="quiz__txt">
+              <b>{{ nombreQuiz(q.tema) }} · {{ q.correctas }} de {{ q.total }} correctas</b>
+              <small>{{ q.fecha | date: 'dd/MM/yyyy h:mm a' }} · {{ duracion(q.duracionSegundos) }}@if (q.fueraDeTiempo) { · <span class="mal">fuera de tiempo</span> }</small>
+            </span>
+            <span class="quiz__ver">{{ quizAbierto() === q.id ? 'Ocultar' : 'Ver respuestas' }} <mat-icon>{{ quizAbierto() === q.id ? 'expand_less' : 'expand_more' }}</mat-icon></span>
+          </button>
+          @if (quizAbierto() === q.id) {
+            <div class="quiz__revision">
+              @if (cargandoRevision()) {
+                <p class="dp-vacio">Cargando respuestas…</p>
+              } @else if (revision(); as r) {
+                @for (p of r.detalle; track p.preguntaId) {
+                  <div class="rev">
+                    <mat-icon [class.ok]="p.correcta" [class.mal]="!p.correcta && p.letraElegida" [class.vacia]="!p.letraElegida">{{ p.correcta ? 'check_circle' : (p.letraElegida ? 'cancel' : 'radio_button_unchecked') }}</mat-icon>
+                    <div>
+                      <p>{{ p.orden }}. {{ p.enunciado }}</p>
+                      <small>
+                        @if (p.letraElegida) { Respondió <b>{{ p.letraElegida }}</b> }
+                        @else { No respondió }
+                        @if (!p.correcta) { · Correcta: <b class="ok">{{ p.letraCorrecta }}</b> }
+                      </small>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="dp-vacio"><mat-icon>quiz</mat-icon><p>Todavía no ha hecho quices.</p></div>
+      }
+    </section>
   }
 </div>

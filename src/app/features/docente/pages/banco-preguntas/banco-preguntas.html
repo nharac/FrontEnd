@@ -7,6 +7,9 @@
     <a class="dp-btn" routerLink="/docente/preguntas/nueva"><mat-icon>add</mat-icon> Nueva pregunta</a>
   </header>
 
+  <app-sumi-dice class="dp-sumi" estado="feliz" accesorio="lapiz" [tamano]="78" compacto
+                 titulo="Consejo para tus preguntas" [mensajes]="consejosBanco" />
+
   <section class="dp-tarjeta">
     <div class="dp-filtros">
       <select class="dp-select" aria-label="Tema" [ngModel]="tema()" (ngModelChange)="tema.set($event); cargar()">

@@ -9,6 +9,8 @@ import {
   untracked
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { Mascota } from '../../../../shared/components/mascota/mascota';
+import { reaccionPractica } from '../../../../shared/components/sumi-dice/dialogos';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { PracticaService } from '../../services/practica.service';
@@ -28,7 +30,7 @@ import { Confeti } from '../../../../shared/components/confeti/confeti';
  */
 @Component({
   selector: 'app-pregunta-card',
-  imports: [MatIconModule, ChatPanel, Confeti],
+  imports: [MatIconModule, ChatPanel, Confeti, Mascota],
   templateUrl: './pregunta-card.html',
   styleUrl: './pregunta-card.scss',
   host: {
@@ -60,6 +62,11 @@ export class PreguntaCard {
   mostrarChat = signal(false);
 
   resuelta = computed(() => this.validacion()?.esCorrecta === true);
+  /** Cómo reacciona Sumi a la última respuesta. */
+  reaccion = computed(() => {
+    const v = this.validacion();
+    return v ? reaccionPractica(v.esCorrecta, this.intentos(), !!this.pista()) : null;
+  });
   etiquetaDificultad = computed(() => {
     const nombres: Record<string, string> = { basico: 'Básico', intermedio: 'Intermedio', avanzado: 'Avanzado' };
     return nombres[this.pregunta().dificultad] ?? this.pregunta().dificultad;

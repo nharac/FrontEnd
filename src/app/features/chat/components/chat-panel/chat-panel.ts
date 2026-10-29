@@ -11,6 +11,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { Mascota } from '../../../../shared/components/mascota/mascota';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ChatService } from '../../services/chat.service';
@@ -35,7 +36,7 @@ const MAX_CARACTERES = 2000;
  */
 @Component({
   selector: 'app-chat-panel',
-  imports: [DatePipe, FormsModule, MatIconModule],
+  imports: [DatePipe, FormsModule, MatIconModule, Mascota],
   templateUrl: './chat-panel.html',
   styleUrl: './chat-panel.scss',
 })

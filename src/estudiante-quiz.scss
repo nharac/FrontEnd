@@ -39,22 +39,26 @@ app-quiz {
   .qz-girando { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.5); border-top-color: #fff; animation: qz-giro 0.8s linear infinite; }
 
   // ---------- Inicio ----------
-  .qz-cabecera {
-    h1 { margin: 10px 0 6px; font-size: clamp(26px, 4vw, 34px); line-height: 1.15; font-weight: 800; letter-spacing: -0.5px; }
-    p { margin: 0; color: $qz-gris; font-size: 15px; max-width: 580px; }
-  }
+  .qz-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+    h1 { margin: 0 0 6px; font-size: clamp(30px, 5vw, 42px); line-height: 1.05; font-weight: 800; letter-spacing: -1px; }
+    p { margin: 0; color: $qz-gris; font-size: 15.5px; max-width: 46ch; }
+    @media (max-width: 720px) { flex-direction: column; align-items: stretch; gap: 8px; } }
+  .qz-hero__sumi { flex: 0 1 430px; margin-bottom: -18px;
+    @media (max-width: 720px) { flex-basis: auto; margin-bottom: -8px; } }
   .qz-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start;
     @media (max-width: 900px) { grid-template-columns: 1fr; } }
 
   .qz-config { display: flex; flex-direction: column; gap: 18px; }
-  .qz-campo__titulo { display: block; font-size: 13px; font-weight: 700; color: $qz-gris; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .qz-campo__titulo { display: block; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
   .qz-temas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;
-    @media (max-width: 560px) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .qz-tema { display: flex; flex-direction: column; align-items: center; gap: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #374151; background: #f9fafb; border: 2px solid transparent; border-radius: 14px; padding: 14px 8px; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s;
-    mat-icon { color: #9ca3af; }
+    @media (max-width: 760px) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .qz-tema { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font: inherit; text-align: left; color: #374151; background: #f8fafc; border: 2px solid transparent; border-radius: 16px; padding: 12px 14px 14px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
     &:hover { background: $qz-suave; }
-    &.activo { border-color: $qz-indigo; background: $qz-suave; color: $qz-indigo; mat-icon { color: $qz-indigo; } }
+    &.activo { border-color: $qz-indigo; background: $qz-suave; .qz-tema__simbolo { color: $qz-indigo; } }
     &:focus-visible { outline: 3px solid rgba(79, 70, 229, 0.35); outline-offset: 2px; } }
+  .qz-tema__simbolo { font: italic 400 30px/1.15 Georgia, 'Times New Roman', serif; color: #94a3b8; margin-bottom: 4px; transition: color 0.15s; }
+  .qz-tema__nombre { font-size: 15px; font-weight: 700; color: $qz-texto; }
+  .qz-tema__desc { font-size: 12.5px; line-height: 1.35; color: $qz-gris; }
   .qz-cantidades { display: inline-flex; background: #f3f4f6; border-radius: 14px; padding: 4px; gap: 2px;
     button { font: inherit; font-size: 15px; font-weight: 600; color: #4b5563; background: transparent; border: 0; border-radius: 10px; padding: 8px 20px; cursor: pointer;
       &.activo { background: #fff; color: $qz-indigo; box-shadow: 0 2px 8px rgba(31, 50, 71, 0.12); }
@@ -71,6 +75,10 @@ app-quiz {
     div { background: #f9fafb; border-radius: 12px; padding: 10px 6px; text-align: center; }
     strong { display: block; font-size: 20px; font-weight: 800; }
     small { color: $qz-gris; font-size: 12px; } }
+  .qz-tendencia { display: flex; align-items: flex-end; gap: 5px; height: 56px; margin: 0 4px 14px; padding-bottom: 6px; border-bottom: 2px solid #f1f5f9;
+    span { flex: 1; max-width: 26px; border-radius: 6px 6px 2px 2px; background: #fbbf24; transform-origin: bottom; animation: qz-barra 0.6s $qz-suavizado both;
+      &.alto { background: #34d399; }
+      &.bajo { background: #f87171; } } }
   .qz-ultimos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px;
     button { width: 100%; display: flex; align-items: center; gap: 12px; font: inherit; text-align: left; color: inherit; background: transparent; border: 0; border-radius: 12px; padding: 8px; cursor: pointer;
       &:hover { background: #f9fafb; }
@@ -89,7 +97,8 @@ app-quiz {
   .qz-barra { position: sticky; top: 76px; z-index: 5; display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 18px; padding: 12px 16px 16px; box-shadow: 0 10px 28px rgba(31, 50, 71, 0.1); overflow: hidden;
     @media (max-width: 560px) { top: 64px; gap: 8px; padding: 10px 12px 14px; } }
   .qz-barra__info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-  .qz-barra__tema { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; mat-icon { color: $qz-indigo; font-size: 20px; width: 20px; height: 20px; } }
+  .qz-barra__tema { font-weight: 700; font-size: 15px; }
+  .qz-barra__sumi { margin: -8px -4px -10px -6px; }
   .qz-barra__progreso { font-size: 13px; color: $qz-gris;
     @media (max-width: 560px) { span { display: none; } } }
   .qz-reloj { display: inline-flex; align-items: center; gap: 6px; font: 700 20px/1 ui-monospace, 'SF Mono', monospace; color: $qz-texto; background: #f3f4f6; border-radius: 12px; padding: 8px 12px; font-variant-numeric: tabular-nums;
@@ -133,6 +142,8 @@ app-quiz {
   // ---------- Resultado ----------
   .qz-res { display: flex; align-items: center; gap: 32px; overflow: hidden;
     @media (max-width: 720px) { flex-direction: column; text-align: center; gap: 16px; } }
+  .qz-res__sumi { align-self: flex-end; margin: 0 -6px -12px 0;
+    @media (max-width: 720px) { position: absolute; top: 10px; right: 8px; margin: 0; --sumi-tamano: 70px !important; } }
   .qz-anillo { position: relative; flex: none; width: 180px; height: 180px;
     svg { width: 100%; height: 100%; transform: rotate(-90deg); }
     circle { fill: none; stroke-width: 11; }
@@ -196,6 +207,7 @@ app-quiz {
 @keyframes qz-brillo { to { background-position: -200% 0; } }
 @keyframes qz-latido { 50% { transform: scale(1.06); } }
 @keyframes qz-entrar { from { opacity: 0; transform: translateY(8px); } }
+@keyframes qz-barra { from { transform: scaleY(0); } }
 @keyframes qz-anillo { from { stroke-dashoffset: 327; } }
 
 // Acceso al quiz desde "Tu práctica de hoy" en el inicio del estudiante

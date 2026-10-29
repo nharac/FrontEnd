@@ -3,6 +3,9 @@
   <header class="dashboard__header">
     <span class="dashboard__badge">Modo Docente</span>
     <h1 class="dashboard__titulo">Bienvenido{{ nombreDocente() ? ', ' + nombreDocente() : '' }} 👋</h1>
+    @let sumi = sumiDocente();
+    <app-sumi-dice class="dd-sumi" [estado]="sumi.estado" accesorio="birrete" [tamano]="86" compacto
+                   [tono]="sumi.estado === 'feliz' ? 'exito' : 'normal'" [titulo]="sumi.titulo" [mensajes]="sumi.texto" />
     <p class="dashboard__subtitulo">Estas son tus tareas pendientes para hoy:</p>
   </header>
 

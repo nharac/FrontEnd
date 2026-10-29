@@ -1,0 +1,13 @@
+<app-mascota class="sd__sumi" [estado]="estado()" [accesorio]="accesorio()" [tamano]="tamano()" [animada]="animada()" />
+<div class="sd__globo" role="status" aria-live="polite">
+  @if (escribiendo()) {
+    <span class="sd__escribiendo" aria-label="Sumi está escribiendo"><i></i><i></i><i></i></span>
+  } @else {
+    @if (titulo()) { <strong class="sd__titulo">{{ titulo() }}</strong> }
+    @if (texto()) { <p class="sd__texto">{{ texto() }}</p> }
+    <ng-content />
+    @if (lista().length > 1) {
+      <button type="button" class="sd__otro" (click)="otro()"><mat-icon>autorenew</mat-icon> Otro consejo</button>
+    }
+  }
+</div>
