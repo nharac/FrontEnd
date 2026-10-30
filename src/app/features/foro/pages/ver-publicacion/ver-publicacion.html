@@ -65,7 +65,8 @@
     <section class="fo-responder">
       <h2><mat-icon>edit</mat-icon> {{ esAutor() ? 'Agrega más detalles' : 'Tu respuesta' }}</h2>
       <form (ngSubmit)="responder(texto())">
-        <textarea rows="3" name="texto"
+        <label for="respuesta-foro" class="sr-only">Tu respuesta</label>
+        <textarea id="respuesta-foro" rows="3" name="texto"
                   [placeholder]="esAutor() ? '¿Avanzaste en algo? Cuéntalo para que te ayuden mejor...' : 'Ayuda a tu compañero: explica el paso o hazle una pregunta guía...'"
                   [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
         <div class="fo-responder__pie">

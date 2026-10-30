@@ -95,7 +95,7 @@ export class PublicacionesDocente implements OnInit {
   }
 
   abrir(p: PublicacionResumen): void {
-    this.router.navigate(['/docente/publicaciones', p.id]);
+    void this.router.navigate(['/docente/publicaciones', p.id]);
   }
 
   private fallo(err: { status?: number; message?: string }): void {

@@ -90,3 +90,18 @@ body {
   }
   .mat-mdc-snack-bar-label { padding: 0 !important; }
 }
+
+/* Accesibilidad: etiquetas que leen los lectores de pantalla pero no se ven */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* <label> que solo envuelve un campo para asociarlo; no altera el diseño */
+label.envoltura { display: contents !important; }

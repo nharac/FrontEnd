@@ -104,7 +104,7 @@ export class RegistroForm {
       next: (res) => {
         this.cargando.set(false);
         // Doble verificación: la cuenta se activa con el código que llegó al correo institucional
-        this.router.navigate(['/auth/verificar'], { queryParams: { correo: res.correo } });
+        void this.router.navigate(['/auth/verificar'], { queryParams: { correo: res.correo } });
       },
       error: (err) => {
         this.cargando.set(false);

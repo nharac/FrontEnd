@@ -149,7 +149,7 @@ export class NuevaPublicacion implements OnDestroy {
     ).subscribe({
       next: (pub) => {
         this.snackBar.open('¡Publicación creada!', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/foro', pub.id]);
+        void this.router.navigate(['/foro', pub.id]);
       },
       error: (err) => {
         this.enviando.set(false);

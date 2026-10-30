@@ -52,7 +52,7 @@ export class RecuperarPassword implements OnInit, OnDestroy {
 
   codigo = computed(() => this.digitos().join(''));
 
-  correoValido = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.correo().trim()));
+  correoValido = computed(() => esCorreoValido(this.correo().trim()));
 
   /** El correo con la parte del usuario oculta: l***@ucundinamarca.edu.co */
   correoOculto = computed(() => {
@@ -255,7 +255,7 @@ export class RecuperarPassword implements OnInit, OnDestroy {
   }
 
   irAlLogin(): void {
-    this.router.navigate(['/auth']);
+    void this.router.navigate(['/auth']);
   }
 
   /** Muestra el error y sacude la tarjeta. */
@@ -264,4 +264,16 @@ export class RecuperarPassword implements OnInit, OnDestroy {
     this.sacudir.set(false);
     setTimeout(() => this.sacudir.set(true));
   }
+}
+
+/**
+ * usuario@dominio.ext sin espacios. Se valida sin expresión regular para evitar
+ * el backtracking que SonarQube marca en patrones como [^\s@]+\.[^\s@]+ (S8786).
+ */
+export function esCorreoValido(correo: string): boolean {
+  const partes = correo.split('@');
+  if (partes.length !== 2 || /\s/.test(correo)) return false;
+  const [usuario, dominio] = partes;
+  const punto = dominio.lastIndexOf('.');
+  return usuario.length > 0 && punto > 0 && punto < dominio.length - 1;
 }

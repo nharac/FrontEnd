@@ -5,7 +5,8 @@
 
   <div class="input-group">
     <mat-icon>person</mat-icon>
-    <input type="text" placeholder="Nombre completo" formControlName="nombre">
+    <label for="registro-nombre" class="sr-only">Nombre completo</label>
+    <input id="registro-nombre" type="text" placeholder="Nombre completo" formControlName="nombre">
   </div>
   <small class="error" *ngIf="nombre?.invalid && nombre?.touched">
     El nombre es obligatorio (mínimo 3 caracteres)
@@ -13,7 +14,8 @@
 
   <div class="input-group">
     <mat-icon>mail</mat-icon>
-    <input type="email" placeholder="Correo institucional" formControlName="correo">
+    <label for="registro-correo" class="sr-only">Correo institucional</label>
+    <input id="registro-correo" type="email" placeholder="Correo institucional" formControlName="correo">
   </div>
   <small class="error" *ngIf="correo?.hasError('required') && correo?.touched">
     El correo es obligatorio
@@ -24,7 +26,8 @@
 
   <div class="input-group">
     <mat-icon>lock</mat-icon>
-    <input [type]="mostrarPassword() ? 'text' : 'password'"
+    <label for="registro-password" class="sr-only">Contraseña</label>
+    <input id="registro-password" [type]="mostrarPassword() ? 'text' : 'password'"
            placeholder="Contraseña" formControlName="password">
     <app-ojo-password [visible]="mostrarPassword()" (alternar)="toggleMostrarPassword()" />
   </div>
@@ -34,7 +37,8 @@
 
   <div class="input-group">
     <mat-icon>lock_outline</mat-icon>
-    <input [type]="mostrarConfirmPassword() ? 'text' : 'password'"
+    <label for="registro-confirmar" class="sr-only">Confirmar contraseña</label>
+    <input id="registro-confirmar" [type]="mostrarConfirmPassword() ? 'text' : 'password'"
            placeholder="Confirmar contraseña" formControlName="confirmPassword">
     <app-ojo-password [visible]="mostrarConfirmPassword()" (alternar)="toggleMostrarConfirmPassword()" />
   </div>

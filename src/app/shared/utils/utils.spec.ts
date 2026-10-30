@@ -1,6 +1,7 @@
 import { esDocente, esEstudiante, normalizarRol } from './rol';
 import { diasDesde, haceCuanto } from './tiempo';
 import { colorAvatar } from './avatar';
+import { azar } from './azar';
 import { Rol } from '../../features/usuario/models/rol.enum';
 
 describe('Utilidades compartidas', () => {
@@ -27,5 +28,15 @@ describe('Utilidades compartidas', () => {
   it('da siempre el mismo color de avatar al mismo nombre', () => {
     expect(colorAvatar('Laura Gómez')).toEqual(colorAvatar('Laura Gómez'));
     expect(colorAvatar(null).fondo).toMatch(/^#/);
+  });
+});
+
+describe('azar', () => {
+  it('devuelve números entre 0 y 1 como Math.random', () => {
+    for (let i = 0; i < 50; i++) {
+      const n = azar();
+      expect(n).toBeGreaterThanOrEqual(0);
+      expect(n).toBeLessThan(1);
+    }
   });
 });

@@ -102,7 +102,7 @@ export class ListaPublicaciones implements OnInit {
   }
 
   abrir(p: PublicacionResumen): void {
-    this.router.navigate(['/foro', p.id]);
+    void this.router.navigate(['/foro', p.id]);
   }
 
   private pedirPagina(aplicar: (lista: PublicacionResumen[]) => void): void {

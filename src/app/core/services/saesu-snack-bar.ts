@@ -34,7 +34,7 @@ export class SaesuSnackBar extends MatSnackBar {
  * quedan con título y detalle sin cambiar cada llamada. Los textos cortos o sin separador quedan igual.
  */
 export function separar(mensaje: string): Pick<DatosAviso, 'titulo' | 'mensaje'> {
-  const m = /^([^:.]{3,40})(?::|\.)\s+(.{3,})$/s.exec(mensaje.trim());
+  const m = /^([^:.]{3,40})[:.]\s+(\S.{2,})$/s.exec(mensaje.trim());
   if (!m) return { mensaje };
   const detalle = m[2].trim();
   return { titulo: m[1].trim(), mensaje: detalle.charAt(0).toUpperCase() + detalle.slice(1) };

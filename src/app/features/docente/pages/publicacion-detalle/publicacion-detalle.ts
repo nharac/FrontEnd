@@ -125,13 +125,13 @@ export class PublicacionDetallePage implements OnInit {
       next: () => {
         this.ocultandoPublicacion.set(false);
         const id = this.id;
-        this.router.navigate(['/docente/foro']);
+        void this.router.navigate(['/docente/foro']);
         this.snackBar.open('Publicación oculta. La encuentras en Moderación.', 'Deshacer', { duration: 6000 })
           .onAction().subscribe(() => {
             this.docenteService.restaurarPublicacion(id).subscribe({
               next: () => {
                 this.avisar('Publicación restaurada');
-                this.router.navigate(['/docente/publicaciones', id]);
+                void this.router.navigate(['/docente/publicaciones', id]);
               }
             });
           });

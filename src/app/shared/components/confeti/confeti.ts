@@ -1,4 +1,5 @@
 import { Component, computed, input } from '@angular/core';
+import { azar } from '../../utils/azar';
 
 const COLORES = ['#4f46e5', '#f59e0b', '#10b981', '#ec4899', '#0ea5e9', '#f97316'];
 
@@ -45,19 +46,19 @@ export class Confeti {
   alcance = input(160);
 
   piezas = computed(() => Array.from({ length: this.cantidad() }, (_, i) => {
-    const angulo = Math.random() * Math.PI * 2;
-    const fuerza = this.alcance() * (0.45 + Math.random() * 0.55);
+    const angulo = azar() * Math.PI * 2;
+    const fuerza = this.alcance() * (0.45 + azar() * 0.55);
     return {
-      x: 35 + Math.random() * 30,
+      x: 35 + azar() * 30,
       color: COLORES[i % COLORES.length],
-      ancho: 6 + Math.random() * 6,
-      alto: 8 + Math.random() * 8,
-      redondo: Math.random() > 0.6,
-      retraso: Math.random() * 250,
+      ancho: 6 + azar() * 6,
+      alto: 8 + azar() * 8,
+      redondo: azar() > 0.6,
+      retraso: azar() * 250,
       dx: Math.round(Math.cos(angulo) * fuerza),
       // hacia arriba primero y luego cae: sesgo positivo en Y
       dy: Math.round(Math.sin(angulo) * fuerza * 0.6 + fuerza * 0.7),
-      giro: Math.round((Math.random() - 0.5) * 720),
+      giro: Math.round((azar() - 0.5) * 720),
     };
   }));
 }

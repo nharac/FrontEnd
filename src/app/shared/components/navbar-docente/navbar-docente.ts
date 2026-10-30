@@ -59,6 +59,6 @@ export class NavbarDocente implements OnInit {
   logout(): void {
     this.docenteService.limpiarCache();
     this.authService.logout();
-    this.router.navigate(['/auth']);
+    void this.router.navigate(['/auth']);
   }
 }

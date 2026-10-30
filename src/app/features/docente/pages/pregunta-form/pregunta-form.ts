@@ -82,7 +82,7 @@ export class PreguntaForm implements OnInit {
         error: () => {
           this.cargando.set(false);
           this.snackBar.open('No se encontró la pregunta', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/docente/preguntas']);
+          void this.router.navigate(['/docente/preguntas']);
         }
       });
     }
@@ -112,7 +112,7 @@ export class PreguntaForm implements OnInit {
       next: () => {
         this.guardando.set(false);
         this.snackBar.open(id ? 'Pregunta actualizada' : 'Pregunta creada: ya aparece en la práctica', 'Cerrar', { duration: 3500 });
-        this.router.navigate(['/docente/preguntas']);
+        void this.router.navigate(['/docente/preguntas']);
       },
       error: (err) => {
         this.guardando.set(false);

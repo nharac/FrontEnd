@@ -79,8 +79,8 @@ export function formatearMensaje(texto: string | null | undefined): string {
 
   for (const cruda of lineas) {
     const linea = cruda.trim();
-    const vineta = /^[-*•]\s+(.*)$/.exec(linea);
-    const numerada = /^\d+[.)]\s+(.*)$/.exec(linea);
+    const vineta = /^[-*•]\s+(\S.*)$/.exec(linea);
+    const numerada = /^\d+[.)]\s+(\S.*)$/.exec(linea);
 
     if (vineta || numerada) {
       cerrarParrafo();
@@ -96,7 +96,7 @@ export function formatearMensaje(texto: string | null | undefined): string {
     } else {
       cerrarLista();
       // Títulos markdown (### Paso 1) se muestran como negrita
-      const titulo = /^#{1,6}\s+(.*)$/.exec(linea);
+      const titulo = /^#{1,6}\s+(\S.*)$/.exec(linea);
       parrafo.push(titulo ? `<strong>${formatoEnLinea(titulo[1])}</strong>` : formatoEnLinea(linea));
     }
   }

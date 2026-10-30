@@ -1,5 +1,6 @@
 import { Component, OnDestroy, booleanAttribute, computed, effect, input, signal, untracked } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { azar } from '../../utils/azar';
 
 import { AccesorioMascota, EstadoMascota, Mascota } from '../mascota/mascota';
 
@@ -57,7 +58,7 @@ export class SumiDice implements OnDestroy {
     effect(() => {
       const n = this.lista().length;
       untracked(() => {
-        this.indice.set(n > 1 && this.aleatorio() ? Math.floor(Math.random() * n) : 0);
+        this.indice.set(n > 1 && this.aleatorio() ? Math.floor(azar() * n) : 0);
         this.escribir();
       });
     });
@@ -66,7 +67,7 @@ export class SumiDice implements OnDestroy {
   otro(): void {
     const n = this.lista().length;
     if (n < 2) return;
-    let siguiente = Math.floor(Math.random() * (n - 1));
+    let siguiente = Math.floor(azar() * (n - 1));
     if (siguiente >= this.indice() % n) siguiente++;
     this.indice.set(siguiente);
     this.escribir();

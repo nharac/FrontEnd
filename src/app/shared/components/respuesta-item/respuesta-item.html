@@ -52,8 +52,11 @@
 
   @if (respondiendo()) {
     <form class="responder" (ngSubmit)="enviarRespuesta()">
-      <textarea rows="2" name="texto" placeholder="Escribe tu respuesta a {{ r.autor.nombre }}..."
-                [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
+      <label class="envoltura">
+        <span class="sr-only">Respuesta a {{ r.autor.nombre }}</span>
+        <textarea rows="2" name="texto" placeholder="Escribe tu respuesta a {{ r.autor.nombre }}..."
+                  [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
+      </label>
       <button type="submit" class="accion accion--oficial" [disabled]="!texto().trim()">Enviar</button>
     </form>
   }

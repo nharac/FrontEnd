@@ -46,8 +46,11 @@
                 <input type="radio" name="correcta" [value]="l" [checked]="correcta() === l" (change)="correcta.set(l)">
                 <span>{{ l }}</span>
               </label>
-              <input class="dp-input" [name]="'opcion' + l" maxlength="500" [placeholder]="'Opción ' + l"
-                     [ngModel]="textos()[l]" (ngModelChange)="cambiarTexto(l, $event)">
+              <label class="envoltura">
+                <span class="sr-only">Texto de la opción {{ l }}</span>
+                <input class="dp-input" [name]="'opcion' + l" maxlength="500" [placeholder]="'Opción ' + l"
+                       [ngModel]="textos()[l]" (ngModelChange)="cambiarTexto(l, $event)">
+              </label>
               @if (correcta() === l) { <mat-icon class="check">check_circle</mat-icon> }
             </div>
           }

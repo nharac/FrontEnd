@@ -103,7 +103,7 @@ export class VerPublicacion implements OnInit {
     this.foroService.eliminar(this.id).subscribe({
       next: () => {
         this.avisar('Publicación eliminada');
-        this.router.navigate(['/foro']);
+        void this.router.navigate(['/foro']);
       },
       error: (err) => {
         this.eliminando.set(false);

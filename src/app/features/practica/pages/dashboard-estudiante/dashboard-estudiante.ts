@@ -86,7 +86,7 @@ export class DashboardEstudiante implements OnInit {
   }
 
   practicar(tema: string): void {
-    this.router.navigate(['/practica'], { queryParams: { tema } });
+    void this.router.navigate(['/practica'], { queryParams: { tema } });
   }
 
   /** Progreso por tema (GET /api/practica/progreso). */
@@ -161,6 +161,6 @@ export class DashboardEstudiante implements OnInit {
 
   irAPractica(): void {
     const tema = this.recomendado()?.tema.id;
-    this.router.navigate(['/practica'], tema ? { queryParams: { tema } } : {});
+    void this.router.navigate(['/practica'], tema ? { queryParams: { tema } } : {});
   }
 }

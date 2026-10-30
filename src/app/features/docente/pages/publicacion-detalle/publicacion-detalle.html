@@ -37,7 +37,8 @@
     <section class="nueva">
       <h2>Responder como docente</h2>
       <form (ngSubmit)="responder(texto())">
-        <textarea rows="3" name="texto" placeholder="Escribe una respuesta para el estudiante..."
+        <label for="respuesta-docente" class="sr-only">Respuesta para el estudiante</label>
+        <textarea id="respuesta-docente" rows="3" name="texto" placeholder="Escribe una respuesta para el estudiante..."
                   [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
         <button type="submit" class="btn" [disabled]="!texto().trim() || enviando()">
           {{ enviando() ? 'Publicando...' : 'Publicar respuesta' }}

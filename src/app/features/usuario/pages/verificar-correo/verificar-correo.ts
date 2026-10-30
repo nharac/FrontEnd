@@ -53,7 +53,7 @@ export class VerificarCorreo implements OnInit, OnDestroy {
   ngOnInit(): void {
     const correo = this.route.snapshot.queryParamMap.get('correo') ?? '';
     if (!correo) {
-      this.router.navigate(['/auth']);
+      void this.router.navigate(['/auth']);
       return;
     }
     this.correo.set(correo);

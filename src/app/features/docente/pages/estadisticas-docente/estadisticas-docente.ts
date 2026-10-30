@@ -31,7 +31,7 @@ export class EstadisticasDocente implements OnInit {
   /** Comentarios de Sumi: el tema con menos aciertos y consejos generales. */
   consejosGrupo = computed(() => {
     const temas = (this.datos()?.porTema ?? []).filter(t => t.intentos > 0);
-    const bajo = temas.length ? temas.reduce((a, b) => (b.porcentaje < a.porcentaje ? b : a)) : null;
+    const bajo = temas.length ? temas.reduce((a, b) => (b.porcentaje < a.porcentaje ? b : a), temas[0]) : null;
     const nombres: Record<string, string> = { limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales' };
     return mensajeEstadisticas(bajo ? nombres[bajo.tema] ?? bajo.tema : null, bajo ? Math.round(bajo.porcentaje) : null);
   });

@@ -98,7 +98,7 @@ export class EstudiantesDocente implements OnInit {
 
   cambiarFiltro(f: Filtro): void {
     this.filtro.set(f);
-    this.router.navigate([], { queryParams: { filtro: f === 'todos' ? null : f }, replaceUrl: true });
+    void this.router.navigate([], { queryParams: { filtro: f === 'todos' ? null : f }, replaceUrl: true });
   }
 
   ordenarPor(clave: Orden): void {
@@ -117,7 +117,7 @@ export class EstudiantesDocente implements OnInit {
   }
 
   abrir(e: EstudianteResumen): void {
-    this.router.navigate(['/docente/estudiantes', e.id]);
+    void this.router.navigate(['/docente/estudiantes', e.id]);
   }
 
   temaDe(e: EstudianteResumen, tema: string) {

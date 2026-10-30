@@ -58,6 +58,6 @@ export class Navbar implements OnInit {
   logout(): void {
     this.perfilService.limpiar();
     this.authService.logout();
-    this.router.navigate(['/auth']);
+    void this.router.navigate(['/auth']);
   }
 }

@@ -5,7 +5,8 @@
 
   <div class="input-group">
     <mat-icon>mail</mat-icon>
-    <input type="email" placeholder="Correo" formControlName="correo">
+    <label for="login-correo" class="sr-only">Correo</label>
+    <input id="login-correo" type="email" placeholder="Correo" formControlName="correo">
   </div>
   <small class="error" *ngIf="correo?.invalid && correo?.touched">
     Ingresa un correo válido
@@ -13,7 +14,8 @@
 
   <div class="input-group">
     <mat-icon>lock</mat-icon>
-    <input [type]="mostrarPassword() ? 'text' : 'password'"
+    <label for="login-password" class="sr-only">Contraseña</label>
+    <input id="login-password" [type]="mostrarPassword() ? 'text' : 'password'"
            placeholder="Contraseña" formControlName="password">
     <app-ojo-password [visible]="mostrarPassword()" (alternar)="toggleMostrarPassword()" />
   </div>
