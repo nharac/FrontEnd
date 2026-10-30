@@ -16,7 +16,8 @@ export class App {
   constructor() {
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      // Sin matchMedia (pruebas en jsdom) o con movimiento reducido no se dibuja la onda
+      if (typeof matchMedia !== 'function' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const alPresionar = (e: PointerEvent) => this.onda(e);
       document.addEventListener('pointerdown', alPresionar, { passive: true });
       destroyRef.onDestroy(() => document.removeEventListener('pointerdown', alPresionar));
