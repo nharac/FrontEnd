@@ -37,6 +37,14 @@
             </button>
           }
         </div>
+        <div class="fo-vistas" role="group" aria-label="Mostrar">
+          @for (v of vistas; track v.id) {
+            <button type="button" class="fo-vista" [class.activo]="vista() === v.id" [attr.aria-pressed]="vista() === v.id" (click)="vista.set(v.id)">
+              <mat-icon>{{ v.icono }}</mat-icon> {{ v.nombre }}
+              @if (v.id !== 'todas') { <b>{{ v.id === 'sin' ? sinResponder() : mias() }}</b> }
+            </button>
+          }
+        </div>
       </section>
 
       @if (cargando()) {
@@ -44,8 +52,13 @@
           <div class="fo-esqueleto" aria-hidden="true"><span></span><span></span><span></span></div>
         }
       } @else {
-        @for (p of publicaciones(); track p.id) {
+        @if (visibles().length === 0 && publicaciones().length) {
+          <p class="fo-vista-vacia"><mat-icon>{{ vista() === 'sin' ? 'task_alt' : 'edit_note' }}</mat-icon>
+            {{ vista() === 'sin' ? '¡Todas las publicaciones cargadas ya tienen respuesta!' : 'Aún no has publicado nada aquí.' }}</p>
+        }
+        @for (p of visibles(); track p.id) {
           @let color = colorAvatar(p.autor.nombre);
+          <div class="fo-pub-caja" [class.fo-pub-caja--confirmando]="confirmandoId() === p.id">
           <button type="button" class="fo-pub fo-pub--{{ p.tema }}" (click)="abrir(p)">
             <span class="fo-avatar" [class.fo-avatar--docente]="esDocente(p.autor.rol)"
                   [style.background]="esDocente(p.autor.rol) ? null : color.fondo"
@@ -74,6 +87,21 @@
               <img class="fo-pub__mini" [src]="p.imagenUrl" alt="" loading="lazy">
             }
           </button>
+          @if (esMia(p)) {
+            <div class="fo-pub-borrar">
+              @if (confirmandoId() === p.id) {
+                <span>¿Eliminar tu publicación?</span>
+                <button type="button" class="fo-pub-borrar__si" [disabled]="eliminandoId() === p.id" (click)="eliminar(p)">
+                  {{ eliminandoId() === p.id ? 'Eliminando…' : 'Sí, eliminar' }}
+                </button>
+                <button type="button" class="fo-pub-borrar__no" (click)="confirmandoId.set(null)">Cancelar</button>
+              } @else {
+                <button type="button" class="fo-pub-borrar__icono" title="Eliminar mi publicación" aria-label="Eliminar mi publicación"
+                        (click)="confirmandoId.set(p.id)"><mat-icon>delete_outline</mat-icon></button>
+              }
+            </div>
+          }
+          </div>
         } @empty {
           <div class="fo-vacio">
             <span class="fo-vacio__icono"><mat-icon>{{ busqueda() || tema() ? 'search_off' : 'forum' }}</mat-icon></span>

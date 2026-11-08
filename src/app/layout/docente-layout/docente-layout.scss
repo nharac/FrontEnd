@@ -16,3 +16,7 @@
     padding: 16px;
   }
 }
+// Espacio para la barra de navegación de abajo en el celular
+@media (max-width: 700px) {
+  .main-content { padding-bottom: calc(86px + env(safe-area-inset-bottom)); }
+}

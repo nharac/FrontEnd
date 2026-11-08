@@ -1,0 +1,93 @@
+// Estilos globales del perfil del estudiante (se separan del componente por el límite de 8 kB por componente).
+// Todo va dentro de app-perfil para no afectar otras pantallas.
+$texto: #2c3e50;
+$texto-suave: #7f8c8d;
+
+app-perfil {
+  // ===== Cifras =====
+  .cifras {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 12px;
+  }
+
+  .cifra {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(79, 70, 229, 0.07);
+
+    > mat-icon {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      padding: 8px;
+      box-sizing: border-box;
+      border-radius: 12px;
+      font-size: 24px;
+      color: var(--c);
+      background: var(--f);
+      font-variation-settings: 'FILL' 1;
+    }
+    div { display: flex; flex-direction: column; line-height: 1.15; }
+    strong { font-size: 21px; color: $texto; span { font-size: 13px; color: $texto-suave; } }
+    small { font-size: 12px; color: $texto-suave; }
+
+    &--oro { --c: #d97706; --f: #fef3c7; }
+    &--fuego { --c: #ea580c; --f: #ffedd5; }
+    &--indigo { --c: #4f46e5; --f: #e0e7ff; }
+    &--verde { --c: #16a34a; --f: #dcfce7; }
+    &--violeta { --c: #7c3aed; --f: #ede9fe; }
+    &--noche { --c: #0d9488; --f: #ccfbf1; }
+  }
+
+  .foto--dev {
+    border-color: transparent !important;
+    background: conic-gradient(from var(--giro, 0deg), #ff004c, #ff8a00, #ffe600, #00ff88, #00e1ff, #3d5bff, #d400ff, #ff004c) border-box;
+    box-shadow: 0 0 22px rgba(0, 225, 255, 0.45), 0 0 30px rgba(212, 0, 255, 0.35) !important;
+    animation: giro-dev 4s linear infinite;
+  }
+
+  // Insignia de desarrollador junto al nombre
+  .cabecera__datos h1 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+
+  @media (max-width: 600px) {
+    .cifras { grid-template-columns: repeat(2, 1fr); }
+    .cabecera__datos h1 { justify-content: center; }
+  }
+}
+
+@property --giro { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes giro-dev { to { --giro: 360deg; } }
+@media (prefers-reduced-motion: reduce) { app-perfil .foto--dev { animation: none; } }
+
+// ---------- Cabecera del perfil: puesto en el ranking e insignias junto al rol ----------
+app-perfil {
+  .chip--puesto {
+    display: inline-flex; align-items: center; gap: 3px; text-decoration: none;
+    background: #ede9fe; color: #6d28d9;
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    &:hover { background: #ddd6fe; }
+  }
+  .cabecera__insignias {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px 2px 4px;
+    border-radius: 999px;
+    background: #f5f3ff;
+    border: 1px solid #e0e7ff;
+    text-decoration: none;
+    transition: box-shadow 0.2s, transform 0.2s;
+    app-insignia { margin-right: -6px; filter: drop-shadow(0 2px 3px rgba(30, 27, 75, 0.18)); transition: transform 0.2s; }
+    app-insignia:hover { transform: translateY(-3px) scale(1.12); z-index: 1; }
+    &:hover { box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15); }
+    &:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+  }
+  .cabecera__mas { margin-left: 12px; font-size: 12px; font-weight: 700; color: #6d28d9; }
+}

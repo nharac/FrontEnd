@@ -75,7 +75,7 @@ export class Quiz implements OnInit, OnDestroy {
   saludoSumi = computed(() => {
     const h = this.historial();
     if (!h) return { titulo: '¡Hola!', texto: 'Dame un segundo, estoy buscando tus resultados…' };
-    if (!h.intentos) return { titulo: '¡Hola, soy Sumi!', texto: 'Elige un tema y te pongo a prueba. Sin puntos, sin presión.' };
+    if (!h.intentos) return { titulo: '¡Hola, soy Sumi!', texto: 'Elige un tema y te pongo a prueba. Sin Puntos Sumi en juego, sin presión.' };
     if (h.mejor === 100) return { titulo: '¡Ya sacaste 100 %!', texto: '¿Lo repites con más preguntas o con otro tema?' };
     return { titulo: `Tu mejor resultado: ${h.mejor} %`, texto: '¿Lo superamos hoy? Yo llevo el tiempo.' };
   });
@@ -102,6 +102,8 @@ export class Quiz implements OnInit, OnDestroy {
     return Math.max(0, Math.min(1, this.restante() / total));
   });
   poco = computed(() => this.restante() <= 60);
+  /** Queda una cuarta parte del tiempo o menos (el reloj se pone ámbar antes del rojo). */
+  medio = computed(() => !this.poco() && this.fraccionTiempo() <= 0.25);
   estadoEnCurso = computed<EstadoMascota>(() => this.poco() ? 'nervioso' : 'pensando');
 
   // ---------- Resultado ----------

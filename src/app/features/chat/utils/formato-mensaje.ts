@@ -1,9 +1,11 @@
 /**
  * Convierte el texto del tutor IA en HTML sencillo y seguro.
  *
- * Gemini suele responder con markdown (**negrita**, listas) y a veces con
- * fórmulas en LaTeX ($x^2$, \frac{a}{b}). Aquí se pasa todo a algo legible:
- * - Primero se escapa el HTML, así nada de lo que escriba la IA se interpreta como etiqueta.
+ * Gemini suele responder con markdown (**negrita**, listas) y con fórmulas en LaTeX
+ * ($x^2 - 9$, $$\frac{a}{b}$$). Aquí se pasa todo a algo legible:
+ * - Las fórmulas se apartan y quedan en <span class="tex">…</span> (texto escapado); el chat las
+ *   dibuja después con KaTeX (ver dibujarFormulas). Si KaTeX no puede, se muestran simplificadas.
+ * - El resto se escapa, así nada de lo que escriba la IA se interpreta como etiqueta.
  * - Luego se aplican negrita, cursiva, código, listas, saltos de línea y exponentes (x^2 → x²).
  * El resultado se enlaza con [innerHTML] (Angular además lo sanea).
  */
@@ -33,9 +35,10 @@ function escaparHtml(texto: string): string {
     .replace(/'/g, '&#39;');
 }
 
-/** Pasa LaTeX básico a texto y quita los delimitadores $...$, \( \) y \[ \]. */
-function simplificarLatex(texto: string): string {
-  let t = texto.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '');
+/** Respaldo sin KaTeX: pasa LaTeX básico a texto y quita los delimitadores $...$, \( \) y \[ \]. */
+export function simplificarLatex(texto: string, quitarDelimitadores = true): string {
+  // Fuera de las fórmulas un $ suelto es un signo de pesos y se deja
+  let t = quitarDelimitadores ? texto.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '') : texto;
   for (const [patron, reemplazo] of LATEX) {
     t = t.replace(patron, reemplazo);
   }
@@ -54,12 +57,62 @@ function formatoEnLinea(linea: string): string {
     .replace(/\^(-?[\w.]+)/g, '<sup>$1</sup>');
 }
 
+/** Marca que reemplaza cada fórmula mientras se procesa el markdown (caracteres que la IA no escribe). */
+const MARCA = (i: number) => `\u0001${i}\u0002`;
+const MARCA_RE = /\u0001(\d+)\u0002/g;
+
+/** Delimitadores de fórmula: los de bloque se dibujan centrados en su propia línea. */
+const DELIMITADORES = [
+  { abre: '$$', cierra: '$$', bloque: true },
+  { abre: '\\[', cierra: '\\]', bloque: true },
+  { abre: '\\(', cierra: '\\)', bloque: false },
+  { abre: '$', cierra: '$', bloque: false },
+];
+
+/**
+ * Aparta las fórmulas y deja una marca en su lugar. Se recorre el texto a mano (sin regex)
+ * para que no haya backtracking. En $…$ el contenido no puede empezar ni terminar con espacio
+ * ni cruzar líneas, para no confundir precios como "$5 y $10".
+ */
+function apartarFormulas(texto: string): { sinFormulas: string; formulas: { tex: string; bloque: boolean }[] } {
+  const formulas: { tex: string; bloque: boolean }[] = [];
+  let sinFormulas = '';
+  let i = 0;
+  while (i < texto.length) {
+    const d = DELIMITADORES.find(x => texto.startsWith(x.abre, i));
+    if (d) {
+      const inicio = i + d.abre.length;
+      const fin = texto.indexOf(d.cierra, inicio);
+      const tex = fin > inicio ? texto.slice(inicio, fin) : '';
+      const valida = tex.trim() !== '' && (d.abre !== '$' || (!/^\s|\s$/.test(tex) && !tex.includes('\n')));
+      if (valida) {
+        formulas.push({ tex: tex.trim(), bloque: d.bloque });
+        sinFormulas += MARCA(formulas.length - 1);
+        i = fin + d.cierra.length;
+        continue;
+      }
+    }
+    sinFormulas += texto[i];
+    i++;
+  }
+  return { sinFormulas, formulas };
+}
+
 export function formatearMensaje(texto: string | null | undefined): string {
   if (!texto) {
     return '';
   }
 
-  const lineas = escaparHtml(simplificarLatex(texto)).split(/\r?\n/);
+  const { sinFormulas, formulas } = apartarFormulas(texto);
+  const html = formatearSinFormulas(sinFormulas);
+  return html.replace(MARCA_RE, (_m, i: string) => {
+    const f = formulas[Number(i)];
+    return `<span class="tex${f.bloque ? ' tex--bloque' : ''}">${escaparHtml(f.tex)}</span>`;
+  });
+}
+
+function formatearSinFormulas(texto: string): string {
+  const lineas = escaparHtml(simplificarLatex(texto, false)).split(/\r?\n/);
   const bloques: string[] = [];
   let lista: { tipo: 'ul' | 'ol'; items: string[] } | null = null;
   let parrafo: string[] = [];

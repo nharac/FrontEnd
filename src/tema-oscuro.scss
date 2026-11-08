@@ -1,0 +1,36 @@
+// ============================================
+// Modo oscuro (TemaService pone la clase .tema-oscuro en <html>)
+// Se invierte la luminosidad de toda la página manteniendo los tonos (índigo sigue siendo índigo),
+// y se vuelven a invertir fotos, ilustraciones de Sumi e insignias para que se vean con sus colores reales.
+// ============================================
+html.tema-oscuro {
+  background: #0b1020;
+  color-scheme: dark;
+  filter: invert(0.9) hue-rotate(180deg);
+
+  // Lo que debe conservar sus colores originales
+  img, video, picture, canvas, iframe,
+  app-mascota, app-sumi-dev, app-puntos-sumi, app-moneda-sumi, app-insignia, app-medalla, app-logo,
+  .avatar, .navbar__avatar, .rk-avatar, .confeti, .katex .mord.emoji {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  // Dentro de algo ya re-invertido no se vuelve a invertir
+  :is(app-mascota, app-sumi-dev, app-insignia, app-medalla, .avatar, .navbar__avatar) :is(img, app-mascota, app-insignia, app-medalla, app-puntos-sumi) {
+    filter: none;
+  }
+
+  // Sombras: en oscuro se ven como halos claros; se suavizan
+  * { text-shadow: none !important; }
+}
+
+// Cambio de tema suave
+html { transition: filter 0.35s ease, background-color 0.35s ease; }
+@media (prefers-reduced-motion: reduce) { html { transition: none; } }
+
+// ============================================
+// Accesibilidad: foco visible al navegar con el teclado
+// ============================================
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}

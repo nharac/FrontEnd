@@ -1,0 +1,77 @@
+<section class="tarjeta an">
+  <h2><mat-icon>psychology_alt</mat-icon> Fortalezas y debilidades</h2>
+
+  @if (error()) {
+    <p class="an__estado">No se pudo cargar el análisis.</p>
+  } @else if (!datos()) {
+    <p class="an__estado">Analizando tus respuestas...</p>
+  } @else if (sinRespuestas()) {
+    <div class="an__vacio">
+      <app-mascota estado="pensando" accesorio="lupa" [tamano]="70" />
+      <p>Cuando respondas algunas preguntas te diré en qué eres fuerte y qué conviene reforzar. 🔍</p>
+      <a class="btn" routerLink="/practica">Ir a practicar</a>
+    </div>
+  } @else {
+    <div class="an__mapa" role="table" aria-label="Porcentaje de acierto por tema y dificultad">
+      <div class="an__fila an__fila--cabecera" role="row">
+        <span role="columnheader"></span>
+        @for (d of dificultades; track d.id) { <span role="columnheader">{{ d.nombre }}</span> }
+      </div>
+      @for (t of temas; track t.id) {
+        <div class="an__fila" role="row">
+          <span class="an__tema" role="rowheader">{{ t.nombre }}</span>
+          @for (d of dificultades; track d.id) {
+            @if (celda(t.id, d.id); as r) {
+              <span class="an__celda an__celda--{{ clase(r) }}" role="cell" [attr.aria-label]="etiquetaCelda(r)" [title]="etiquetaCelda(r)">
+                @if (r.respondidas) {
+                  <strong>{{ r.porcentaje }}%</strong><small>{{ r.correctas }}/{{ r.respondidas }}</small>
+                } @else {
+                  <small>—</small>
+                }
+              </span>
+            }
+          }
+        </div>
+      }
+    </div>
+    <p class="an__leyenda">
+      <span class="an__punto an__punto--fuerte"></span> 70 % o más
+      <span class="an__punto an__punto--regular"></span> 60–69 %
+      <span class="an__punto an__punto--debil"></span> menos de 60 %
+      <span class="an__punto an__punto--sin-datos"></span> menos de {{ minimo }} respuestas
+    </p>
+
+    <div class="an__listas">
+      <div class="an__lista an__lista--fuerte">
+        <h3>💪 Tus fortalezas</h3>
+        @for (f of datos()!.fortalezas; track f.tema + f.dificultad) {
+          <p><span>{{ nombre(f) }}</span><b>{{ f.porcentaje }}%</b></p>
+        } @empty {
+          <p class="an__nada">Aún ninguna con 70 % o más. ¡Ya llegarán!</p>
+        }
+      </div>
+      <div class="an__lista an__lista--debil">
+        <h3>🎯 Por reforzar</h3>
+        @for (d of datos()!.debilidades; track d.tema + d.dificultad) {
+          <p><span>{{ nombre(d) }}</span><b>{{ d.porcentaje }}%</b></p>
+        } @empty {
+          <p class="an__nada">Nada por debajo del 60 %. ¡Muy bien!</p>
+        }
+      </div>
+    </div>
+
+    @if (datos()!.recomendacion; as rec) {
+      <div class="an__recomendacion">
+        <app-mascota estado="saludo" accesorio="libro" [tamano]="62" />
+        <div>
+          <small>Sumi te recomienda</small>
+          <strong>{{ nombre(rec) }}</strong>
+          <p>{{ rec.motivo }}</p>
+        </div>
+        <a class="btn" routerLink="/practica" [queryParams]="{ tema: rec.tema, dificultad: rec.dificultad }">
+          <mat-icon>play_arrow</mat-icon> Practicar ahora
+        </a>
+      </div>
+    }
+  }
+</section>

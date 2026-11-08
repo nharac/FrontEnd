@@ -4,8 +4,8 @@
     <span class="pc__num">Pregunta <b>{{ numero() }}</b> de {{ total() }}</span>
     <span class="pc__dif pc__dif--{{ pregunta().dificultad }}">{{ etiquetaDificultad() }}</span>
     <span class="pc__vale" [class.pc__vale--baja]="!resuelta() && intentos() > 0" [class.pc__vale--ok]="resuelta()">
-      <mat-icon>{{ resuelta() ? 'stars' : 'bolt' }}</mat-icon>
-      {{ resuelta() ? (valeAhora() ? 'Ganaste +' + valeAhora() : 'Ya la habías resuelto') : 'Vale +' + valeAhora() + ' pts' }}
+      <app-puntos-sumi [tamano]="18" />
+      {{ resuelta() ? (valeAhora() ? 'Ganaste +' + valeAhora() + ' Puntos Sumi' : 'Ya la habías resuelto') : 'Vale +' + valeAhora() + ' Puntos Sumi' }}
     </span>
   </header>
 
@@ -33,7 +33,7 @@
   @if (validacion(); as v) {
     <div class="pc-resultado" [class.pc-resultado--ok]="v.esCorrecta" [class.pc-resultado--error]="!v.esCorrecta" role="status">
       @if (v.esCorrecta && v.puntosGanados) {
-        <span class="puntos-flotantes" aria-hidden="true">+{{ v.puntosGanados }}</span>
+        <span class="puntos-flotantes" aria-hidden="true">+{{ v.puntosGanados }} <app-puntos-sumi [tamano]="20" destacado /></span>
         <app-confeti [cantidad]="16" [alcance]="130" />
       }
       @if (reaccion(); as r) {
@@ -43,7 +43,7 @@
         <strong>{{ reaccion()?.titulo }}</strong>
         <p>{{ reaccion()?.texto }}</p>
         @if (!v.esCorrecta && v.puntosEnJuego) {
-          <p>Si aciertas ahora ganas <b>+{{ v.puntosEnJuego }} puntos</b>.</p>
+          <p>Si aciertas ahora ganas <b>+{{ v.puntosEnJuego }} Puntos Sumi</b>.</p>
         }
       </div>
     </div>

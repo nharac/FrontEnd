@@ -1,21 +1,25 @@
 <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
-  <app-logo class="form-logo" [size]="56" />
   <h1>Crear cuenta</h1>
-  <p class="subtitle">Regístrate como estudiante de Ingeniería de Sistemas</p>
 
-  <div class="input-group">
+  <!-- Sumi guía al estudiante según el campo en el que está -->
+  <app-sumi-dice class="auth-sumi" compacto [tamano]="62" [aleatorio]="false"
+                 [estado]="sumi().estado" [titulo]="sumi().titulo" [mensajes]="sumi().texto" [tono]="sumi().tono" />
+
+  <div class="input-group" [class.input-group--ok]="(nombre?.value?.trim()?.length ?? 0) >= 3">
     <mat-icon>person</mat-icon>
     <label for="registro-nombre" class="sr-only">Nombre completo</label>
-    <input id="registro-nombre" type="text" placeholder="Nombre completo" formControlName="nombre">
+    <input id="registro-nombre" type="text" placeholder="Nombre completo" formControlName="nombre"
+           autocomplete="name" (focus)="enfocar('nombre')">
   </div>
   <small class="error" *ngIf="nombre?.invalid && nombre?.touched">
     El nombre es obligatorio (mínimo 3 caracteres)
   </small>
 
-  <div class="input-group">
+  <div class="input-group" [class.input-group--ok]="correoOk()">
     <mat-icon>mail</mat-icon>
     <label for="registro-correo" class="sr-only">Correo institucional</label>
-    <input id="registro-correo" type="email" placeholder="Correo institucional" formControlName="correo">
+    <input id="registro-correo" type="email" placeholder="tu.correo@ucundinamarca.edu.co" formControlName="correo"
+           autocomplete="email" (focus)="enfocar('correo')">
   </div>
   <small class="error" *ngIf="correo?.hasError('required') && correo?.touched">
     El correo es obligatorio
@@ -24,22 +28,24 @@
     Usa tu correo institucional &#64;ucundinamarca.edu.co
   </small>
 
-  <div class="input-group">
+  <div class="input-group" [class.input-group--ok]="passwordOk()">
     <mat-icon>lock</mat-icon>
     <label for="registro-password" class="sr-only">Contraseña</label>
     <input id="registro-password" [type]="mostrarPassword() ? 'text' : 'password'"
-           placeholder="Contraseña" formControlName="password">
+           placeholder="Contraseña" formControlName="password" autocomplete="new-password" (focus)="enfocar('password')">
     <app-ojo-password [visible]="mostrarPassword()" (alternar)="toggleMostrarPassword()" />
   </div>
-  <small class="error" *ngIf="password?.invalid && password?.touched">
-    Mínimo 8 caracteres, con mayúscula, minúscula, número y un carácter especial (&#64;#$%^&amp;+=!)
-  </small>
+  @if (passwordValor() || password?.touched) {
+    <app-fuerza-password [password]="passwordValor()" />
+  }
 
-  <div class="input-group">
+  <div class="input-group" [class.input-group--ok]="coinciden()"
+       [class.input-group--mal]="registroForm.errors?.['passwordsDistintas'] && confirmPassword?.touched">
     <mat-icon>lock_outline</mat-icon>
     <label for="registro-confirmar" class="sr-only">Confirmar contraseña</label>
     <input id="registro-confirmar" [type]="mostrarConfirmPassword() ? 'text' : 'password'"
-           placeholder="Confirmar contraseña" formControlName="confirmPassword">
+           placeholder="Confirmar contraseña" formControlName="confirmPassword" autocomplete="new-password"
+           (focus)="enfocar('confirmar')">
     <app-ojo-password [visible]="mostrarConfirmPassword()" (alternar)="toggleMostrarConfirmPassword()" />
   </div>
   <small class="error" *ngIf="registroForm.errors?.['passwordsDistintas'] && confirmPassword?.touched">
@@ -53,4 +59,6 @@
       Registrarse <mat-icon>person_add</mat-icon>
     }
   </button>
+
+  <p class="cambiar-modo">¿Ya tienes cuenta? <button type="button" (click)="cambiarModo.emit()">Inicia sesión</button></p>
 </form>

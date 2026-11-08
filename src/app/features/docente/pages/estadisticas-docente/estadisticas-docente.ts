@@ -16,6 +16,25 @@ import { colorPorcentaje } from '../../utils/colores';
  * Cómo le va al grupo: aciertos por tema, actividad de los últimos 14 días
  * y las preguntas en las que más fallan (con la respuesta incorrecta que más eligen).
  */
+const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const DIAS_LARGOS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+
+/** Suma los intentos por día de la semana (lunes primero) y el alto relativo de cada barra. */
+export function intentosPorDiaSemana(actividad: { fecha: string; intentos: number }[]) {
+  const totales = [0, 0, 0, 0, 0, 0, 0];
+  for (const a of actividad ?? []) {
+    const [y, m, d] = a.fecha.split('-').map(Number);
+    const dia = (new Date(y, m - 1, d).getDay() + 6) % 7; // lunes = 0
+    totales[dia] += a.intentos;
+  }
+  const max = Math.max(...totales);
+  return totales.map((intentos, i) => ({
+    nombre: DIAS_SEMANA[i], largo: DIAS_LARGOS[i], intentos,
+    alto: max ? Math.max(4, Math.round((intentos / max) * 100)) : 4,
+    esMax: max > 0 && intentos === max,
+  }));
+}
+
 @Component({
   selector: 'app-estadisticas-docente',
   imports: [RouterLink, MatIconModule, ActividadChart, ContadorDirective, SumiDice],
@@ -27,6 +46,21 @@ export class EstadisticasDocente implements OnInit {
   private docenteService = inject(DocenteService);
 
   datos = signal<EstadisticasGrupo | null>(null);
+
+  /** Intentos por día de la semana (de los últimos 14 días). */
+  porDiaSemana = computed(() => intentosPorDiaSemana(this.datos()?.actividad ?? []));
+  mejorDia = computed(() => {
+    const max = this.porDiaSemana().find(x => x.esMax);
+    return max ? `El ${max.largo} es el día con más práctica.` : 'Todavía no hay práctica registrada.';
+  });
+
+  /** "7 de noviembre de 2026" (para el encabezado del PDF). */
+  readonly hoy = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  /** El navegador abre su diálogo de impresión, donde se elige "Guardar como PDF". */
+  imprimir(): void {
+    window.print();
+  }
   error = signal(false);
   /** Comentarios de Sumi: el tema con menos aciertos y consejos generales. */
   consejosGrupo = computed(() => {

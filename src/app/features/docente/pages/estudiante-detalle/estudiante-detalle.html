@@ -19,7 +19,7 @@
         <h1>{{ e.nombre }}</h1>
         <p><mat-icon>mail</mat-icon> {{ e.correo }}</p>
         <div class="perfil__chips">
-          <span class="dp-chip dp-chip--ambar"><mat-icon>stars</mat-icon> {{ e.puntos }} pts</span>
+          <span class="dp-chip dp-chip--ambar"><app-puntos-sumi [tamano]="18" /> {{ e.puntos }} Puntos Sumi</span>
           <span class="dp-chip" [class.dp-chip--rojo]="e.racha > 0"><mat-icon>local_fire_department</mat-icon> {{ e.racha }} días de racha</span>
           <span class="dp-chip dp-chip--indigo"><mat-icon>emoji_events</mat-icon> {{ d.logrosObtenidos }} logros</span>
           <span class="dp-chip">Desde {{ d.fechaRegistro | date: 'dd/MM/yyyy' }}</span>

@@ -1,3 +1,4 @@
+import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ResultadoQuiz, duracion, nombreTemaQuiz } from '../../../quiz/models/quiz.model';
 import { DatePipe } from '@angular/common';
@@ -18,7 +19,7 @@ import { colorPorcentaje, iniciales } from '../../utils/colores';
  */
 @Component({
   selector: 'app-estudiante-detalle',
-  imports: [RouterLink, DatePipe, MatIconModule, ActividadChart],
+  imports: [RouterLink, DatePipe, MatIconModule, ActividadChart, PuntosSumi],
   templateUrl: './estudiante-detalle.html',
   styleUrl: './estudiante-detalle.scss',
 })

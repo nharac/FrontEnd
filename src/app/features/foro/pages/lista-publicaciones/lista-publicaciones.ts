@@ -1,6 +1,6 @@
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { FORO } from '../../../../shared/components/sumi-dice/dialogos';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, computed, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,6 +41,26 @@ export class ListaPublicaciones implements OnInit {
   tema = signal<string | null>(null);
   orden = signal<OrdenForo>('reciente');
 
+  /** Id del usuario que inició sesión (para mostrar "Eliminar" en sus publicaciones). */
+  usuarioId = signal<number | null>(null);
+  /** Filtro rápido sobre lo cargado: todas, sin responder o las mías. */
+  readonly vistas = [
+    { id: 'todas' as const, nombre: 'Todas', icono: 'view_list' },
+    { id: 'sin' as const, nombre: 'Sin responder', icono: 'mark_chat_unread' },
+    { id: 'mias' as const, nombre: 'Mis publicaciones', icono: 'person' },
+  ];
+  vista = signal<'todas' | 'sin' | 'mias'>('todas');
+  sinResponder = computed(() => this.publicaciones().filter(p => !p.respuestasCount).length);
+  mias = computed(() => this.publicaciones().filter(p => this.esMia(p)).length);
+  visibles = computed(() => {
+    const v = this.vista();
+    return this.publicaciones().filter(p => v === 'todas' || (v === 'sin' ? !p.respuestasCount : this.esMia(p)));
+  });
+
+  /** Publicación que se está confirmando o eliminando. */
+  confirmandoId = signal<number | null>(null);
+  eliminandoId = signal<number | null>(null);
+
   readonly temas = [
     { id: null, nombre: 'Todos', icono: 'apps' },
     { id: 'limites', nombre: 'Límites', icono: 'trending_flat' },
@@ -67,6 +87,31 @@ export class ListaPublicaciones implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
+    this.foroService.obtenerPerfil().subscribe({
+      next: (u) => this.usuarioId.set(u.id),
+      error: () => this.usuarioId.set(null)
+    });
+  }
+
+  esMia(p: PublicacionResumen): boolean {
+    return this.usuarioId() !== null && p.autor.id === this.usuarioId();
+  }
+
+  /** Elimina una publicación propia desde la lista (pide confirmación antes). */
+  eliminar(p: PublicacionResumen): void {
+    this.eliminandoId.set(p.id);
+    this.foroService.eliminar(p.id).subscribe({
+      next: () => {
+        this.eliminandoId.set(null);
+        this.confirmandoId.set(null);
+        this.publicaciones.update(lista => lista.filter(x => x.id !== p.id));
+        this.snackBar.open('Publicación eliminada', 'Cerrar', { duration: 3000 });
+      },
+      error: (err) => {
+        this.eliminandoId.set(null);
+        this.snackBar.open(err?.message || 'No se pudo eliminar la publicación', 'Cerrar', { duration: 3500 });
+      }
+    });
   }
 
   elegirTema(tema: string | null): void {

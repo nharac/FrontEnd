@@ -1,3 +1,4 @@
+import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { mensajeRanking } from '../../../../shared/components/sumi-dice/dialogos';
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
@@ -33,9 +34,21 @@ const CLAVE_PERIODO = 'saesu_ranking_periodo';
  * la posición del estudiante (aunque no esté en el top), su nivel y sus últimos puntos.
  * Se puede ver el ranking de la semana, del mes o el histórico.
  */
+const CLAVE_PUESTOS = 'saesu-ranking-puestos-';
+
+/** Puestos guardados de la visita anterior (por periodo). */
+export function leerPuestos(periodo: string): Record<number, number> {
+  try { return JSON.parse(localStorage.getItem(CLAVE_PUESTOS + periodo) ?? '{}'); } catch { return {}; }
+}
+
+export function guardarPuestos(periodo: string, lista: PosicionRanking[]): void {
+  const mapa = Object.fromEntries(lista.map((p, i) => [p.usuarioId, i + 1]));
+  try { localStorage.setItem(CLAVE_PUESTOS + periodo, JSON.stringify(mapa)); } catch { /* sin almacenamiento */ }
+}
+
 @Component({
   selector: 'app-ranking',
-  imports: [RouterLink, MatIconModule, Confeti, ContadorDirective, Medalla, SumiDice],
+  imports: [RouterLink, MatIconModule, Confeti, ContadorDirective, Medalla, SumiDice, PuntosSumi],
   templateUrl: './ranking.html',
   styleUrl: './ranking.scss',
 })
@@ -54,6 +67,8 @@ export class Ranking implements OnInit, OnDestroy {
 
   periodo = signal<PeriodoRanking>(this.leerPeriodo());
   posiciones = signal<PosicionRanking[]>([]);
+  /** Puestos que vio este navegador la última vez, por periodo (para las flechas de subida y bajada). */
+  private anteriores = signal<Record<number, number>>({});
   yo = signal<MiPosicion | null>(null);
   /** Lo que dice Sumi según la posición (null mientras carga). */
   sumiRanking = computed(() => {
@@ -129,7 +144,9 @@ export class Ranking implements OnInit, OnDestroy {
       yo: this.rankingService.miPosicion(periodo).pipe(catchError(() => of(null))),
     }).subscribe({
       next: ({ top, yo }) => {
+        this.anteriores.set(leerPuestos(periodo));
         this.posiciones.set(top ?? []);
+        guardarPuestos(periodo, this.posiciones());
         this.yo.set(yo);
         this.cargando.set(false);
         if (this.posiciones().length) {
@@ -141,6 +158,15 @@ export class Ranking implements OnInit, OnDestroy {
         this.error.set(true);
       }
     });
+  }
+
+  /**
+   * Cuántos puestos cambió desde la última vez que se abrió el ranking (positivo = subió).
+   * null si es la primera vez o el estudiante no estaba antes en el top.
+   */
+  cambio(p: PosicionRanking, lugar: number): number | null {
+    const antes = this.anteriores()[p.usuarioId];
+    return antes ? antes - lugar : null;
   }
 
   esYo(p: PosicionRanking): boolean {

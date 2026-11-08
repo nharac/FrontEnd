@@ -46,6 +46,17 @@ describe('Servicios del estudiante', () => {
     expect(conFiltros.request.params.get('dificultad')).toBe('basico');
     conFiltros.flush([]);
 
+    practica.sesion({ tema: 'limites' }).subscribe();
+    const sesion = backend.expectOne((r) => r.url === `${API}/practica/preguntas/sesion`);
+    expect(sesion.request.params.get('tema')).toBe('limites');
+    expect(sesion.request.params.get('size')).toBe('10');
+    expect(sesion.request.params.has('dificultad')).toBe(false);
+    sesion.flush([]);
+    practica.sesion({ tema: 'integrales', dificultad: 'avanzado', size: 5 }).subscribe();
+    const sesion2 = backend.expectOne((r) => r.url === `${API}/practica/preguntas/sesion`);
+    expect(sesion2.request.params.get('dificultad')).toBe('avanzado');
+    sesion2.flush([]);
+
     practica.responder(7, 3).subscribe();
     expect(backend.expectOne(`${API}/practica/preguntas/7/responder`).request.body).toEqual({ opcionId: 3 });
     practica.obtenerPista(7).subscribe();

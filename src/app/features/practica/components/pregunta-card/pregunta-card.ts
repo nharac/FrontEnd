@@ -1,3 +1,4 @@
+import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
 import {
   Component,
   computed,
@@ -30,7 +31,7 @@ import { Confeti } from '../../../../shared/components/confeti/confeti';
  */
 @Component({
   selector: 'app-pregunta-card',
-  imports: [MatIconModule, ChatPanel, Confeti, Mascota],
+  imports: [MatIconModule, ChatPanel, Confeti, Mascota, PuntosSumi],
   templateUrl: './pregunta-card.html',
   styleUrl: './pregunta-card.scss',
   host: {

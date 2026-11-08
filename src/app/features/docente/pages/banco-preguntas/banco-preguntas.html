@@ -10,6 +10,29 @@
   <app-sumi-dice class="dp-sumi" estado="feliz" accesorio="lapiz" [tamano]="78" compacto
                  titulo="Consejo para tus preguntas" [mensajes]="consejosBanco" />
 
+  <!-- Cuántas preguntas hay de cada tema y dificultad (toca una celda para filtrar) -->
+  @if (!tema() && !dificultad() && preguntas().length) {
+    <section class="dp-tarjeta dp-matriz" aria-label="Preguntas por tema y dificultad">
+      <div class="dp-matriz__fila dp-matriz__fila--cabeza">
+        <span></span>
+        @for (d of dificultadesMatriz; track d.id) { <span>{{ d.nombre }}</span> }
+        <span>Total</span>
+      </div>
+      @for (fila of matriz(); track fila.tema) {
+        <div class="dp-matriz__fila">
+          <strong>{{ fila.nombre }}</strong>
+          @for (c of fila.celdas; track c.dificultad) {
+            <button type="button" class="dp-matriz__celda" [class.dp-matriz__celda--poca]="c.total < 5"
+                    (click)="filtrarMatriz(fila.tema, c.dificultad)"
+                    [attr.aria-label]="c.total + ' preguntas de ' + fila.nombre + ', ' + c.dificultad">{{ c.total }}</button>
+          }
+          <b>{{ fila.total }}</b>
+        </div>
+      }
+      <small class="dp-nota">En rojo: menos de 5 preguntas activas. Conviene agregar más para que la práctica no se repita.</small>
+    </section>
+  }
+
   <section class="dp-tarjeta">
     <div class="dp-filtros">
       <select class="dp-select" aria-label="Tema" [ngModel]="tema()" (ngModelChange)="tema.set($event); cargar()">

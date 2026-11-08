@@ -1,0 +1,43 @@
+// ============================================
+// Despedida al cerrar sesión (shared/components/despedida)
+// ============================================
+.despedida {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  text-align: center;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  // La cortina se abre en círculo desde arriba a la derecha (donde está el menú de la cuenta)
+  animation: despedida-abrir 0.6s cubic-bezier(0.65, 0, 0.35, 1) both;
+
+  &--saliendo { animation: despedida-cerrar 0.45s ease forwards; }
+
+  &__centro { position: relative; display: flex; flex-direction: column; align-items: center; padding: 24px; }
+  &__sumi { animation: despedida-sumi 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both; filter: drop-shadow(0 16px 30px rgba(30, 27, 75, 0.35)); }
+  h2 { margin: 18px 0 10px; font-size: clamp(26px, 5vw, 36px); line-height: 1.25; font-weight: 700; animation: despedida-subir 0.5s ease 0.45s both; }
+  p { margin: 0; font-size: 15px; color: #e0e7ff; animation: despedida-subir 0.5s ease 0.55s both; }
+
+  &__barra {
+    width: 180px; height: 5px; margin-top: 22px; border-radius: 99px; overflow: hidden;
+    background: rgba(255, 255, 255, 0.25); animation: despedida-subir 0.5s ease 0.6s both;
+    i { display: block; height: 100%; border-radius: inherit; background: #fff; transform-origin: left; animation: despedida-barra 1s ease-in-out 0.6s both; }
+  }
+
+  &__burbuja {
+    position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.1);
+    &--1 { width: 340px; height: 340px; top: -120px; left: -80px; animation: despedida-flotar 3s ease-in-out infinite alternate; }
+    &--2 { width: 220px; height: 220px; bottom: -70px; right: -40px; animation: despedida-flotar 3s ease-in-out 0.6s infinite alternate-reverse; }
+  }
+}
+
+@keyframes despedida-abrir { from { clip-path: circle(0% at 95% 4%); } to { clip-path: circle(150% at 95% 4%); } }
+@keyframes despedida-cerrar { to { opacity: 0; transform: scale(1.04); } }
+@keyframes despedida-sumi { from { opacity: 0; transform: translateY(40px) scale(0.6) rotate(-8deg); } }
+@keyframes despedida-subir { from { opacity: 0; transform: translateY(12px); } }
+@keyframes despedida-barra { from { transform: scaleX(0); } }
+@keyframes despedida-flotar { to { transform: translate(20px, 16px); } }

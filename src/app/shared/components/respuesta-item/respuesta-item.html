@@ -16,13 +16,28 @@
     <time>{{ haceCuanto(r.fechaCreacion) }}</time>
   </header>
 
-  <p class="respuesta__contenido">
-    @if (r.oculta) { <mat-icon>visibility_off</mat-icon> }
-    {{ r.contenido }}
-  </p>
+  @if (r.oculta) {
+    <p class="respuesta__contenido"><mat-icon>visibility_off</mat-icon> {{ r.contenido }}</p>
+  } @else {
+    <div class="respuesta__contenido" [appTextoRico]="r.contenido"></div>
+    @if (r.imagenUrl) {
+      <a class="respuesta__imagen" [href]="r.imagenUrl" target="_blank" rel="noopener" title="Ver la imagen completa">
+        <img [src]="r.imagenUrl" alt="Imagen adjunta a la respuesta de {{ r.autor.nombre }}" loading="lazy">
+      </a>
+    }
+  }
 
-  @if (mostrarBotonOficial() || puedeResponder() || mostrarBotonOcultar()) {
+  @if (!r.oculta || mostrarBotonOficial() || puedeResponder() || mostrarBotonOcultar()) {
     <div class="respuesta__acciones">
+      @if (!r.oculta) {
+        @let marcada = utiles.mias().has(r.id);
+        @let cuantos = utiles.conteos()[r.id] ?? 0;
+        <button type="button" class="accion accion--util" [class.accion--util-on]="marcada" [attr.aria-pressed]="marcada"
+                [disabled]="utiles.procesando() === r.id" (click)="utiles.alternar(r.id)"
+                [title]="marcada ? 'Quitar «Me sirvió»' : 'Marcar que esta respuesta te sirvió'">
+          <mat-icon>{{ marcada ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon> Me sirvió@if (cuantos) { <b>{{ cuantos }}</b> }
+        </button>
+      }
       @if (mostrarBotonOficial()) {
         @if (r.esOficial) {
           <button type="button" class="accion accion--quitar"
@@ -57,7 +72,10 @@
         <textarea rows="2" name="texto" placeholder="Escribe tu respuesta a {{ r.autor.nombre }}..."
                   [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
       </label>
-      <button type="submit" class="accion accion--oficial" [disabled]="!texto().trim()">Enviar</button>
+      <div class="responder__pie">
+        <app-adjuntar-imagen [(archivo)]="archivo" />
+        <button type="submit" class="accion accion--oficial" [disabled]="!texto().trim()">Enviar</button>
+      </div>
     </form>
   }
 </div>

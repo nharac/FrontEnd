@@ -1,13 +1,23 @@
 <div class="dashboard">
 
-  <header class="dashboard__header">
-    <span class="dashboard__badge">Modo Docente</span>
-    <h1 class="dashboard__titulo">Bienvenido{{ nombreDocente() ? ', ' + nombreDocente() : '' }} 👋</h1>
+  <!-- Bienvenida: saludo según la hora, resumen del día y Sumi -->
+  <header class="dd-hero">
+    <div class="dd-hero__texto">
+      <span class="dd-hero__badge"><mat-icon>school</mat-icon> Modo docente</span>
+      <h1>{{ saludoHora() }}{{ primerNombre() ? ', ' + primerNombre() : '' }}</h1>
+      <p class="dd-hero__fecha">{{ hoy }}</p>
+      <p class="dd-hero__resumen">{{ resumen() }}</p>
+      <div class="dd-hero__acciones">
+        <a class="dd-hero__btn" routerLink="/docente/notificaciones"><mat-icon>mark_chat_unread</mat-icon> Responder consultas</a>
+        <a class="dd-hero__btn dd-hero__btn--claro" routerLink="/docente/estudiantes"><mat-icon>groups</mat-icon> Ver estudiantes</a>
+      </div>
+    </div>
     @let sumi = sumiDocente();
-    <app-sumi-dice class="dd-sumi" [estado]="sumi.estado" accesorio="birrete" [tamano]="86" compacto
+    <app-sumi-dice class="dd-sumi" [estado]="sumi.estado" accesorio="birrete" [tamano]="96" compacto lado="derecha"
                    [tono]="sumi.estado === 'feliz' ? 'exito' : 'normal'" [titulo]="sumi.titulo" [mensajes]="sumi.texto" />
-    <p class="dashboard__subtitulo">Estas son tus tareas pendientes para hoy:</p>
   </header>
+
+  <h3 class="accesos__titulo dd-seccion dd-seccion--suelta"><mat-icon>checklist</mat-icon> Tus tareas pendientes</h3>
 
   <section class="cards">
     <a class="card card--warning" routerLink="/docente/notificaciones">
@@ -37,7 +47,7 @@
 
   @if (grupo(); as g) {
     <section class="grupo">
-      <h3 class="accesos__titulo">Tu grupo</h3>
+      <h3 class="accesos__titulo dd-seccion"><mat-icon>groups</mat-icon> Tu grupo</h3>
       <div class="dp-kpis">
         <a class="dp-kpi" [class.dp-kpi--rojo]="g.estudiantesEnRiesgo > 0" [class.dp-kpi--verde]="!g.estudiantesEnRiesgo"
            routerLink="/docente/estudiantes" [queryParams]="{ filtro: 'riesgo' }">
@@ -62,7 +72,7 @@
 
   @if (masAntiguas().length) {
     <section class="urgentes">
-      <h3 class="accesos__titulo">Las que más llevan esperando</h3>
+      <h3 class="accesos__titulo dd-seccion"><mat-icon>schedule</mat-icon> Las que más llevan esperando</h3>
       @for (p of masAntiguas(); track p.id) {
         <a class="urgente" [routerLink]="['/docente/publicaciones', p.id]">
           <span class="urgente__tema">{{ nombresTema[p.tema] || p.tema }}</span>
@@ -75,7 +85,7 @@
   }
 
   <section class="accesos">
-    <h3 class="accesos__titulo">Accesos rápidos</h3>
+    <h3 class="accesos__titulo dd-seccion"><mat-icon>bolt</mat-icon> Accesos rápidos</h3>
     <div class="accesos__grid">
       <a class="acceso" routerLink="/docente/notificaciones">
         <mat-icon>notifications</mat-icon>

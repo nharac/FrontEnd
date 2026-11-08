@@ -1,72 +1,169 @@
 <div class="perfil">
 
   @if (usuario(); as u) {
+    <!-- ===== Cabecera con nivel ===== -->
     <section class="tarjeta cabecera">
-      <div class="foto">
-        @if (fotoUrl(); as url) {
-          <img class="avatar avatar--foto" [src]="url" alt="Foto de perfil de {{ u.nombre }}">
-        } @else {
-          <span class="avatar">{{ iniciales() }}</span>
-        }
-        <app-medalla [lugar]="miLugar()" tamano="lg" />
-        <label class="foto__boton" [class.foto__boton--cargando]="subiendoFoto()"
-               title="Cambiar foto de perfil">
-          <mat-icon>{{ subiendoFoto() ? 'hourglass_top' : 'photo_camera' }}</mat-icon>
-          <span class="sr-only">Cambiar foto de perfil</span>
-          <input type="file" accept="image/png,image/jpeg,image/webp,image/gif"
-                 [disabled]="subiendoFoto()" (change)="elegirFoto($event)">
-        </label>
+      <div class="cabecera__portada" aria-hidden="true">
+        <span class="cabecera__circulo cabecera__circulo--1"></span>
+        <span class="cabecera__circulo cabecera__circulo--2"></span>
       </div>
-      <div class="cabecera__datos">
-        <h1>{{ u.nombre }}</h1>
-        <p><mat-icon>mail</mat-icon> {{ u.correo }}</p>
-        <div class="cabecera__chips">
-          <span class="chip" [class.chip--docente]="esDocente()">
-            {{ esDocente() ? 'Docente' : 'Estudiante' }}
-          </span>
-          @if (u.fechaRegistro) {
-            <span class="chip chip--suave">Miembro desde {{ u.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
+      <div class="cabecera__cuerpo">
+        <div class="foto" [class.foto--dev]="esDesarrollador()">
+          @if (fotoUrl(); as url) {
+            <img class="avatar avatar--foto" [src]="url" alt="Foto de perfil de {{ u.nombre }}">
+          } @else {
+            <span class="avatar">{{ iniciales() }}</span>
           }
-          @if (miLugar(); as lugar) {
-            @if (lugar <= 3) {
-              <span class="chip chip--top chip--top-{{ lugar }}"><mat-icon>military_tech</mat-icon> Top {{ lugar }} del ranking</span>
+          <app-medalla [lugar]="miLugar()" tamano="lg" />
+          <label class="foto__boton" [class.foto__boton--cargando]="subiendoFoto()"
+                 title="Cambiar foto de perfil">
+            <mat-icon>{{ subiendoFoto() ? 'hourglass_top' : 'photo_camera' }}</mat-icon>
+            <span class="sr-only">Cambiar foto de perfil</span>
+            <input type="file" accept="image/png,image/jpeg,image/webp,image/gif"
+                   [disabled]="subiendoFoto()" (change)="elegirFoto($event)">
+          </label>
+        </div>
+        <div class="cabecera__datos">
+          <h1>{{ u.nombre }}
+            @if (esDesarrollador()) { <app-sumi-dev class="insignia-dev" [tamano]="44" /> }
+          </h1>
+          <p><mat-icon>mail</mat-icon> {{ u.correo }}</p>
+          <div class="cabecera__chips">
+            <span class="chip" [class.chip--docente]="esDocente()">
+              {{ esDocente() ? 'Docente' : 'Estudiante' }}
+            </span>
+            @if (u.fechaRegistro) {
+              <span class="chip chip--suave">Miembro desde {{ u.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
             }
-          }
-          @if (esEstudiante() && u.puntosTotales != null) {
-            <span class="chip chip--puntos"><mat-icon>stars</mat-icon> {{ u.puntosTotales }} pts</span>
-          }
-          @if (esEstudiante() && u.rachaActual) {
-            <span class="chip chip--racha"><mat-icon class="meta-icono--fuego">local_fire_department</mat-icon> {{ u.rachaActual }} {{ u.rachaActual === 1 ? 'día' : 'días' }}</span>
-          }
+            @if (esEstudiante() && puesto(); as lugar) {
+              @if (lugar <= 3) {
+                <span class="chip chip--top chip--top-{{ lugar }}"><mat-icon>military_tech</mat-icon> Top {{ lugar }} del ranking</span>
+              } @else {
+                <a class="chip chip--puesto" routerLink="/ranking"><mat-icon>leaderboard</mat-icon> Puesto #{{ lugar }} del ranking</a>
+              }
+            }
+            @if (esEstudiante() && insigniasCabecera().length) {
+              <a class="cabecera__insignias" href="#coleccion" (click)="irAColeccion($event)"
+                 [attr.aria-label]="insigniasObtenidas().length + ' insignias obtenidas. Ver la colección'">
+                @for (l of insigniasCabecera(); track l.codigo) {
+                  <app-insignia [logro]="l" [tamano]="30" [attr.title]="l.nombre" />
+                }
+                @if (insigniasRestantes()) { <span class="cabecera__mas">+{{ insigniasRestantes() }}</span> }
+              </a>
+            }
+          </div>
         </div>
       </div>
+
+      @if (esEstudiante() && nivel(); as n) {
+        <div class="nivel">
+          <span class="nivel__icono"><mat-icon>{{ n.actual.icono }}</mat-icon></span>
+          <div class="nivel__texto">
+            <div class="nivel__fila">
+              <span>Nivel <strong>{{ n.actual.nombre }}</strong></span>
+              @if (n.siguiente) {
+                <small>Faltan {{ n.faltan }} Puntos Sumi para <b>{{ n.siguiente.nombre }}</b></small>
+              } @else {
+                <small>¡Llegaste al nivel máximo! 🏆</small>
+              }
+            </div>
+            <div class="nivel__barra" role="progressbar" [attr.aria-valuenow]="n.avance" aria-valuemin="0" aria-valuemax="100"
+                 [attr.aria-label]="'Avance al siguiente nivel'">
+              <div class="nivel__relleno" [style.width.%]="n.avance"></div>
+            </div>
+          </div>
+        </div>
+      }
     </section>
 
-    @if (esEstudiante() && progreso(); as p) {
-      <section class="tarjeta">
-        <h2><mat-icon>insights</mat-icon> Mi progreso</h2>
-        @if (totalRespondidas() === 0) {
-          <p class="ayuda">Aún no has respondido preguntas. ¡Empieza en Práctica!</p>
-        }
-        <div class="progreso">
-          @for (t of temas; track t.id) {
-            @let pt = p[t.id];
-            <div class="progreso__tema">
-              <div class="progreso__fila">
-                <strong>{{ t.nombre }}</strong>
-                <span>{{ pt.correctas }} / {{ pt.respondidas }} · {{ pt.porcentaje | number: '1.0-0' }}%</span>
-              </div>
-              <div class="barra"><div class="barra__relleno" [style.width.%]="pt.porcentaje"></div></div>
-            </div>
-          }
+    @if (esEstudiante()) {
+      <!-- ===== Cifras ===== -->
+      <section class="cifras" aria-label="Resumen">
+        <div class="cifra cifra--oro">
+          <app-puntos-sumi [tamano]="34" />
+          <div><strong>{{ u.puntosTotales ?? 0 }}</strong><small>Puntos Sumi</small></div>
+        </div>
+        <div class="cifra cifra--fuego">
+          <mat-icon>local_fire_department</mat-icon>
+          <div><strong>{{ u.rachaActual ?? 0 }}</strong><small>{{ u.rachaActual === 1 ? 'día de racha' : 'días de racha' }}</small></div>
+        </div>
+        <div class="cifra cifra--indigo">
+          <mat-icon>task_alt</mat-icon>
+          <div><strong>{{ totalRespondidas() }}</strong><small>Respondidas</small></div>
+        </div>
+        <div class="cifra cifra--verde">
+          <mat-icon>my_location</mat-icon>
+          <div><strong>{{ precision() }}%</strong><small>Precisión</small></div>
+        </div>
+        <div class="cifra cifra--violeta">
+          <mat-icon>emoji_events</mat-icon>
+          <div><strong>{{ logrosObtenidos() }}</strong><small>Logros</small></div>
+        </div>
+        <div class="cifra cifra--noche">
+          <mat-icon>check_circle</mat-icon>
+          <div><strong>{{ totalCorrectas() }}</strong><small>Aciertos</small></div>
         </div>
       </section>
+
+      <!-- ===== Meta semanal y calendario de actividad ===== -->
+      <div class="avance">
+        <app-meta-semanal />
+        <app-calendario-actividad />
+      </div>
+
+      <!-- ===== Progreso por tema ===== -->
+      @if (progreso(); as p) {
+        <section class="tarjeta">
+          <h2><mat-icon>insights</mat-icon> Mi progreso por tema</h2>
+          @if (totalRespondidas() === 0) {
+            <p class="ayuda">Aún no has respondido preguntas. ¡Empieza en Práctica!</p>
+          }
+          <div class="temas">
+            @for (t of temas; track t.id) {
+              @let pt = p[t.id];
+              <div class="tema tema--{{ t.id }}">
+                <div class="tema__anillo" [style.--p]="pt.porcentaje" role="img"
+                     [attr.aria-label]="t.nombre + ': ' + (pt.porcentaje | number: '1.0-0') + '% de acierto'">
+                  <strong>{{ pt.porcentaje | number: '1.0-0' }}%</strong>
+                </div>
+                <div class="tema__texto">
+                  <strong>{{ t.nombre }}</strong>
+                  <small>{{ pt.correctas }} correctas de {{ pt.respondidas }}</small>
+                  <span class="tema__estado">{{ estadoTema(pt.respondidas, pt.porcentaje) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ===== Fortalezas y debilidades ===== -->
+      <app-analisis-temas />
+
+      <!-- ===== Próximos logros ===== -->
+      @if (proximos().length) {
+        <section class="tarjeta">
+          <h2><mat-icon>flag</mat-icon> Tus próximos logros</h2>
+          <ul class="proximos">
+            @for (l of proximos(); track l.codigo) {
+              <li class="proximo">
+                <app-insignia [logro]="l" [tamano]="52" />
+                <div class="proximo__texto">
+                  <strong>{{ l.nombre }}</strong>
+                  <small>{{ l.descripcion }}</small>
+                  <div class="barra"><div class="barra__relleno" [style.width.%]="avance(l)"></div></div>
+                  <span class="proximo__falta">{{ l.progreso }} / {{ l.meta }} · te falta{{ l.meta - l.progreso === 1 ? '' : 'n' }} {{ l.meta - l.progreso }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <app-logros-grid [logros]="logros()" [cargando]="cargandoLogros()" [error]="errorLogros()" />
     }
 
-    @if (esEstudiante()) {
-      <app-logros-grid />
-    }
-
+    <div class="formularios">
     <section class="tarjeta">
       <h2><mat-icon>badge</mat-icon> Datos personales</h2>
       <form [formGroup]="formNombre" (ngSubmit)="guardarNombre()">
@@ -124,6 +221,7 @@
         </div>
       </form>
     </section>
+    </div>
   } @else {
     <p class="cargando">Cargando perfil...</p>
   }

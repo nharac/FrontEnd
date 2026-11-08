@@ -1,12 +1,15 @@
 import { Component, DestroyRef, afterNextRender, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { BienvenidaSumi } from './shared/components/bienvenida-sumi/bienvenida-sumi';
+import { TemaService } from './core/services/tema.service';
+import { DespedidaComponent } from './shared/components/despedida/despedida';
 
 /** Elementos que muestran la "onda" al hacer clic. */
 const CON_ONDA = 'button:not(.mat-mdc-menu-item):not(.mat-mdc-button-base), a.btn, .acceso-card, .acceso';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, BienvenidaSumi, DespedidaComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -14,6 +17,7 @@ export class App {
   title = 'SAESU';
 
   constructor() {
+    inject(TemaService); // aplica el modo claro u oscuro guardado
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
       // Sin matchMedia (pruebas en jsdom) o con movimiento reducido no se dibuja la onda

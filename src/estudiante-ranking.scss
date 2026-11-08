@@ -68,7 +68,7 @@ app-ranking {
     }
     &--1 &__avatar img, &--1 &__avatar > span { width: 84px; height: 84px; font-size: 26px; }
     &__nombre { max-width: 100%; font-size: 14.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    &__puntos { font-size: 13.5px; font-weight: 700; color: #fff; background: var(--color); padding: 2px 10px; border-radius: 999px; }
+    &__puntos { display: inline-flex; align-items: center; gap: 4px; font-size: 13.5px; font-weight: 700; color: #fff; background: var(--color); padding: 2px 10px 2px 4px; border-radius: 999px; }
     &__base {
       width: 100%; height: var(--alto); margin-top: 8px; border-radius: 16px 16px 0 0; display: grid; place-items: start center; padding-top: 10px; box-sizing: border-box;
       background: linear-gradient(180deg, var(--suave), color-mix(in srgb, var(--suave) 40%, #fff));
@@ -98,7 +98,7 @@ app-ranking {
     &__nombre { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     &__barra { height: 6px; border-radius: 999px; background: #f1f2f6; overflow: hidden;
       i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a5b4fc, $rk-indigo); transform-origin: left; } }
-    &__puntos { flex: none; font-size: 14.5px; font-weight: 800; min-width: 64px; text-align: right; }
+    &__puntos { flex: none; display: inline-flex; align-items: center; justify-content: flex-end; gap: 5px; font-size: 14.5px; font-weight: 800; min-width: 64px; }
   }
   .rk-separador { display: flex; justify-content: center; gap: 4px; padding: 2px 0;
     span { width: 4px; height: 4px; border-radius: 50%; background: #c7d2fe; } }
@@ -185,3 +185,18 @@ app-ranking {
 
 // Sumi en el ranking
 app-ranking .rk-sumi { margin-top: 4px; }
+
+// ---------- Flechas: cuántos puestos subió o bajó desde la última visita ----------
+app-ranking {
+  .rk-cambio {
+    display: inline-flex; align-items: center; gap: 1px; margin-left: 6px; padding: 1px 6px 1px 3px;
+    border-radius: 999px; font-size: 11px; font-weight: 700; vertical-align: middle;
+    mat-icon { font-size: 13px; width: 13px; height: 13px; }
+  }
+  .rk-cambio--sube { background: #dcfce7; color: #15803d; }
+  .rk-cambio--baja { background: #fee2e2; color: #b91c1c; }
+  @media (prefers-reduced-motion: no-preference) {
+    .rk-cambio--sube mat-icon { animation: rk-subir 1.2s ease-in-out 2; }
+  }
+}
+@keyframes rk-subir { 50% { transform: translateY(-3px); } }

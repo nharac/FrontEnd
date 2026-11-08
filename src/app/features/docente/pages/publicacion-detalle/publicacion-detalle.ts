@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+import { ForoService } from '../../../foro/services/foro.service';
 import { DocenteService } from '../../services/docente.service';
 import { RespuestaItem } from '../../../../shared/components/respuesta-item/respuesta-item';
 import { NOMBRES_TEMA, PublicacionDetalle, Respuesta } from '../../../foro/models/foro.model';
@@ -14,26 +15,35 @@ import { haceCuanto } from '../../../../shared/utils/tiempo';
  * El docente lee la consulta, revisa las respuestas (anidadas), marca la
  * respuesta oficial y puede responder él mismo.
  */
+import { UtilesService } from '../../../foro/services/utiles.service';
+import { AdjuntarImagen } from '../../../../shared/components/adjuntar-imagen/adjuntar-imagen';
+import { Observable, map, of, switchMap } from 'rxjs';
 @Component({
   selector: 'app-publicacion-detalle',
-  imports: [RouterLink, FormsModule, MatIconModule, RespuestaItem],
+  imports: [RouterLink, FormsModule, MatIconModule, RespuestaItem, AdjuntarImagen],
   templateUrl: './publicacion-detalle.html',
   styleUrl: './publicacion-detalle.scss',
 })
 export class PublicacionDetallePage implements OnInit {
+  private utilesService = inject(UtilesService);
 
   private route = inject(ActivatedRoute);
   private docenteService = inject(DocenteService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  private foroService = inject(ForoService);
 
   publicacion = signal<PublicacionDetalle | null>(null);
   cargando = signal(true);
   error = signal(false);
   procesandoId = signal<number | null>(null);
   texto = signal('');
+  /** Foto para adjuntar a la respuesta. */
+  archivo = signal<File | null>(null);
   enviando = signal(false);
   ocultandoPublicacion = signal(false);
+  confirmandoEliminar = signal(false);
+  eliminando = signal(false);
 
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
@@ -46,6 +56,7 @@ export class PublicacionDetallePage implements OnInit {
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     this.cargar();
+    this.utilesService.cargar(this.id);
   }
 
   cargar(): void {
@@ -119,6 +130,24 @@ export class PublicacionDetallePage implements OnInit {
   }
 
   /** Moderación: oculta toda la publicación y vuelve al foro (con opción de deshacer). */
+  /** Elimina la publicación del foro (a diferencia de ocultar, no se restaura desde Moderación). */
+  eliminarPublicacion(): void {
+    this.eliminando.set(true);
+    this.foroService.eliminar(this.id).subscribe({
+      next: () => {
+        this.eliminando.set(false);
+        this.confirmandoEliminar.set(false);
+        this.docenteService.refrescarPendientes();
+        this.avisar('Publicación eliminada del foro');
+        void this.router.navigate(['/docente/foro']);
+      },
+      error: (err) => {
+        this.eliminando.set(false);
+        this.avisar(err?.message || 'No se pudo eliminar la publicación');
+      }
+    });
+  }
+
   ocultarPublicacion(): void {
     this.ocultandoPublicacion.set(true);
     this.docenteService.ocultarPublicacion(this.id).subscribe({
@@ -144,17 +173,23 @@ export class PublicacionDetallePage implements OnInit {
   }
 
   /** Respuesta directa a la publicación (padreId = null) o a una respuesta. */
-  responder(contenido: string, padreId: number | null = null): void {
+  responder(contenido: string, padreId: number | null = null, archivo: File | null = null): void {
     const texto = contenido.trim();
     if (!texto || this.enviando()) {
       return;
     }
     this.enviando.set(true);
-    this.docenteService.responder(this.id, { contenido: texto, respuestaPadreId: padreId }).subscribe({
+    const imagenUrl$: Observable<string | null> = archivo
+      ? this.foroService.subirImagen(archivo).pipe(map(r => r.url))
+      : of(null);
+    imagenUrl$.pipe(
+      switchMap(imagenUrl => this.docenteService.responder(this.id, { contenido: texto, respuestaPadreId: padreId, imagenUrl }))
+    ).subscribe({
       next: () => {
         this.enviando.set(false);
         if (padreId === null) {
           this.texto.set('');
+          this.archivo.set(null);
         }
         this.avisar('Respuesta publicada');
         this.cargar();

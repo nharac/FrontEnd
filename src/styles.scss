@@ -8,10 +8,15 @@
 @use './docente-panel';
 @use './estudiante-inicio';
 @use './estudiante-practica';
+@use './estudiante-perfil';
 @use './estudiante-comunidad';
 @use './estudiante-ranking';
 @use './estudiante-quiz';
 @use './saesu-mascota';
+@use './auth-sumi';
+@use './despedida';
+@use './tema-oscuro';
+@use './adjuntar-imagen';
 // Íconos incluidos en el proyecto (no dependen de internet)
 @use 'material-symbols/outlined';
 

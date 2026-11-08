@@ -31,6 +31,19 @@ export class BancoPreguntas implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   preguntas = signal<PreguntaDocente[]>([]);
+
+  readonly dificultadesMatriz = [
+    { id: 'basico', nombre: 'Básico' }, { id: 'intermedio', nombre: 'Intermedio' }, { id: 'avanzado', nombre: 'Avanzado' },
+  ];
+  /** Preguntas activas por tema y dificultad. */
+  matriz = computed(() => (['limites', 'derivadas', 'integrales'] as const).map(tema => {
+    const delTema = this.preguntas().filter(p => p.tema === tema && p.activa);
+    return {
+      tema, nombre: NOMBRES_TEMA[tema],
+      total: delTema.length,
+      celdas: this.dificultadesMatriz.map(d => ({ dificultad: d.id, total: delTema.filter(p => p.dificultad === d.id).length })),
+    };
+  }));
   cargando = signal(true);
   error = signal(false);
   procesandoId = signal<number | null>(null);
@@ -54,6 +67,12 @@ export class BancoPreguntas implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cargar();
+  }
+
+  filtrarMatriz(tema: string, dificultad: string): void {
+    this.tema.set(tema);
+    this.dificultad.set(dificultad);
     this.cargar();
   }
 

@@ -20,9 +20,10 @@ const MAX_TITULO = 255;
  * /foro/nueva: formulario para publicar una consulta en el foro.
  * Valida lo mismo que el backend: título (máx. 255), contenido y tema obligatorios.
  */
+import { TextoRicoDirective } from '../../../../shared/directives/texto-rico.directive';
 @Component({
   selector: 'app-nueva-publicacion',
-  imports: [RouterLink, ReactiveFormsModule, MatIconModule],
+  imports: [TextoRicoDirective, RouterLink, ReactiveFormsModule, MatIconModule],
   templateUrl: './nueva-publicacion.html',
   styleUrl: './nueva-publicacion.scss',
 })
@@ -53,13 +54,15 @@ export class NuevaPublicacion implements OnDestroy {
   });
 
   /** Valores del formulario como signal, para la vista previa y la lista de chequeo. */
-  private valores = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+  readonly valores = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
 
   vistaTitulo = computed(() => this.valores().titulo?.trim() || 'Tu pregunta aparecerá aquí');
   vistaContenido = computed(() => {
     const texto = this.valores().contenido?.trim() || 'Describe tu duda para que tus compañeros puedan ayudarte.';
     return texto.length > 150 ? texto.slice(0, 150) + '…' : texto;
   });
+  /** El contenido tiene fórmulas en LaTeX ($…$): se muestra cómo quedarán dibujadas. */
+  tieneFormulas = computed(() => /\$[^$]+\$/.test(this.valores().contenido ?? ''));
   nombreTema = computed(() => this.temas.find(t => t.id === this.valores().tema)?.nombre ?? null);
 
   /** Lista de chequeo de una buena pregunta (solo orienta; lo obligatorio lo validan los Validators). */

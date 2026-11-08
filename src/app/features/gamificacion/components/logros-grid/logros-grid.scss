@@ -1,7 +1,8 @@
 $primario: #4f46e5;
 $oro: #f59e0b;
-$texto: #2c3e50;
+$texto: #1f2937;
 $suave: #6b7280;
+$rarezas: (comun: #0ea5e9, raro: #22c55e, epico: #8b5cf6, legendario: #f59e0b);
 
 .tarjeta {
   background: #fff;
@@ -10,102 +11,280 @@ $suave: #6b7280;
   box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);
 }
 
-.logros__cabecera {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-
-  h2 {
+.logros {
+  &__cabecera {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin: 0;
-    font-size: 17px;
-    color: $texto;
+    justify-content: space-between;
+    gap: 16px;
 
-    mat-icon { color: $oro; }
+    h2 {
+      display: flex; align-items: center; gap: 8px;
+      margin: 0; font-size: 19px; color: $texto;
+      mat-icon { color: $oro; }
+    }
+  }
+  &__sub { margin: 4px 0 0; color: $suave; font-size: 13.5px; }
+  &__estado, &__vacio { color: $suave; margin: 16px 0 0; }
+  &__vacio { text-align: center; padding: 18px; border-radius: 14px; background: #f9fafb; }
+}
+
+// Anillo con el porcentaje de logros obtenidos
+.anillo {
+  --p: 0;
+  flex: none;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, #fff 76%, transparent 78%),
+    conic-gradient($oro calc(var(--p) * 1%), #fef3c7 0);
+  line-height: 1;
+
+  strong { font-size: 22px; color: $texto; }
+  small { font-size: 11.5px; color: $suave; margin-top: 2px; }
+}
+
+.rarezas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rareza {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  font-size: 13px;
+  color: $texto;
+
+  b { font-weight: 700; }
+  &__punto { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+
+  @each $n, $c in $rarezas { &--#{$n} { --c: #{$c}; } }
+}
+
+// ===== Vitrina de insignias especiales =====
+.vitrina {
+  margin-top: 20px;
+  padding: 18px 18px 20px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(251, 191, 36, 0.28), transparent 45%),
+    radial-gradient(circle at 90% 100%, rgba(139, 92, 246, 0.35), transparent 50%),
+    linear-gradient(135deg, #1e1b4b, #312e81);
+  color: #fff;
+
+  h3 {
+    display: flex; align-items: center; gap: 8px;
+    margin: 0; font-size: 16px;
+    mat-icon { color: #fbbf24; }
+  }
+  &__sub { margin: 4px 0 14px; font-size: 13px; color: #c7d2fe; }
+
+  &__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 }
 
-.logros__contador {
-  padding: 3px 12px;
+.reto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  app-insignia { margin-bottom: 4px; }
+  strong { font-size: 14px; }
+  small { font-size: 12px; color: #c7d2fe; line-height: 1.35; }
+
+  &--obtenido {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(251, 191, 36, 0.45);
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.18) inset;
+  }
+  &:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.14); }
+
+  &__fecha {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 4px; padding: 2px 10px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 700;
+    background: rgba(251, 191, 36, 0.2); color: #fde68a;
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  }
+
+  // Exclusiva (desarrolladores): ocupa dos columnas, borde holográfico que gira
+  &--exclusivo {
+    position: relative;
+    grid-column: span 2;
+    padding: 18px 14px 16px;
+    border: 2px solid transparent;
+    background:
+      linear-gradient(135deg, rgba(49, 46, 129, 0.95), rgba(76, 29, 149, 0.95)) padding-box,
+      conic-gradient(from var(--giro, 0deg), #ff004c, #ff8a00, #ffe600, #00ff88, #00e1ff, #3d5bff, #d400ff, #ff004c) border-box;
+    box-shadow: 0 0 24px rgba(0, 225, 255, 0.35), 0 0 32px rgba(212, 0, 255, 0.3);
+    animation: borde-holo 4s linear infinite;
+    strong { font-size: 16px; background: linear-gradient(90deg, #ff4d7d, #ffe600, #00ff88, #00e1ff, #d400ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    &:hover { background:
+      linear-gradient(135deg, rgba(49, 46, 129, 0.9), rgba(76, 29, 149, 0.9)) padding-box,
+      conic-gradient(from var(--giro, 0deg), #ff004c, #ff8a00, #ffe600, #00ff88, #00e1ff, #3d5bff, #d400ff, #ff004c) border-box; }
+  }
+  &__cinta {
+    position: absolute; top: 10px; right: -6px;
+    padding: 3px 12px; border-radius: 6px 0 0 6px;
+    background: linear-gradient(90deg, #ff004c, #d400ff);
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@property --giro { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes borde-holo { to { --giro: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .reto--exclusivo { animation: none; } }
+
+// ===== Filtros =====
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 22px 0 14px;
+}
+
+.pestanas { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.pestana {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
   border-radius: 999px;
-  background: #fef3c7;
-  color: #92400e;
+  background: #fff;
+  color: $texto;
+  font: inherit;
   font-size: 13px;
-  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; color: $primario; }
+  span { font-size: 11.5px; color: $suave; }
+  &:hover { border-color: #c7d2fe; background: #eef2ff; }
+
+  &--activa {
+    background: $primario; border-color: $primario; color: #fff;
+    mat-icon, span { color: #e0e7ff; }
+    &:hover { background: #4338ca; }
+  }
 }
 
-.logros__estado { color: $suave; margin: 0; }
-
-.barra {
-  height: 8px;
-  margin-bottom: 18px;
+.segmento {
+  display: inline-flex;
+  padding: 3px;
   border-radius: 999px;
-  background: #fef3c7;
-  overflow: hidden;
+  background: #f3f4f6;
 
-  &__relleno { height: 100%; background: linear-gradient(90deg, $oro, #f97316); }
+  button {
+    padding: 5px 12px; border: 0; border-radius: 999px; background: transparent;
+    font: inherit; font-size: 12.5px; color: $suave; cursor: pointer;
+  }
+  &--activo { background: #fff !important; color: $texto !important; font-weight: 700; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
 }
 
-.insignias {
+// ===== Lista de logros =====
+.lista {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.insignia {
+.logro {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 16px 10px 12px;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid #eef0f4;
   border-radius: 16px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  text-align: center;
-  color: $suave;
+  background: #fafafa;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 
-  strong { font-size: 13px; color: #9ca3af; }
-  small { font-size: 11px; line-height: 1.3; }
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(79, 70, 229, 0.1); }
+  &--obtenido { background: #fff; border-color: #e0e7ff; }
 
-  &__icono {
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #e5e7eb;
-    color: #9ca3af;
-    mat-icon { font-size: 26px; width: 26px; height: 26px; }
+  &__texto { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+  &__titulo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  strong { font-size: 14.5px; color: $texto; }
+  small { font-size: 12.5px; color: $suave; line-height: 1.35; }
+
+  &__fecha {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600; color: #15803d;
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
   }
 
-  &__fecha { margin-top: 2px; font-size: 11px; color: #b45309; font-weight: 600; }
-
-  &--obtenida {
-    background: linear-gradient(180deg, #fffbeb, #fff);
-    border-color: #fde68a;
-    color: #78350f;
-
-    strong { color: $texto; }
-
-    .insignia__icono {
-      background: linear-gradient(135deg, $oro, #f97316);
-      color: #fff;
-      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
-    }
+  &__barra {
+    display: flex; align-items: center; gap: 8px; margin-top: 3px;
+    span { flex: none; font-size: 11.5px; font-weight: 700; color: $suave; }
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .insignia { animation: saesu-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
-  @for $i from 1 through 11 {
-    .insignia:nth-child(#{$i}) { animation-delay: #{0.1 + $i * 0.06}s; }
+.etiqueta {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 14%, #fff);
+
+  @each $n, $c in $rarezas { &--#{$n} { --c: #{$c}; } }
+  &--comun { --c: #0284c7; }
+  &--raro { --c: #16a34a; }
+  &--legendario { --c: #d97706; }
+}
+
+.barra {
+  flex: 1;
+  height: 7px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+
+  &__relleno {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--c);
+    transition: width 0.8s ease;
+    @each $n, $c in $rarezas { &--#{$n} { --c: #{$c}; } }
   }
-  .insignia--obtenida .insignia__icono { animation: saesu-latido 2.6s ease-in-out 1.2s infinite; }
-  .insignia--obtenida:hover .insignia__icono { animation: saesu-balanceo 0.6s ease-in-out; }
+}
+
+@media (max-width: 560px) {
+  .tarjeta { padding: 20px 16px; }
+  .vitrina { padding: 16px 12px; &__lista { grid-template-columns: repeat(2, 1fr); } }
+  .lista { grid-template-columns: 1fr; }
 }

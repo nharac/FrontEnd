@@ -28,7 +28,7 @@ export function saludoInicio(racha: number | null, practicoHoy: boolean): { titu
 /** Práctica: al elegir tema. */
 export const PRACTICA_INICIO = [
   'Elige un tema y vamos pregunta por pregunta. Si fallas, te doy una pista.',
-  'Acertar al primer intento vale 20 puntos. ¡Sin afán, piensa bien!',
+  'Acertar al primer intento vale 20 Puntos Sumi. ¡Sin afán, piensa bien!',
   'Si te atascas, pulsa "Pedir ayuda" y te guío sin darte la respuesta.',
 ];
 
@@ -63,7 +63,7 @@ export function reaccionResultado(porcentaje: number): {
 export const FORO = [
   '¿Te quedaste en un ejercicio? Publícalo: tus compañeros y los docentes te ayudan.',
   'Una buena pregunta incluye lo que intentaste. Así te ayudan más rápido.',
-  'Responder dudas de otros también suma puntos (hasta 3 al día).',
+  'Responder dudas de otros también suma Puntos Sumi (hasta 3 al día).',
   'Puedes adjuntar una foto del ejercicio en tu publicación.',
 ];
 
@@ -74,11 +74,11 @@ export function mensajeRanking(posicion: number | null, puntosParaSubir: number 
   if (posicion === 1) return { estado: 'celebra', titulo: '¡Vas de primero!', texto: 'Defiende el puesto: cada día de práctica cuenta.' };
   if (posicion && posicion <= 3) {
     return { estado: 'feliz', titulo: `¡Estás en el podio, #${posicion}!`,
-      texto: puntosParaSubir ? `Te faltan ${puntosParaSubir} puntos para pasar a ${siguiente ?? 'quien va arriba'}.` : 'Sigue sumando.' };
+      texto: puntosParaSubir ? `Te faltan ${puntosParaSubir} Puntos Sumi para pasar a ${siguiente ?? 'quien va arriba'}.` : 'Sigue sumando.' };
   }
   if (posicion) {
     return { estado: 'animo', titulo: `Vas en el puesto #${posicion}`,
-      texto: puntosParaSubir ? `Con ${puntosParaSubir} puntos más pasas a ${siguiente ?? 'quien va arriba'}. Una sesión de práctica puede bastar.` : 'Practica para subir.' };
+      texto: puntosParaSubir ? `Con ${puntosParaSubir} Puntos Sumi más pasas a ${siguiente ?? 'quien va arriba'}. Una sesión de práctica puede bastar.` : 'Practica para subir.' };
   }
   return { estado: 'animo', titulo: 'Todavía no apareces', texto: 'Responde unas preguntas en la práctica y entras al ranking.' };
 }

@@ -22,6 +22,7 @@
     <p class="vacio">Cargando...</p>
   } @else {
     @for (p of filtradas(); track p.id) {
+      <div class="pub-caja">
       <button type="button" class="pub" (click)="abrir(p)">
         <div class="pub__arriba">
           <span class="tema">{{ nombresTema[p.tema] || p.tema }}</span>
@@ -45,6 +46,27 @@
           <span class="pub__respuestas"><mat-icon>chat_bubble_outline</mat-icon>{{ p.respuestasCount }}</span>
         </div>
       </button>
+      @if (pendientes().has(p.id)) {
+        @if (respondiendoId() === p.id) {
+          <form class="pub-rapida" (ngSubmit)="responderRapido(p)">
+            <label class="sr-only" [attr.for]="'rapida-' + p.id">Respuesta oficial para {{ p.titulo }}</label>
+            <textarea [id]="'rapida-' + p.id" rows="3" name="texto" placeholder="Escribe la respuesta oficial…"
+                      [ngModel]="textoRapido()" (ngModelChange)="textoRapido.set($event)"></textarea>
+            <div class="pub-rapida__acciones">
+              <small><mat-icon>verified</mat-icon> Se publica y queda marcada como oficial</small>
+              <button type="button" class="dp-btn dp-btn--claro dp-btn--chico" (click)="respondiendoId.set(null)">Cancelar</button>
+              <button type="submit" class="dp-btn dp-btn--chico" [disabled]="textoRapido().trim().length < 2 || enviandoRapido()">
+                <mat-icon>send</mat-icon> {{ enviandoRapido() ? 'Enviando…' : 'Responder' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <button type="button" class="pub-rapida__abrir" (click)="abrirRapida(p.id)">
+            <mat-icon>quickreply</mat-icon> Responder aquí
+          </button>
+        }
+      }
+      </div>
     } @empty {
       <app-sumi-dice class="dp-sumi dp-sumi--vacio" [estado]="modo() === 'pendientes' ? 'celebra' : 'feliz'" accesorio="birrete"
                      [tono]="modo() === 'pendientes' ? 'exito' : 'normal'" [tamano]="92"

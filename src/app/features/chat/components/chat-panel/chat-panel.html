@@ -26,6 +26,26 @@
     </div>
   </header>
 
+  @if (fijadas().length) {
+    <div class="chat__fijadas">
+      <button type="button" class="chat__fijadas-boton" (click)="verFijadas.set(!verFijadas())" [attr.aria-expanded]="verFijadas()">
+        <mat-icon>keep</mat-icon> {{ fijadas().length }} {{ fijadas().length === 1 ? 'respuesta fijada' : 'respuestas fijadas' }}
+        <mat-icon class="chat__fijadas-flecha">{{ verFijadas() ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </button>
+      @if (verFijadas()) {
+        <ul>
+          @for (f of fijadas(); track f.id) {
+            <li>
+              <div class="burbuja__texto--rico" [innerHTML]="f.html"></div>
+              <button type="button" (click)="quitarFijada(f.id)"
+                      title="Quitar" aria-label="Quitar de fijadas"><mat-icon>close</mat-icon></button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+
   <div class="chat__mensajes" #contenedor aria-live="polite">
     @if (cargandoHistorial()) {
       <div class="chat__estado">
@@ -57,6 +77,11 @@
               <div class="burbuja__texto burbuja__texto--rico" [innerHTML]="m.html"></div>
               <div class="burbuja__pie">
                 <time>{{ m.fechaHora | date: 'shortTime' }}</time>
+                <button type="button" class="burbuja__copiar" [class.burbuja__fijar--on]="estaFijada(m)" (click)="alternarFijada(m)"
+                        [attr.aria-label]="estaFijada(m) ? 'Quitar de fijadas' : 'Fijar respuesta'"
+                        [attr.aria-pressed]="estaFijada(m)" [title]="estaFijada(m) ? 'Quitar de fijadas' : 'Fijar'">
+                  <mat-icon>{{ estaFijada(m) ? 'keep_off' : 'keep' }}</mat-icon>
+                </button>
                 <button type="button" class="burbuja__copiar" (click)="copiar(m)"
                         [attr.aria-label]="copiado() === m.id ? 'Copiado' : 'Copiar respuesta'"
                         [title]="copiado() === m.id ? 'Copiado' : 'Copiar'">
@@ -79,12 +104,37 @@
     @if (enviando()) {
       <div class="fila fila--ia">
         <span class="fila__avatar fila__avatar--sumi" aria-hidden="true"><app-mascota [tamano]="30" [animada]="false" /></span>
-        <div class="burbuja burbuja--ia burbuja--escribiendo" aria-label="El tutor está escribiendo">
-          <span></span><span></span><span></span>
+        <div class="espera">
+          <div class="burbuja burbuja--ia burbuja--escribiendo" aria-label="El tutor está escribiendo">
+            <span></span><span></span><span></span>
+          </div>
+          @if (textoEspera()) {
+            <small class="espera__texto" aria-live="polite">{{ textoEspera() }}</small>
+          }
+        </div>
+      </div>
+    }
+
+    @if (fallido(); as f) {
+      <div class="fila fila--ia">
+        <span class="fila__avatar fila__avatar--sumi" aria-hidden="true"><app-mascota estado="nervioso" [tamano]="30" [animada]="false" /></span>
+        <div class="burbuja burbuja--ia burbuja--fallo" role="alert">
+          <p class="burbuja__texto"><strong>{{ f.motivo }}</strong><br>Tu mensaje no se perdió. ¿Lo intento otra vez?</p>
+          <button type="button" class="burbuja__reintentar" (click)="reintentar()" [disabled]="enviando()">
+            <mat-icon>refresh</mat-icon> Reintentar
+          </button>
         </div>
       </div>
     }
   </div>
+
+  @if (mensajes().length && mensajesRestantes() !== 0) {
+    <div class="chat__seguir" aria-label="Seguir la conversación">
+      @for (s of seguimientos; track s.texto) {
+        <button type="button" (click)="usarSugerencia(s.texto)" [disabled]="enviando()"><mat-icon>{{ s.icono }}</mat-icon> {{ s.texto }}</button>
+      }
+    </div>
+  }
 
   <form class="chat__entrada" (ngSubmit)="enviar()">
     <div class="chat__caja">

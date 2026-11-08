@@ -217,3 +217,16 @@ app-dashboard-estudiante {
     mat-icon { font-size: 18px; width: 18px; height: 18px; }
     &:hover { background: #fff; } }
 }
+
+// ---------- Reloj del quiz en anillo (índigo → ámbar → rojo) ----------
+app-quiz {
+  .qz-reloj__anillo { width: 24px; height: 24px; transform: rotate(-90deg); flex: none; }
+  .qz-reloj__pista { fill: none; stroke: #e0e7ff; stroke-width: 4; }
+  .qz-reloj__resto { fill: none; stroke: #4f46e5; stroke-width: 4; stroke-linecap: round; transition: stroke-dasharray 0.25s linear, stroke 0.3s; }
+  .qz-barra--medio {
+    .qz-reloj { color: #b45309; background: #fffbeb; }
+    .qz-reloj__resto { stroke: #f59e0b; }
+    .qz-barra__tiempo span { background: #f59e0b; }
+  }
+  .qz-barra--poco .qz-reloj__resto { stroke: #dc2626; }
+}

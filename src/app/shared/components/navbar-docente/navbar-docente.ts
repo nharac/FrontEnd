@@ -1,5 +1,6 @@
 import { Logo } from '../logo/logo';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { BotonTema } from '../boton-tema/boton-tema';
+import { Component, DestroyRef, OnInit, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, interval } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -10,11 +11,13 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { AuthService } from '../../../features/usuario/services/auth.service';
 import { DocenteService } from '../../../features/docente/services/docente.service';
+import { DespedidaService } from '../../../core/services/despedida.service';
+import { PerfilService } from '../../../core/services/perfil.service';
 
 @Component({
   selector: 'app-navbar-docente',
   standalone: true,
-  imports: [Logo, 
+  imports: [Logo, BotonTema, 
     CommonModule,
     RouterLink,
     RouterLinkActive,
@@ -28,13 +31,17 @@ import { DocenteService } from '../../../features/docente/services/docente.servi
 export class NavbarDocente implements OnInit {
 
   private authService = inject(AuthService);
+  private despedida = inject(DespedidaService);
   private docenteService = inject(DocenteService);
   private router = inject(Router);
+  private perfilService = inject(PerfilService);
 
   private destroyRef = inject(DestroyRef);
 
-  nombreDocente = signal('Docente');
-  iniciales = signal('D');
+  /** Nombre, iniciales y foto del docente (se actualizan al editar el perfil). */
+  nombreDocente = computed(() => this.perfilService.usuario()?.nombre || 'Docente');
+  iniciales = computed(() => this.perfilService.iniciales() || 'D');
+  foto = this.perfilService.fotoUrl;
   /** Consultas sin respuesta oficial (badge rojo). */
   pendientes = this.docenteService.pendientes;
 
@@ -47,18 +54,16 @@ export class NavbarDocente implements OnInit {
       .subscribe(() => this.docenteService.refrescarPendientes());
 
     // Nombre real del docente que inició sesión (GET /api/auth/perfil)
-    this.docenteService.obtenerPerfil().subscribe({
-      next: (u) => {
-        this.nombreDocente.set(u.nombre);
-        const partes = u.nombre.trim().split(/\s+/);
-        this.iniciales.set((partes[0][0] + (partes.length > 1 ? partes[partes.length - 1][0] : '')).toUpperCase());
-      }
-    });
+    this.perfilService.cargar();
   }
 
+  /** Sumi se despide y, mientras cubre la pantalla, se cierra la sesión. */
   logout(): void {
-    this.docenteService.limpiarCache();
-    this.authService.logout();
-    void this.router.navigate(['/auth']);
+    this.despedida.cerrarSesion(this.nombreDocente(), () => {
+      this.docenteService.limpiarCache();
+      this.perfilService.limpiar();
+      this.authService.logout();
+      void this.router.navigate(['/auth']);
+    });
   }
 }

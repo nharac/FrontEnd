@@ -1,7 +1,12 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
   <app-logo class="form-logo" [size]="56" />
-  <h1>Iniciar sesión</h1>
-  <p class="subtitle">Accede a tu cuenta de SAESU</p>
+  @if (recordado(); as r) {
+    <h1>¡Hola de nuevo, {{ r.nombre }}!</h1>
+    <p class="subtitle">Solo falta tu contraseña · <button type="button" class="no-soy-yo" (click)="olvidar()">No soy yo</button></p>
+  } @else {
+    <h1>Iniciar sesión</h1>
+    <p class="subtitle">Accede a tu cuenta de SAESU</p>
+  }
 
   <div class="input-group">
     <mat-icon>mail</mat-icon>
@@ -23,6 +28,11 @@
     La contraseña debe tener mínimo 8 caracteres
   </small>
 
+  <label class="recordar">
+    <input type="checkbox" [checked]="recordar()" (change)="recordar.set($any($event.target).checked)">
+    <span>Recordar mi correo en este equipo</span>
+  </label>
+
   <a class="forgot-pass" routerLink="/auth/recuperar" [queryParams]="correo?.valid ? { correo: correo?.value } : {}">¿Olvidaste tu contraseña?</a>
 
   <button type="submit" class="btn" [disabled]="cargando()">
@@ -32,4 +42,7 @@
       Ingresar <mat-icon>arrow_forward</mat-icon>
     }
   </button>
+
+  <!-- En el celular no hay panel morado: se cambia de formulario con este enlace -->
+  <p class="cambiar-modo">¿No tienes cuenta? <button type="button" (click)="cambiarModo.emit()">Crea una aquí</button></p>
 </form>

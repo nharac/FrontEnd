@@ -1,8 +1,14 @@
 <section class="tarjeta logros">
   <div class="logros__cabecera">
-    <h2><mat-icon>emoji_events</mat-icon> Mis logros</h2>
-    @if (!cargando() && !error()) {
-      <span class="logros__contador">{{ obtenidos() }} de {{ logros().length }}</span>
+    <div>
+      <h2><mat-icon>emoji_events</mat-icon> Mis logros</h2>
+      <p class="logros__sub">Cada reto que cumples suma una insignia a tu colección.</p>
+    </div>
+    @if (!cargando() && !error() && logros().length) {
+      <div class="anillo" [style.--p]="porcentaje()" role="img"
+           [attr.aria-label]="obtenidos() + ' de ' + total() + ' logros'">
+        <strong>{{ obtenidos() }}</strong><small>de {{ total() }}</small>
+      </div>
     }
   </div>
 
@@ -11,22 +17,90 @@
   } @else if (error()) {
     <p class="logros__estado">No se pudieron cargar los logros.</p>
   } @else {
-    <div class="barra" aria-hidden="true"><div class="barra__relleno" [style.width.%]="porcentaje()"></div></div>
-
-    <ul class="insignias">
-      @for (l of logros(); track l.codigo) {
-        <li class="insignia" [class.insignia--obtenida]="l.obtenido"
-            [attr.aria-label]="l.nombre + (l.obtenido ? ', obtenido' : ', pendiente') + ': ' + l.descripcion">
-          <span class="insignia__icono">
-            <mat-icon>{{ l.obtenido ? l.icono : 'lock' }}</mat-icon>
-          </span>
-          <strong>{{ l.nombre }}</strong>
-          <small>{{ l.descripcion }}</small>
-          @if (l.obtenido && l.fechaObtenido) {
-            <time class="insignia__fecha">{{ l.fechaObtenido | date: 'dd/MM/yyyy' }}</time>
-          }
+    <ul class="rarezas">
+      @for (r of porRareza(); track r.rareza) {
+        <li class="rareza rareza--{{ r.rareza.toLowerCase() }}">
+          <span class="rareza__punto"></span> {{ r.nombre }} <b>{{ r.tiene }}/{{ r.total }}</b>
         </li>
       }
     </ul>
+
+    <!-- ===== Insignias especiales ===== -->
+    @if (retos().length) {
+      <section class="vitrina" aria-labelledby="titulo-vitrina">
+        <h3 id="titulo-vitrina"><mat-icon>auto_awesome</mat-icon> Insignias especiales</h3>
+        <p class="vitrina__sub">Los retos más difíciles de SAESU. Solo los verdaderos maestros del cálculo las consiguen… ¡y algunas son secretas!</p>
+        <ul class="vitrina__lista">
+          @for (l of retos(); track l.codigo) {
+            <li class="reto" [class.reto--obtenido]="l.obtenido" [class.reto--exclusivo]="l.rareza === 'EXCLUSIVO'"
+                [attr.aria-label]="etiqueta(l)">
+              @if (l.rareza === 'EXCLUSIVO') { <span class="reto__cinta">Exclusiva</span> }
+              <app-insignia [logro]="l" [tamano]="l.rareza === 'EXCLUSIVO' ? 96 : 78" />
+              <strong>{{ l.nombre }}</strong>
+              <small>{{ l.descripcion }}</small>
+              @if (l.obtenido) {
+                <span class="reto__fecha"><mat-icon>check_circle</mat-icon> {{ l.fechaObtenido | date: 'dd/MM/yyyy' }}</span>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- ===== Filtros ===== -->
+    <div class="filtros">
+      <div class="pestanas" role="group" aria-label="Categoría">
+        <button type="button" class="pestana" [class.pestana--activa]="categoria() === 'TODOS'"
+                [attr.aria-pressed]="categoria() === 'TODOS'" (click)="categoria.set('TODOS')">
+          Todos <span>{{ conteo()['TODOS'].tiene }}/{{ conteo()['TODOS'].total }}</span>
+        </button>
+        @for (c of categorias; track c.id) {
+          @if (conteo()[c.id]; as n) {
+            <button type="button" class="pestana" [class.pestana--activa]="categoria() === c.id"
+                    [attr.aria-pressed]="categoria() === c.id" (click)="categoria.set(c.id)">
+              <mat-icon>{{ c.icono }}</mat-icon> {{ c.nombre }} <span>{{ n.tiene }}/{{ n.total }}</span>
+            </button>
+          }
+        }
+      </div>
+      <div class="segmento" role="group" aria-label="Estado">
+        @for (e of ['todos', 'obtenidos', 'pendientes']; track e) {
+          <button type="button" [class.segmento--activo]="estado() === e" [attr.aria-pressed]="estado() === e"
+                  (click)="estado.set($any(e))">{{ e === 'todos' ? 'Todos' : e === 'obtenidos' ? 'Obtenidos' : 'Pendientes' }}</button>
+        }
+      </div>
+    </div>
+
+    <!-- ===== Logros ===== -->
+    @if (visibles().length) {
+      <ul class="lista">
+        @for (l of visibles(); track l.codigo) {
+          <li class="logro" [class.logro--obtenido]="l.obtenido" [attr.aria-label]="etiqueta(l)">
+            <app-insignia [logro]="l" [tamano]="58" />
+            <div class="logro__texto">
+              <div class="logro__titulo">
+                <strong>{{ l.nombre }}</strong>
+                <span class="etiqueta etiqueta--{{ l.rareza.toLowerCase() }}">{{ nombreRareza(l.rareza) }}</span>
+              </div>
+              <small>{{ l.descripcion }}</small>
+              @if (l.obtenido) {
+                <span class="logro__fecha"><mat-icon>check_circle</mat-icon> Obtenido el {{ l.fechaObtenido | date: 'dd/MM/yyyy' }}</span>
+              } @else {
+                <div class="logro__barra">
+                  <div class="barra" aria-hidden="true">
+                    <div class="barra__relleno barra__relleno--{{ l.rareza.toLowerCase() }}" [style.width.%]="avance(l)"></div>
+                  </div>
+                  <span>{{ l.progreso | number }} / {{ l.meta | number }}</span>
+                </div>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="logros__vacio">
+        {{ estado() === 'obtenidos' ? 'Todavía no tienes logros en esta categoría. ¡Tú puedes!' : '¡Los tienes todos en esta categoría! 🎉' }}
+      </p>
+    }
   }
 </section>

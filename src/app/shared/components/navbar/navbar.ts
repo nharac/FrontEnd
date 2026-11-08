@@ -1,4 +1,5 @@
 import { Logo } from '../logo/logo';
+import { BotonTema } from '../boton-tema/boton-tema';
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -9,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../features/usuario/services/auth.service';
 import { TokenService } from '../../../core/services/token.service';
 import { PerfilService } from '../../../core/services/perfil.service';
+import { DespedidaService } from '../../../core/services/despedida.service';
 import { RankingService } from '../../../features/gamificacion/services/ranking.service';
 import { Medalla } from '../medalla/medalla';
 import { esEstudiante } from '../../utils/rol';
@@ -16,7 +18,7 @@ import { esEstudiante } from '../../utils/rol';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [Logo, 
+  imports: [Logo, BotonTema, 
     CommonModule,
     RouterLink,
     RouterLinkActive,
@@ -34,6 +36,7 @@ export class Navbar implements OnInit {
   private tokenService = inject(TokenService);
   private perfilService = inject(PerfilService);
   private router = inject(Router);
+  private despedida = inject(DespedidaService);
 
   /** Primer nombre del usuario autenticado (GET /api/auth/perfil). */
   readonly nombreUsuario = this.perfilService.primerNombre;
@@ -55,9 +58,12 @@ export class Navbar implements OnInit {
     return this.nombreUsuario().charAt(0).toUpperCase();
   }
 
+  /** Sumi se despide y, mientras cubre la pantalla, se cierra la sesión. */
   logout(): void {
-    this.perfilService.limpiar();
-    this.authService.logout();
-    void this.router.navigate(['/auth']);
+    this.despedida.cerrarSesion(this.nombreUsuario(), () => {
+      this.perfilService.limpiar();
+      this.authService.logout();
+      void this.router.navigate(['/auth']);
+    });
   }
 }

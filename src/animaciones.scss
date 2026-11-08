@@ -381,3 +381,11 @@ $saesu-tam: (34px, 22px, 40px, 26px, 30px, 20px, 36px, 24px, 28px, 42px, 22px, 3
   .saesu-confeti { display: none !important; }
   .saesu-entra { animation: none; }
 }
+
+/* Aviso de cuarentena de Microsoft en "Confirma tu correo" */
+.cuarentena {
+  display: flex; gap: 8px; margin: 2px 0 0; padding: 10px 12px; border-radius: 12px;
+  background: #fffbeb; border: 1px solid #fde68a; color: #78350f; font-size: 12px; line-height: 1.5; text-align: left;
+  mat-icon { flex: none; width: 18px; height: 18px; font-size: 18px; color: #d97706; }
+  a { color: #b45309; font-weight: 600; word-break: break-all; }
+}

@@ -17,11 +17,10 @@
 
   @if (!listo()) {
     <form class="paso" (ngSubmit)="verificar()" novalidate>
-      <span class="sobre" aria-hidden="true"><mat-icon>mark_email_unread</mat-icon></span>
       <h1>Confirma tu correo</h1>
-      <p class="subtitulo">
-        Te enviamos un código de 6 dígitos a <b>{{ correoOculto() }}</b>. Tu cuenta se crea cuando lo escribas. Vence en 15 minutos.
-      </p>
+      <app-sumi-dice class="auth-sumi" compacto [tamano]="62" [aleatorio]="false"
+                     [estado]="sumi().estado" [titulo]="sumi().titulo" [mensajes]="sumi().texto" [tono]="sumi().tono" />
+      <p class="subtitulo">Código enviado a <b>{{ correoOculto() }}</b> · vence en 15 minutos</p>
 
       <div class="codigo" (paste)="pegar($event)" role="group" aria-label="Código de 6 dígitos">
         @for (i of posiciones; track i) {
@@ -48,12 +47,17 @@
           <button type="button" class="enlace" [disabled]="enviando()" (click)="reenviar()">envía un código nuevo</button>
         }
       </p>
+
+      <p class="cuarentena">
+        <mat-icon aria-hidden="true">shield</mat-icon>
+        <span>¿Usas tu correo de la universidad? A veces Microsoft deja el mensaje en cuarentena. Revisa
+          <a href="https://security.microsoft.com/quarantine" target="_blank" rel="noopener">security.microsoft.com/quarantine</a>
+          y libera el correo de SAESU.</span>
+      </p>
     </form>
   } @else {
     <div class="paso listo">
-      <span class="listo__check" aria-hidden="true">
-        <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" /><path d="M15 27 l7 7 l15 -16" /></svg>
-      </span>
+      <app-mascota class="listo__sumi" estado="celebra" accesorio="birrete" [tamano]="120" etiqueta="Sumi celebrando" />
       <h1>¡Cuenta creada!</h1>
       <p class="subtitulo">Tu correo quedó verificado y tu cuenta está lista. Te llevamos a SAESU…</p>
     </div>

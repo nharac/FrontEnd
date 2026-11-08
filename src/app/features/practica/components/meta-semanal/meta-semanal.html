@@ -1,0 +1,60 @@
+<section class="tarjeta meta" [class.meta--cumplida]="datos()?.cumplida">
+  @if (datos()?.cumplida) { <app-confeti [cantidad]="30" [alcance]="160" /> }
+  <div class="meta__cabecera">
+    <h2><mat-icon>flag_circle</mat-icon> Meta semanal</h2>
+    @if (datos() && !editando()) {
+      <button type="button" class="meta__editar" (click)="editando.set(true)">
+        <mat-icon>edit</mat-icon> Cambiar
+      </button>
+    }
+  </div>
+
+  @if (error()) {
+    <p class="meta__estado">No se pudo cargar tu meta.</p>
+  } @else if (datos(); as d) {
+    @if (editando()) {
+      <div class="meta__editor">
+        <p>¿Cuántas preguntas quieres responder por semana?</p>
+        <div class="meta__opciones" role="group" aria-label="Metas sugeridas">
+          @for (n of sugeridas; track n) {
+            <button type="button" class="meta__opcion" [class.meta__opcion--activa]="n === d.meta"
+                    [disabled]="guardando()" (click)="guardar(n)">{{ n }}</button>
+          }
+        </div>
+        <div class="meta__otra">
+          <label for="meta-otra">Otra</label>
+          <input id="meta-otra" type="number" [min]="min" [max]="max" [(ngModel)]="otra" placeholder="{{ min }}–{{ max }}">
+          <button type="button" class="btn" [disabled]="guardando() || otra == null" (click)="guardar(otra)">Guardar</button>
+          <button type="button" class="meta__cancelar" (click)="editando.set(false)">Cancelar</button>
+        </div>
+      </div>
+    } @else {
+      <div class="meta__cuerpo">
+        <div class="meta__anillo" [style.--p]="avancePct()" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+             [attr.aria-valuenow]="avancePct()" [attr.aria-label]="d.respondidas + ' de ' + d.meta + ' preguntas esta semana'">
+          <strong>{{ d.respondidas }}</strong>
+          <small>de {{ d.meta }}</small>
+        </div>
+        <div class="meta__texto">
+          <p class="meta__linea">
+            @if (d.cumplida) {
+              <b>¡Cumplida!</b>
+            } @else {
+              Te faltan <b>{{ faltan() }}</b> {{ faltan() === 1 ? 'pregunta' : 'preguntas' }}
+            }
+          </p>
+          <p class="meta__sub">
+            <mat-icon>schedule</mat-icon>
+            {{ d.diasRestantes === 1 ? 'Hoy es el último día' : 'Quedan ' + d.diasRestantes + ' días' }} · {{ d.aciertos }} aciertos
+          </p>
+        </div>
+      </div>
+      <div class="meta__sumi">
+        <app-mascota [estado]="mensaje().estado" [tamano]="58" [animada]="d.cumplida" />
+        <p>{{ mensaje().texto }}</p>
+      </div>
+    }
+  } @else {
+    <p class="meta__estado">Cargando meta...</p>
+  }
+</section>

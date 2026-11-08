@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { afterEach, describe, expect, it } from 'vitest';
 import { montar, texto, limpiar, peticiones } from './montar.testing';
 import { DashboardEstudiante } from '../features/practica/pages/dashboard-estudiante/dashboard-estudiante';
@@ -48,7 +49,42 @@ describe('Pantallas del estudiante', () => {
 
   it('perfil', async () => {
     const f = await montar(Perfil);
-    expect(texto(f)).toContain('Ana');
+    const t = texto(f);
+    expect(t).toContain('Ana');
+    // nivel, cifras, temas, próximos logros y la colección
+    expect(t).toContain('Nivel');
+    expect(t).toContain('Precisión');
+    expect(t).toContain('64%');               // 9 correctas de 14 respondidas
+    expect(t).toContain('Insignias especiales');
+    expect(t).toContain('Tus próximos logros');
+    expect(t).toContain('Centenario');
+    expect(t).toContain('Excelente');         // límites: 80 %
+    expect(t).toContain('Por empezar');       // integrales: sin respuestas
+    // Meta semanal, calendario y fortalezas
+    expect(t).toContain('Meta semanal');
+    expect(t).toContain('Mi actividad');
+    expect(t).toContain('Fortalezas y debilidades');
+    // Sin la insignia exclusiva no hay distintivo de desarrollador
+    expect(f.nativeElement.querySelector('.cabecera app-sumi-dev')).toBeNull();
+    const c = f.componentInstance as any;
+    c.logros.update((l: any[]) => [...l, { codigo: 'DESARROLLADOR', nombre: 'Desarrollador de SAESU', descripcion: 'd', icono: 'code_blocks',
+      categoria: 'RETOS', rareza: 'EXCLUSIVO', secreto: false, obtenido: true, fechaObtenido: '2026-10-01', progreso: 1, meta: 1 }]);
+    f.detectChanges();
+    const dev = f.nativeElement.querySelector('.cabecera h1 app-sumi-dev .dev');
+    expect(dev.getAttribute('aria-label')).toContain('Desarrollador de SAESU');
+    expect(f.nativeElement.querySelector('.cabecera h1').textContent).not.toContain('Desarrollador');
+    expect(f.nativeElement.querySelector('.foto').className).toContain('foto--dev');
+    expect(c.logrosObtenidos()).toBe(3); // la exclusiva no suma a "Logros"
+  });
+
+  it('práctica llega con el tema y la dificultad recomendados', async () => {
+    const f = await montar(DashboardPractica, { query: { tema: 'derivadas', dificultad: 'avanzado' } });
+    const c = f.componentInstance as any;
+    expect(c.temaElegido()).toBe('derivadas');
+    expect(c.dificultadElegida()).toBe('avanzado');
+    TestBed.resetTestingModule();
+    const g = await montar(DashboardPractica, { query: { tema: 'derivadas', dificultad: 'imposible' } });
+    expect((g.componentInstance as any).dificultadElegida()).toBeNull();
   });
 
   it('ranking', async () => {

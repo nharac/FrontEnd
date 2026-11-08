@@ -1,7 +1,7 @@
 import { Component, OnDestroy, effect, input, signal, untracked } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 
-import { Logro } from '../../models/logro.model';
+import { Logro, RAREZAS } from '../../models/logro.model';
+import { Insignia } from '../insignia/insignia';
 import { Confeti } from '../../../../shared/components/confeti/confeti';
 
 /**
@@ -10,14 +10,14 @@ import { Confeti } from '../../../../shared/components/confeti/confeti';
  */
 @Component({
   selector: 'app-logro-aviso',
-  imports: [MatIconModule, Confeti],
+  imports: [Confeti, Insignia],
   template: `
     @if (visible(); as l) {
       <div class="aviso" role="status" aria-live="polite">
         <app-confeti [cantidad]="24" [alcance]="180" />
-        <span class="aviso__icono"><mat-icon>{{ l.icono }}</mat-icon></span>
+        <app-insignia class="aviso__icono" [logro]="l" [tamano]="56" />
         <div>
-          <small>¡Logro desbloqueado!</small>
+          <small>{{ l.rareza === 'EXCLUSIVO' ? '¡Insignia exclusiva!' : l.categoria === 'RETOS' ? '¡Insignia especial desbloqueada!' : '¡Logro desbloqueado!' }}{{ rareza(l) ? ' · ' + rareza(l) : '' }}</small>
           <strong>{{ l.nombre }}</strong>
           <span>{{ l.descripcion }}</span>
         </div>
@@ -47,13 +47,7 @@ import { Confeti } from '../../../../shared/components/confeti/confeti';
     strong { font-size: 16px; }
     span { font-size: 13px; color: #d1d5db; }
     .aviso__icono {
-      display: grid;
-      place-items: center;
       flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #f59e0b, #f97316);
       animation: girar 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
     }
     @keyframes entrar {
@@ -74,6 +68,8 @@ export class LogroAviso implements OnDestroy {
   logros = input<Logro[]>([]);
 
   visible = signal<Logro | null>(null);
+  /** Nombre de la rareza ("Épico"), o vacío si no viene. */
+  rareza = (l: Logro) => RAREZAS[l.rareza]?.nombre ?? '';
   private cola: Logro[] = [];
   private timer: ReturnType<typeof setTimeout> | undefined;
 

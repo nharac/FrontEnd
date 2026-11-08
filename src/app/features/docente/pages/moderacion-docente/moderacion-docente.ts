@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocenteService } from '../../services/docente.service';
 import { ContenidoOculto } from '../../models/docente.model';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 
 /**
  * /docente/moderacion
@@ -13,7 +14,7 @@ import { haceCuanto } from '../../../../shared/utils/tiempo';
  */
 @Component({
   selector: 'app-moderacion-docente',
-  imports: [RouterLink, MatIconModule],
+  imports: [RouterLink, MatIconModule, SumiDice],
   templateUrl: './moderacion-docente.html',
   styleUrl: './moderacion-docente.scss',
 })
@@ -26,6 +27,8 @@ export class ModeracionDocente implements OnInit {
   cargando = signal(true);
   error = signal(false);
   procesando = signal<string | null>(null);
+  /** Elemento en el que se está confirmando la eliminación. */
+  confirmando = signal<string | null>(null);
 
   readonly haceCuanto = haceCuanto;
 
@@ -65,6 +68,27 @@ export class ModeracionDocente implements OnInit {
       error: (err) => {
         this.procesando.set(null);
         this.snackBar.open(err?.message || 'No se pudo restaurar', 'Cerrar', { duration: 3500 });
+      }
+    });
+  }
+
+  /** Elimina para siempre (no se puede restaurar). Pide confirmación antes en la plantilla. */
+  eliminar(i: ContenidoOculto): void {
+    this.procesando.set(this.clave(i));
+    const peticion = i.tipo === 'PUBLICACION'
+      ? this.docenteService.eliminarPublicacion(i.id)
+      : this.docenteService.eliminarRespuesta(i.id);
+    peticion.subscribe({
+      next: () => {
+        this.procesando.set(null);
+        this.confirmando.set(null);
+        this.items.update(lista => lista.filter(x => this.clave(x) !== this.clave(i)));
+        this.snackBar.open(i.tipo === 'PUBLICACION' ? 'Publicación eliminada para siempre' : 'Respuesta eliminada para siempre',
+          'Cerrar', { duration: 3000 });
+      },
+      error: (err) => {
+        this.procesando.set(null);
+        this.snackBar.open(err?.message || 'No se pudo eliminar', 'Cerrar', { duration: 3500 });
       }
     });
   }

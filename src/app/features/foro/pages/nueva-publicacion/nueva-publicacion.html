@@ -40,6 +40,15 @@
       @if (contenido.touched && contenido.invalid) {
         <small class="error">Escribe al menos 10 caracteres para que te puedan ayudar</small>
       }
+      <small class="fo-form__ayuda-tex">
+        <mat-icon>function</mat-icon> Escribe fórmulas entre signos de dólar: <code>$x^2 + 3x$</code> o <code>$\frac{{ '{' }}1{{ '}' }}{{ '{' }}x{{ '}' }}$</code>
+      </small>
+      @if (tieneFormulas()) {
+        <div class="fo-form__tex" aria-live="polite">
+          <span><mat-icon>visibility</mat-icon> Así se verá</span>
+          <div [appTextoRico]="valores().contenido"></div>
+        </div>
+      }
 
       <span class="fo-form__etiqueta">Imagen del ejercicio <small>(opcional)</small></span>
       @if (vistaPrevia(); as src) {

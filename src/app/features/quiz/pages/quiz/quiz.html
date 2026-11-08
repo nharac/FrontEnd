@@ -52,7 +52,7 @@
             @if (empezando()) { <span class="qz-girando" aria-hidden="true"></span> Preparando… }
             @else { <mat-icon>play_arrow</mat-icon> Empezar quiz }
           </button>
-          <p class="qz-nota">El quiz es para medirte: no suma puntos del ranking. Para ganar puntos usa la <a routerLink="/practica">práctica</a>.</p>
+          <p class="qz-nota">El quiz es para medirte: no suma Puntos Sumi del ranking. Para ganarlos usa la <a routerLink="/practica">práctica</a>.</p>
         </section>
 
         <aside class="qz-caja qz-historial" aria-labelledby="qz-hist-titulo">
@@ -101,14 +101,19 @@
     <!-- ================= En curso ================= -->
     @case ('en-curso') {
       @if (quiz(); as q) {
-        <div class="qz-barra" [class.qz-barra--poco]="poco()">
+        <div class="qz-barra" [class.qz-barra--poco]="poco()" [class.qz-barra--medio]="medio()">
           <app-mascota class="qz-barra__sumi" [estado]="estadoEnCurso()" accesorio="cronometro" [tamano]="46" />
           <div class="qz-barra__info">
             <span class="qz-barra__tema">{{ nombreTema(q.tema) }}</span>
             <span class="qz-barra__progreso">{{ respondidas() }}/{{ q.cantidad }}<span> respondidas</span></span>
           </div>
           <div class="qz-reloj" role="timer" [attr.aria-label]="'Tiempo restante ' + reloj(restante())">
-            <mat-icon>timer</mat-icon>
+            <!-- Anillo que se vacía: índigo, ámbar con la cuarta parte del tiempo y rojo en el último minuto -->
+            <svg class="qz-reloj__anillo" viewBox="0 0 36 36" aria-hidden="true">
+              <circle cx="18" cy="18" r="15" pathLength="100" class="qz-reloj__pista" />
+              <circle cx="18" cy="18" r="15" pathLength="100" class="qz-reloj__resto"
+                      [attr.stroke-dasharray]="(fraccionTiempo() * 100) + ' 100'" />
+            </svg>
             <span>{{ reloj(restante()) }}</span>
           </div>
           <button type="button" class="qz-btn qz-btn--claro" (click)="pedirEntrega()" [disabled]="entregando()">Entregar</button>

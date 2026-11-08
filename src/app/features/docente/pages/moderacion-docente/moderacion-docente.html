@@ -2,10 +2,19 @@
   <header class="dp-cabecera">
     <div>
       <h1>Moderación del foro</h1>
-      <p>Contenido que ocultaste. Los estudiantes no lo ven; puedes restaurarlo cuando quieras.</p>
+      <p>Contenido que ocultaste. Los estudiantes no lo ven; puedes restaurarlo o eliminarlo para siempre.</p>
     </div>
     <a class="dp-btn dp-btn--claro" routerLink="/docente/foro"><mat-icon>forum</mat-icon> Ir al foro</a>
   </header>
+
+  @if (!cargando() && !error()) {
+    <app-sumi-dice class="dp-sumi" accesorio="lupa" compacto [aleatorio]="false"
+                   [estado]="items().length ? 'pensando' : 'feliz'" [tono]="items().length ? 'normal' : 'exito'"
+                   [titulo]="items().length ? items().length + (items().length === 1 ? ' elemento oculto' : ' elementos ocultos') : 'El foro está en orden'"
+                   [mensajes]="items().length
+                     ? 'Si algo se ocultó por error, restáuralo. Si es spam o no aporta, elimínalo para siempre.'
+                     : 'No has ocultado nada. Si ves algo fuera de lugar en el foro, ábrelo y toca «Ocultar».'" />
+  }
 
   @if (error()) {
     <p class="dp-aviso-error">No se pudo cargar el contenido oculto.</p>
@@ -28,9 +37,25 @@
               Escrita por <b>{{ i.autor }}</b> {{ haceCuanto(i.fechaCreacion) }} ·
               ocultada{{ i.ocultadoPor ? ' por ' + i.ocultadoPor : '' }} {{ i.fechaOculta ? haceCuanto(i.fechaOculta) : '' }}
             </small>
-            <button type="button" class="dp-btn dp-btn--claro dp-btn--chico" [disabled]="procesando() === clave(i)" (click)="restaurar(i)">
-              <mat-icon>restore</mat-icon> Restaurar
-            </button>
+            <div class="item__acciones">
+              @if (confirmando() === clave(i)) {
+                <span class="item__pregunta">
+                  ¿Eliminar {{ i.tipo === 'PUBLICACION' ? 'la publicación y sus respuestas' : 'la respuesta' }}? No se puede deshacer.
+                </span>
+                <button type="button" class="dp-btn dp-btn--rojo dp-btn--chico" [disabled]="procesando() === clave(i)" (click)="eliminar(i)">
+                  <mat-icon>delete_forever</mat-icon> {{ procesando() === clave(i) ? 'Eliminando…' : 'Sí, eliminar' }}
+                </button>
+                <button type="button" class="dp-btn dp-btn--claro dp-btn--chico" (click)="confirmando.set(null)">Cancelar</button>
+              } @else {
+                <button type="button" class="dp-btn dp-btn--claro dp-btn--chico" [disabled]="procesando() === clave(i)" (click)="restaurar(i)">
+                  <mat-icon>restore</mat-icon> Restaurar
+                </button>
+                <button type="button" class="dp-btn dp-btn--peligro dp-btn--chico" [disabled]="procesando() === clave(i)"
+                        (click)="confirmando.set(clave(i))">
+                  <mat-icon>delete_outline</mat-icon> Eliminar
+                </button>
+              }
+            </div>
           </div>
         </article>
       } @empty {

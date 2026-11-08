@@ -20,8 +20,8 @@
   <!-- ===== Cifras ===== -->
   <section class="cifras">
     <a class="cifra cifra--ambar" routerLink="/ranking">
-      <span class="cifra__icono"><mat-icon>stars</mat-icon></span>
-      <div><strong [appContador]="puntos()"></strong><small>Puntos</small></div>
+      <span class="cifra__icono"><app-puntos-sumi [tamano]="30" destacado /></span>
+      <div><strong [appContador]="puntos()"></strong><small>Puntos Sumi</small></div>
     </a>
     <div class="cifra cifra--verde">
       <span class="cifra__icono"><mat-icon>task_alt</mat-icon></span>
@@ -29,7 +29,7 @@
     </div>
     <a class="cifra cifra--morado" routerLink="/perfil">
       <span class="cifra__icono"><mat-icon>emoji_events</mat-icon></span>
-      <div><strong>{{ logrosObtenidos() }}<span class="cifra__de">/{{ logros().length || 11 }}</span></strong><small>Logros</small></div>
+      <div><strong>{{ logrosObtenidos() }}<span class="cifra__de">/{{ logros().length || 40 }}</span></strong><small>Logros</small></div>
     </a>
     <a class="cifra" routerLink="/ranking">
       <span class="cifra__icono"><mat-icon>leaderboard</mat-icon></span>
@@ -62,7 +62,7 @@
           </div>
         }
         <div class="hoy__pie">
-          <span><mat-icon>schedule</mat-icon> ~{{ minutosEstimados }} min · hasta 20 pts por pregunta</span>
+          <span><mat-icon>schedule</mat-icon> ~{{ minutosEstimados }} min · hasta 20 Puntos Sumi por pregunta</span>
           <div class="hoy__acciones">
             <a class="hoy__quiz" routerLink="/quiz"><mat-icon>timer</mat-icon> Hacer un quiz</a>
             <button type="button" class="hoy__btn" (click)="irAPractica()">
@@ -71,6 +71,9 @@
           </div>
         </div>
       </section>
+
+      <!-- ===== Reto del día ===== -->
+      <app-reto-dia />
 
       <!-- ===== Progreso por tema ===== -->
       <section class="bloque">
@@ -116,9 +119,9 @@
       <!-- ===== Próximo logro ===== -->
       @if (proximoLogro(); as l) {
         <section class="bloque logro">
-          <span class="logro__icono"><mat-icon>{{ l.icono }}</mat-icon></span>
+          <app-insignia [logro]="l" [tamano]="56" />
           <div>
-            <small>Próximo logro</small>
+            <small>Próximo logro · {{ l.progreso }} / {{ l.meta }}</small>
             <strong>{{ l.nombre }}</strong>
             <p>{{ l.descripcion }}</p>
           </div>
@@ -150,7 +153,7 @@
                   <app-medalla [lugar]="i + 1" tamano="sm" />
                 </span>
                 <span class="ranking__nombre">{{ p.nombre }}</span>
-                <b>{{ p.puntosTotales }}</b>
+                <b title="Puntos Sumi"><app-puntos-sumi [tamano]="14" /> {{ p.puntosTotales }}</b>
               </li>
             }
           </ol>

@@ -158,6 +158,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/docente/pages/moderacion-docente/moderacion-docente')
             .then(m => m.ModeracionDocente)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/docente/pages/perfil-docente/perfil-docente')
+            .then(m => m.PerfilDocente)
       }
     ]
   },
@@ -172,6 +178,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'auth'
+    loadComponent: () =>
+      import('./shared/components/no-encontrada/no-encontrada').then(m => m.NoEncontrada)
   }
 ];

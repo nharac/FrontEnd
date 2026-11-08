@@ -7,7 +7,8 @@ import { Aviso } from '../shared/components/aviso/aviso';
 import { SumiDice } from '../shared/components/sumi-dice/sumi-dice';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const logro = (codigo: string) => ({ codigo, nombre: codigo, descripcion: 'd', icono: 'stars', obtenido: true, fechaObtenido: null });
+const logro = (codigo: string) => ({ codigo, nombre: codigo, descripcion: 'd', icono: 'stars', categoria: codigo === 'B' ? 'RETOS' as const : 'PRACTICA' as const,
+  rareza: 'EPICO' as const, secreto: false, obtenido: true, fechaObtenido: null, progreso: 1, meta: 1 });
 
 describe('Componentes compartidos', () => {
   afterEach(() => { vi.useRealTimers(); TestBed.resetTestingModule(); });
@@ -20,8 +21,14 @@ describe('Componentes compartidos', () => {
     f.detectChanges();
     const c = f.componentInstance as any;
     expect(c.visible()?.codigo).toBe('A');
+    expect(f.nativeElement.textContent).toContain('¡Logro desbloqueado! · Épico');
     vi.advanceTimersByTime(4000);
     expect(c.visible()?.codigo).toBe('B');
+    f.detectChanges();
+    expect(f.nativeElement.textContent).toContain('¡Insignia especial desbloqueada!');
+    c.visible.set({ ...logro('C'), rareza: 'EXCLUSIVO' });
+    f.detectChanges();
+    expect(f.nativeElement.textContent).toContain('¡Insignia exclusiva! · Exclusivo');
     vi.advanceTimersByTime(4000);
     expect(c.visible()).toBeNull();
     f.destroy();

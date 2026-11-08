@@ -52,13 +52,21 @@
     </li>
   </ul>
 
+  <app-boton-tema class="navbar__tema" />
+
   <button class="navbar__user" [matMenuTriggerFor]="menu">
-    <span class="navbar__avatar">{{ iniciales() }}</span>
+    <span class="navbar__avatar">
+      @if (foto()) { <img [src]="foto()" alt=""> } @else { {{ iniciales() }} }
+    </span>
     <span class="navbar__name">{{ nombreDocente() }}</span>
     <mat-icon>expand_more</mat-icon>
   </button>
 
   <mat-menu #menu="matMenu" xPosition="before">
+    <button mat-menu-item routerLink="/docente/perfil">
+      <mat-icon>person</mat-icon>
+      <span>Mi perfil</span>
+    </button>
     <button mat-menu-item routerLink="/docente/moderacion">
       <mat-icon>shield</mat-icon>
       <span>Moderación del foro</span>

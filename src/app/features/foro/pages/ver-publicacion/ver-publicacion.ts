@@ -16,13 +16,18 @@ import { colorAvatar } from '../../../../shared/utils/avatar';
  * El estudiante puede responder la publicación o una respuesta directa,
  * y eliminar la publicación si es el autor.
  */
+import { TextoRicoDirective } from '../../../../shared/directives/texto-rico.directive';
+import { AdjuntarImagen } from '../../../../shared/components/adjuntar-imagen/adjuntar-imagen';
+import { Observable, map, of, switchMap } from 'rxjs';
+import { UtilesService } from '../../services/utiles.service';
 @Component({
   selector: 'app-ver-publicacion',
-  imports: [RouterLink, FormsModule, MatIconModule, RespuestaItem],
+  imports: [TextoRicoDirective, AdjuntarImagen, RouterLink, FormsModule, MatIconModule, RespuestaItem],
   templateUrl: './ver-publicacion.html',
   styleUrl: './ver-publicacion.scss',
 })
 export class VerPublicacion implements OnInit {
+  private utilesService = inject(UtilesService);
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -33,6 +38,8 @@ export class VerPublicacion implements OnInit {
   cargando = signal(true);
   error = signal(false);
   texto = signal('');
+  /** Foto para adjuntar a la respuesta. */
+  archivo = signal<File | null>(null);
   enviando = signal(false);
   usuarioId = signal<number | null>(null);
   confirmandoEliminar = signal(false);
@@ -59,6 +66,7 @@ export class VerPublicacion implements OnInit {
       error: () => this.usuarioId.set(null)
     });
     this.cargar();
+    this.utilesService.cargar(this.id);
   }
 
   cargar(): void {
@@ -76,17 +84,24 @@ export class VerPublicacion implements OnInit {
   }
 
   /** Respuesta directa a la publicación (padreId = null) o a una respuesta. */
-  responder(contenido: string, padreId: number | null = null): void {
+  responder(contenido: string, padreId: number | null = null, archivo: File | null = null): void {
     const texto = contenido.trim();
     if (!texto || this.enviando()) {
       return;
     }
     this.enviando.set(true);
-    this.foroService.responder(this.id, { contenido: texto, respuestaPadreId: padreId }).subscribe({
+    // Si hay foto, primero se sube a S3 y luego se publica la respuesta con su URL
+    const imagenUrl$: Observable<string | null> = archivo
+      ? this.foroService.subirImagen(archivo).pipe(map(r => r.url))
+      : of(null);
+    imagenUrl$.pipe(
+      switchMap(imagenUrl => this.foroService.responder(this.id, { contenido: texto, respuestaPadreId: padreId, imagenUrl }))
+    ).subscribe({
       next: () => {
         this.enviando.set(false);
         if (padreId === null) {
           this.texto.set('');
+          this.archivo.set(null);
         }
         this.avisar('Respuesta publicada');
         this.cargar();

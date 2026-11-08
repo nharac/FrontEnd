@@ -1,0 +1,52 @@
+@if (datos(); as d) {
+  <div class="bv" [class.bv--saliendo]="saliendo()" [class.bv--nuevo]="d.nuevo"
+       [style.--bv-duracion.ms]="duracion()" (click)="cerrar()">
+    <span class="bv__luz" aria-hidden="true"></span>
+    @if (d.nuevo) { <app-confeti class="bv__confeti" [cantidad]="70" [alcance]="420" /> }
+
+    <div class="bv__escena" role="dialog" aria-modal="true" aria-labelledby="bv-titulo" aria-describedby="bv-mensaje">
+      <!-- Globo de diálogo de cómic: sale de Sumi cuando aterriza -->
+      <div class="bv__globo" (click)="$event.stopPropagation()">
+        @if (titulo(); as t) {
+          <h2 id="bv-titulo" class="bv__titulo">
+            {{ t.antes }}@if (t.nombre) {<span class="bv__nombre">{{ t.nombre }}</span>}{{ t.despues }}
+            <span class="bv__emoji" aria-hidden="true">{{ t.emoji }}</span>
+          </h2>
+        }
+        <p class="bv__mensaje" aria-hidden="true">{{ escrito() }}<span class="bv__cursor"></span></p>
+        <p id="bv-mensaje" class="bv__oculto">{{ mensaje() }}</p>
+      </div>
+
+      <!-- Sumi libre en la pantalla: entra saltando, aterriza y se queda saludando -->
+      <div class="bv__sumi-salto">
+        <div class="bv__sumi-aterriza">
+          <span class="bv__brillo bv__brillo--1" aria-hidden="true">✦</span>
+          <span class="bv__brillo bv__brillo--2" aria-hidden="true">✦</span>
+          <span class="bv__brillo bv__brillo--3" aria-hidden="true">✦</span>
+          <span class="bv__brillo bv__brillo--4" aria-hidden="true">✦</span>
+          <app-mascota class="bv__sumi"
+                       [estado]="d.nuevo ? 'celebra' : 'saludo'"
+                       [accesorio]="d.esDocente ? 'gafas' : (d.nuevo ? 'birrete' : 'ninguno')"
+                       [tamano]="tamanoSumi"
+                       etiqueta="Sumi, la mascota de SAESU, te saluda" />
+        </div>
+        <span class="bv__sombra" aria-hidden="true"></span>
+      </div>
+
+      @if (chips().length) {
+        <ul class="bv__chips">
+          @for (c of chips(); track c.texto; let i = $index) {
+            <li class="bv__chip" [style.--i]="i">
+              @if (c.icono === 'puntos') { <app-puntos-sumi [tamano]="20" /> } @else { <mat-icon aria-hidden="true">{{ c.icono }}</mat-icon> }{{ c.texto }}
+            </li>
+          }
+        </ul>
+      }
+
+      <button type="button" class="bv__boton" (click)="$event.stopPropagation(); cerrar()">
+        {{ d.nuevo ? '¡Empecemos!' : '¡Vamos!' }}
+        <span class="bv__progreso" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+}

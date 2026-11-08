@@ -211,4 +211,14 @@ export class DocenteService {
   restaurarPublicacion(id: number): Observable<void> {
     return this.http.delete<void>(`${this.API}/docente/publicaciones/${id}/ocultar`);
   }
+
+  /** Elimina para siempre una publicación (con sus respuestas). DELETE /api/docente/publicaciones/{id} */
+  eliminarPublicacion(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API}/docente/publicaciones/${id}`);
+  }
+
+  /** Elimina para siempre una respuesta (con las que le respondieron). DELETE /api/docente/respuestas/{id} */
+  eliminarRespuesta(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API}/docente/respuestas/${id}`);
+  }
 }

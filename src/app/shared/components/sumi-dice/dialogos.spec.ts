@@ -52,7 +52,7 @@ describe('Diálogos de Sumi', () => {
       expect(mensajeRanking(1, null, null).estado).toBe('celebra');
     });
     it('dice cuántos puntos faltan en el podio', () => {
-      expect(mensajeRanking(2, 15, 'Ana').texto).toBe('Te faltan 15 puntos para pasar a Ana.');
+      expect(mensajeRanking(2, 15, 'Ana').texto).toBe('Te faltan 15 Puntos Sumi para pasar a Ana.');
     });
     it('invita a practicar si aún no aparece', () => {
       expect(mensajeRanking(null, null, null).titulo).toBe('Todavía no apareces');

@@ -1,3 +1,4 @@
+import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { CONSEJOS_CALCULO, saludoInicio } from '../../../../shared/components/sumi-dice/dialogos';
@@ -14,16 +15,18 @@ import { InfoTema, Progreso, TEMAS } from '../../models/practica.model';
 import { ContadorDirective } from '../../../../shared/directives/contador.directive';
 import { Medalla } from '../../../../shared/components/medalla/medalla';
 import { LogrosService } from '../../../gamificacion/services/logros.service';
-import { Logro } from '../../../gamificacion/models/logro.model';
+import { Insignia } from '../../../gamificacion/components/insignia/insignia';
+import { Logro, proximosLogros } from '../../../gamificacion/models/logro.model';
 import { ForoService } from '../../../foro/services/foro.service';
 import { NOMBRES_TEMA, PublicacionResumen } from '../../../foro/models/foro.model';
 import { haceCuanto } from '../../../../shared/utils/tiempo';
 import { saludoSegunHora } from '../../../../shared/components/aviso/aviso.model';
+import { RetoDia } from '../../components/reto-dia/reto-dia';
 
 @Component({
   selector: 'app-dashboard-estudiante',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective, Medalla, SumiDice],
+  imports: [RetoDia, CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective, Medalla, SumiDice, PuntosSumi, Insignia],
   templateUrl: './dashboard-estudiante.html',
   styleUrl: './dashboard-estudiante.scss',
 })
@@ -53,8 +56,8 @@ export class DashboardEstudiante implements OnInit {
   foroReciente = signal<PublicacionResumen[]>([]);
 
   logrosObtenidos = computed(() => this.logros().filter(l => l.obtenido).length);
-  /** El siguiente logro por desbloquear (el primero que falta, en el orden del backend). */
-  proximoLogro = computed(() => this.logros().find(l => !l.obtenido) ?? null);
+  /** El logro pendiente más cerca de cumplirse. */
+  proximoLogro = computed(() => proximosLogros(this.logros(), 1)[0] ?? null);
 
   /** Aciertos sumando los tres temas. */
   totales = computed(() => {

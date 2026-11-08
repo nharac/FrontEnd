@@ -1,0 +1,77 @@
+$texto: #1f2937;
+$suave: #6b7280;
+
+:host { display: block; min-width: 0; }
+
+.tarjeta {
+  height: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px 24px;
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08);
+}
+
+.cal {
+  &__cabecera {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px;
+    h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 17px; color: $texto; mat-icon { color: #16a34a; } }
+  }
+  &__chip { padding: 3px 12px; border-radius: 999px; background: #dcfce7; color: #15803d; font-size: 12.5px; font-weight: 700; }
+  &__estado { margin: 0; color: $suave; }
+
+  // rtl: si no cabe, el scroll arranca a la derecha (las semanas más recientes)
+  &__marco { overflow-x: auto; padding-bottom: 4px; direction: rtl; }
+
+  &__rejilla {
+    display: grid;
+    --c: 16px;
+    direction: ltr;
+    grid-template-columns: 18px repeat(var(--semanas), var(--c));
+    grid-template-rows: 16px repeat(7, var(--c));
+    gap: 4px;
+    width: max-content;
+    margin: 0 auto;
+  }
+
+  &__mes { grid-row: 1; font-size: 10.5px; color: $suave; white-space: nowrap; }
+  &__dia-semana { grid-column: 1; font-size: 10px; line-height: var(--c); color: $suave; }
+
+  &__celda {
+    display: block;
+    width: var(--c, 14px);
+    height: var(--c, 14px);
+    border-radius: 4px;
+    background: #ebedf0;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+
+    &:hover { transform: scale(1.25); }
+    &--1 { background: #bbf7d0; }
+    &--2 { background: #4ade80; }
+    &--3 { background: #16a34a; }
+    &--4 { background: #166534; }
+    &--hoy { outline: 2px solid #4f46e5; outline-offset: 1px; }
+  }
+
+  &__pie {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px;
+  }
+  &__detalle { margin: 0; font-size: 13px; color: $suave; b { color: $texto; } }
+  &__leyenda {
+    display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: $suave;
+    .cal__celda { width: 11px; height: 11px; border-radius: 3px; cursor: default; &:hover { transform: none; } }
+  }
+
+  &__cifras {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 0; padding: 0; list-style: none;
+    li { display: flex; flex-direction: column; align-items: center; padding: 8px; border-radius: 12px; background: #f8fafc; }
+    strong { font-size: 17px; color: $texto; }
+    small { font-size: 11.5px; color: $suave; }
+  }
+}
+
+@media (max-width: 480px) {
+  .tarjeta { padding: 20px 16px; }
+  .cal__rejilla { --c: 13px; gap: 3px; }
+}

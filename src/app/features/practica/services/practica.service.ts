@@ -43,6 +43,19 @@ export class PracticaService {
   }
 
   /**
+   * Preguntas al azar para una sesión de práctica (cambian cada día):
+   * primero las que el estudiante no ha visto hoy y luego las que aún no ha resuelto.
+   * GET /api/practica/preguntas/sesion?tema=&dificultad=&size=
+   */
+  sesion(filtros: { tema: Tema; dificultad?: Dificultad | null; size?: number }): Observable<Pregunta[]> {
+    let params = new HttpParams().set('tema', filtros.tema).set('size', filtros.size ?? 10);
+    if (filtros.dificultad) {
+      params = params.set('dificultad', filtros.dificultad);
+    }
+    return this.http.get<Pregunta[]>(`${this.API}/preguntas/sesion`, { params });
+  }
+
+  /**
    * Valida la opción elegida.
    * POST /api/practica/preguntas/{id}/responder
    */

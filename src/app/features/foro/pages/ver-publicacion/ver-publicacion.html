@@ -29,7 +29,7 @@
       </header>
 
       <h1>{{ p.titulo }}</h1>
-      <p class="fo-detalle__contenido">{{ p.contenido }}</p>
+      <div class="fo-detalle__contenido" [appTextoRico]="p.contenido"></div>
       @if (p.imagenUrl) {
         <a class="fo-detalle__imagen" [href]="p.imagenUrl" target="_blank" rel="noopener" title="Ver imagen completa">
           <img [src]="p.imagenUrl" alt="Imagen adjunta a la publicación">
@@ -64,12 +64,13 @@
 
     <section class="fo-responder">
       <h2><mat-icon>edit</mat-icon> {{ esAutor() ? 'Agrega más detalles' : 'Tu respuesta' }}</h2>
-      <form (ngSubmit)="responder(texto())">
+      <form (ngSubmit)="responder(texto(), null, archivo())">
         <label for="respuesta-foro" class="sr-only">Tu respuesta</label>
         <textarea id="respuesta-foro" rows="3" name="texto"
                   [placeholder]="esAutor() ? '¿Avanzaste en algo? Cuéntalo para que te ayuden mejor...' : 'Ayuda a tu compañero: explica el paso o hazle una pregunta guía...'"
                   [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
         <div class="fo-responder__pie">
+          <app-adjuntar-imagen [(archivo)]="archivo" />
           <small><mat-icon>tips_and_updates</mat-icon> Explica el porqué, no solo el resultado.</small>
           <button type="submit" class="fo-btn" [disabled]="!texto().trim() || enviando()">
             <mat-icon>send</mat-icon> {{ enviando() ? 'Publicando...' : 'Responder' }}
@@ -83,7 +84,7 @@
       @for (r of p.respuestas; track r.id) {
         <app-respuesta-item
           [respuesta]="r"
-          (responder)="responder($event.contenido, $event.padreId)" />
+          (responder)="responder($event.contenido, $event.padreId, $event.archivo)" />
       } @empty {
         <div class="fo-vacio fo-vacio--chico">
           <span class="fo-vacio__icono"><mat-icon>forum</mat-icon></span>

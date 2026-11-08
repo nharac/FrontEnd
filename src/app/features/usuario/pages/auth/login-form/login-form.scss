@@ -140,3 +140,8 @@ small.error {
 // Campo de contraseña con el botón del ojo: espacio a la derecha y color del "hueco" del tachón
 .input-group:has(app-ojo-password) input { padding-right: 50px; }
 .input-group:has(input:focus) { --ojo-fondo: #ffffff; }
+
+// Celular: un solo formulario a lo ancho, sin el panel morado
+@media (max-width: 700px) {
+  form { height: auto; padding: 30px 22px 26px; }
+}

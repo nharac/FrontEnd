@@ -1,4 +1,5 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
+import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { PRACTICA_INICIO, reaccionResultado } from '../../../../shared/components/sumi-dice/dialogos';
 import { DecimalPipe } from '@angular/common';
@@ -38,12 +39,12 @@ const PREGUNTAS_POR_SESION = 10;
  * 3. Al final ve un resumen de la sesión.
  */
 @Component({
-  imports: [DecimalPipe, RouterLink, MatIconModule, PreguntaCard, Confeti, ContadorDirective, LogroAviso, SumiDice],
+  imports: [DecimalPipe, RouterLink, MatIconModule, PreguntaCard, Confeti, ContadorDirective, LogroAviso, SumiDice, PuntosSumi],
   selector: 'app-dashboard-practica',
   styleUrl: './dashboard-practica.scss',
   templateUrl: './dashboard-practica.html',
 })
-export class DashboardPractica implements OnInit {
+export class DashboardPractica implements OnInit, OnDestroy {
 
   private practicaService = inject(PracticaService);
   private snackBar = inject(MatSnackBar);
@@ -83,6 +84,17 @@ export class DashboardPractica implements OnInit {
   infoTema = computed(() => this.temas.find(t => t.id === this.temaElegido()) ?? null);
   reintentos = computed(() => this.resultados().filter(r => r === 'reintento').length);
 
+  /** Preguntas en las que necesitó más de un intento (para "Repasar mis errores"). */
+  errores = computed(() => this.preguntas().filter((_, i) => this.resultados()[i] === 'reintento'));
+  /** La sesión actual es un repaso de errores. */
+  repasando = signal(false);
+
+  /** Modo enfoque: oculta la barra de navegación mientras responde. */
+  enfoque = signal(false);
+  private readonly efectoEnfoque = effect(() => {
+    document.body.classList.toggle('modo-enfoque', this.enfoque() && this.vista() === 'sesion');
+  });
+
   /** Tema sugerido: el que nunca ha practicado o el de menor porcentaje de aciertos. */
   recomendado = computed<Tema | null>(() => {
     const p = this.progreso();
@@ -114,10 +126,14 @@ export class DashboardPractica implements OnInit {
 
   ngOnInit(): void {
     this.cargarProgreso();
-    // Desde el inicio se puede llegar con un tema recomendado: /practica?tema=derivadas
+    // Desde el inicio o el perfil se llega con lo recomendado: /practica?tema=derivadas&dificultad=avanzado
     const tema = this.route.snapshot.queryParamMap.get('tema');
+    const dificultad = this.route.snapshot.queryParamMap.get('dificultad');
     if (this.temas.some(t => t.id === tema)) {
       this.elegirTema(tema as Tema);
+      if (this.dificultades.some(d => d.id !== null && d.id === dificultad)) {
+        this.elegirDificultad(dificultad as Dificultad);
+      }
     }
   }
 
@@ -147,7 +163,8 @@ export class DashboardPractica implements OnInit {
     }
 
     this.vista.set('cargando');
-    this.practicaService.listarPreguntas({
+    // Preguntas al azar del banco, distintas cada día (no siempre las mismas primeras)
+    this.practicaService.sesion({
       tema,
       dificultad: this.dificultadElegida(),
       size: PREGUNTAS_POR_SESION
@@ -158,12 +175,8 @@ export class DashboardPractica implements OnInit {
           this.vista.set('seleccion');
           return;
         }
-        this.preguntas.set(preguntas);
-        this.indice.set(0);
-        this.aciertosPrimerIntento.set(0);
-        this.puntosSesion.set(0);
-        this.resultados.set(preguntas.map(() => null));
-        this.vista.set('sesion');
+        this.repasando.set(false);
+        this.iniciarSesion(preguntas);
       },
       error: (err) => {
         this.vista.set('seleccion');
@@ -192,6 +205,28 @@ export class DashboardPractica implements OnInit {
       this.vista.set('resumen');
       this.cargarProgreso();
     }
+  }
+
+  /** Vuelve a hacer solo las preguntas que necesitaron reintentos. */
+  repasarErrores(): void {
+    const errores = this.errores();
+    if (!errores.length) return;
+    this.repasando.set(true);
+    this.iniciarSesion(errores);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  private iniciarSesion(preguntas: Pregunta[]): void {
+    this.preguntas.set(preguntas);
+    this.indice.set(0);
+    this.aciertosPrimerIntento.set(0);
+    this.puntosSesion.set(0);
+    this.resultados.set(preguntas.map(() => null));
+    this.vista.set('sesion');
+  }
+
+  ngOnDestroy(): void {
+    document.body.classList.remove('modo-enfoque');
   }
 
   volverASeleccion(): void {

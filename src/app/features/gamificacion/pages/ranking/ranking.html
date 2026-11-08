@@ -29,7 +29,7 @@
       } @else if (!posiciones().length) {
         <div class="rk-vacio">
           <span class="rk-vacio__icono"><mat-icon>emoji_events</mat-icon></span>
-          <strong>Nadie ha sumado puntos {{ infoPeriodo().corto }}</strong>
+          <strong>Nadie ha sumado Puntos Sumi {{ infoPeriodo().corto }}</strong>
           <p>¡Es tu oportunidad! Responde una pregunta y quedarás en el primer lugar.</p>
           <a class="rk-btn" routerLink="/practica"><mat-icon>play_arrow</mat-icon> Ir a practicar</a>
         </div>
@@ -56,7 +56,14 @@
               </span>
               <strong class="rk-puesto__nombre" [title]="p.nombre">{{ p.nombre }}</strong>
               @if (esYo(p)) { <span class="rk-tu">Tú</span> }
-              <span class="rk-puesto__puntos"><span [appContador]="p.puntosTotales" [retraso]="700"></span> pts</span>
+              @let cp = cambio(p, p.lugar);
+              @if (cp) {
+                <span class="rk-cambio" [class.rk-cambio--sube]="cp > 0" [class.rk-cambio--baja]="cp < 0"
+                      [attr.title]="cp > 0 ? 'Subió ' + cp + (cp === 1 ? ' puesto' : ' puestos') : 'Bajó ' + (-cp) + (cp === -1 ? ' puesto' : ' puestos')">
+                  <mat-icon>{{ cp > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>{{ cp > 0 ? cp : -cp }}
+                </span>
+              }
+              <span class="rk-puesto__puntos" title="Puntos Sumi"><app-puntos-sumi [tamano]="20" [destacado]="p.lugar === 1" /> <span [appContador]="p.puntosTotales" [retraso]="700"></span></span>
               @if (p.rachaActual) {
                 <span class="rk-racha" [title]="p.rachaActual + ' días seguidos'"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
               }
@@ -78,13 +85,21 @@
                   <span class="rk-fila__avatar" [style.background]="color.fondo" [style.color]="color.texto">{{ inicialesDe(p.nombre) }}</span>
                 }
                 <div class="rk-fila__cuerpo">
-                  <span class="rk-fila__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="rk-tu">Tú</span> }</span>
+                  <span class="rk-fila__nombre">{{ p.nombre }}@if (esYo(p)) { <span class="rk-tu">Tú</span> }
+                    @let cf = cambio(p, p.lugar);
+              @if (cf) {
+                <span class="rk-cambio" [class.rk-cambio--sube]="cf > 0" [class.rk-cambio--baja]="cf < 0"
+                      [attr.title]="cf > 0 ? 'Subió ' + cf + (cf === 1 ? ' puesto' : ' puestos') : 'Bajó ' + (-cf) + (cf === -1 ? ' puesto' : ' puestos')">
+                  <mat-icon>{{ cf > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>{{ cf > 0 ? cf : -cf }}
+                </span>
+              }
+                  </span>
                   <span class="rk-fila__barra"><i [style.width.%]="ancho(p.puntosTotales)"></i></span>
                 </div>
                 @if (p.rachaActual) {
                   <span class="rk-racha"><mat-icon>local_fire_department</mat-icon> {{ p.rachaActual }}</span>
                 }
-                <strong class="rk-fila__puntos"><span [appContador]="p.puntosTotales" [retraso]="900"></span> pts</strong>
+                <strong class="rk-fila__puntos" title="Puntos Sumi"><app-puntos-sumi [tamano]="16" /> <span [appContador]="p.puntosTotales" [retraso]="900"></span></strong>
               </li>
             }
             @if (fueraDelTop(); as yo) {
@@ -105,13 +120,13 @@
 
       <!-- Cómo se ganan puntos -->
       <section class="rk-caja">
-        <h2><mat-icon>stars</mat-icon> ¿Cómo gano puntos?</h2>
+        <h2><app-puntos-sumi [tamano]="22" /> ¿Cómo gano Puntos Sumi?</h2>
         <ul class="rk-reglas">
           @for (r of reglas; track r.texto) {
             <li>
               <span class="rk-reglas__icono"><mat-icon>{{ r.icono }}</mat-icon></span>
               <span><b>{{ r.texto }}</b><small>{{ r.detalle }}</small></span>
-              <strong>{{ r.puntos }}</strong>
+              <strong>{{ r.puntos }} <app-puntos-sumi [tamano]="16" /></strong>
             </li>
           }
         </ul>
@@ -133,19 +148,19 @@
               <span>de {{ yo.participantes }} {{ yo.participantes === 1 ? 'estudiante' : 'estudiantes' }}</span>
             </div>
             @if (yo.puntosParaSubir && yo.siguienteNombre) {
-              <p class="rk-yo__meta">Te faltan <b>{{ yo.puntosParaSubir }} pts</b> para pasar a {{ yo.siguienteNombre }}</p>
+              <p class="rk-yo__meta">Te faltan <b>{{ yo.puntosParaSubir }} Puntos Sumi</b> para pasar a {{ yo.siguienteNombre }}</p>
               <span class="rk-yo__barra"><i [style.width.%]="avanceSubir()"></i></span>
             } @else {
               <p class="rk-yo__meta"><mat-icon>military_tech</mat-icon> ¡Vas primero! Defiende tu lugar.</p>
             }
           } @else {
             <div class="rk-yo__puesto"><strong>—</strong><span>Aún sin puesto</span></div>
-            <p class="rk-yo__meta">Suma tus primeros puntos {{ infoPeriodo().corto }} para entrar al ranking.</p>
+            <p class="rk-yo__meta">Suma tus primeros Puntos Sumi {{ infoPeriodo().corto }} para entrar al ranking.</p>
             <a class="rk-yo__accion" routerLink="/practica"><mat-icon>play_arrow</mat-icon> Practicar ahora</a>
           }
           <div class="rk-yo__cifras">
-            <div><b>+{{ yo.puntosHoy }}</b><small>hoy</small></div>
-            <div><b>+{{ yo.puntosSemana }}</b><small>semana</small></div>
+            <div><b><app-puntos-sumi [tamano]="16" />+{{ yo.puntosHoy }}</b><small>hoy</small></div>
+            <div><b><app-puntos-sumi [tamano]="16" />+{{ yo.puntosSemana }}</b><small>semana</small></div>
             <div><b><mat-icon>local_fire_department</mat-icon>{{ yo.rachaActual }}</b><small>{{ yo.rachaActual === 1 ? 'día' : 'días' }} de racha</small></div>
           </div>
         </section>
@@ -155,12 +170,12 @@
         <section class="rk-caja rk-nivel">
           <span class="rk-nivel__icono"><mat-icon>{{ n.actual.icono }}</mat-icon></span>
           <div class="rk-nivel__cuerpo">
-            <small>Tu nivel · {{ yo.puntosTotales }} pts</small>
+            <small>Tu nivel · {{ yo.puntosTotales }} Puntos Sumi</small>
             <strong>{{ n.actual.nombre }}</strong>
             <span class="rk-nivel__barra"><i [style.width.%]="n.avance"></i></span>
             <small>
               @if (n.siguiente) {
-                {{ n.faltan }} pts para <b>{{ n.siguiente.nombre }}</b>
+                {{ n.faltan }} Puntos Sumi para <b>{{ n.siguiente.nombre }}</b>
               } @else {
                 ¡Llegaste al nivel máximo!
               }
@@ -170,7 +185,7 @@
 
         <!-- Últimos puntos -->
         <section class="rk-caja">
-          <h2><mat-icon>history</mat-icon> Tus últimos puntos</h2>
+          <h2><mat-icon>history</mat-icon> Tus últimos Puntos Sumi</h2>
           @if (yo.ultimosMovimientos.length) {
             <ul class="rk-movimientos">
               @for (m of yo.ultimosMovimientos; track $index) {
@@ -178,12 +193,12 @@
                 <li>
                   <span class="rk-movimientos__icono"><mat-icon>{{ d.icono }}</mat-icon></span>
                   <span><b>{{ d.texto }}</b><small>{{ haceCuanto(m.fecha) }}</small></span>
-                  <strong>+{{ m.cantidad }}</strong>
+                  <strong>+{{ m.cantidad }} <app-puntos-sumi [tamano]="16" /></strong>
                 </li>
               }
             </ul>
           } @else {
-            <p class="rk-nada">Todavía no tienes puntos. ¡Tu primera respuesta correcta vale +20!</p>
+            <p class="rk-nada">Todavía no tienes Puntos Sumi. ¡Tu primera respuesta correcta vale +20 <app-puntos-sumi [tamano]="16" />!</p>
           }
         </section>
       }

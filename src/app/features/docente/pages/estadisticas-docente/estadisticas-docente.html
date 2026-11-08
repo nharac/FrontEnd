@@ -4,10 +4,16 @@
       <h1>Estadísticas del grupo</h1>
       <p>Cómo van tus estudiantes en límites, derivadas e integrales.</p>
     </div>
-    <a class="dp-btn dp-btn--claro" routerLink="/docente/estudiantes">
-      <mat-icon>groups</mat-icon> Ver estudiantes
-    </a>
+    <div class="dp-acciones dp-no-imprimir">
+      <button type="button" class="dp-btn" (click)="imprimir()" [disabled]="!datos()">
+        <mat-icon>picture_as_pdf</mat-icon> Descargar PDF
+      </button>
+      <a class="dp-btn dp-btn--claro" routerLink="/docente/estudiantes">
+        <mat-icon>groups</mat-icon> Ver estudiantes
+      </a>
+    </div>
   </header>
+  <p class="dp-solo-impresion">SAESU · Universidad de Cundinamarca · Reporte generado el {{ hoy }}</p>
 
   @if (error()) {
     <p class="dp-aviso-error">No se pudieron cargar las estadísticas. Verifica que iniciaste sesión como docente.</p>
@@ -64,6 +70,20 @@
         <app-actividad-chart [dias]="d.actividad" />
       </section>
     </div>
+
+    <section class="dp-tarjeta">
+      <h2><mat-icon>date_range</mat-icon> ¿Qué días practican más?</h2>
+      <div class="dp-semana" role="img" [attr.aria-label]="'Intentos por día de la semana: ' + porDiaSemana().map(x => x.nombre + ' ' + x.intentos).join(', ')">
+        @for (x of porDiaSemana(); track x.nombre) {
+          <div class="dp-semana__dia">
+            <span class="dp-semana__valor">{{ x.intentos }}</span>
+            <span class="dp-semana__barra" [class.dp-semana__barra--max]="x.esMax" [style.height.%]="x.alto"></span>
+            <span class="dp-semana__nombre">{{ x.nombre }}</span>
+          </div>
+        }
+      </div>
+      <small class="dp-nota">Suma de los últimos 14 días. {{ mejorDia() }}</small>
+    </section>
 
     <section class="dp-tarjeta">
       <h2><mat-icon>report</mat-icon> Preguntas en las que más fallan</h2>

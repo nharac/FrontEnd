@@ -1,7 +1,8 @@
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, switchMap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -20,7 +21,7 @@ type Estado = 'sin-respuestas' | 'sin-oficial' | 'oficial';
  */
 @Component({
   selector: 'app-publicaciones-docente',
-  imports: [MatIconModule, SumiDice],
+  imports: [MatIconModule, SumiDice, FormsModule],
   templateUrl: './publicaciones-docente.html',
   styleUrl: './publicaciones-docente.scss',
 })
@@ -38,6 +39,11 @@ export class PublicacionesDocente implements OnInit {
   cargando = signal(true);
   tema = signal<string | null>(null);
 
+  /** Respuesta rápida desde la lista (sin abrir la publicación). */
+  respondiendoId = signal<number | null>(null);
+  textoRapido = signal('');
+  enviandoRapido = signal(false);
+
   readonly temas = [
     { id: null, nombre: 'Todos' },
     { id: 'limites', nombre: 'Límites' },
@@ -52,6 +58,38 @@ export class PublicacionesDocente implements OnInit {
     const t = this.tema();
     return t ? this.publicaciones().filter(p => p.tema === t) : this.publicaciones();
   });
+
+  abrirRapida(id: number): void {
+    this.respondiendoId.set(id);
+    this.textoRapido.set('');
+  }
+
+  /** Publica la respuesta y la marca como oficial; la consulta sale de pendientes. */
+  responderRapido(p: PublicacionResumen): void {
+    const texto = this.textoRapido().trim();
+    if (texto.length < 2 || this.enviandoRapido()) return;
+    this.enviandoRapido.set(true);
+    this.docenteService.responder(p.id, { contenido: texto }).pipe(
+      switchMap(r => this.docenteService.marcarOficial(r.id))
+    ).subscribe({
+      next: () => {
+        this.enviandoRapido.set(false);
+        this.respondiendoId.set(null);
+        this.pendientes.update(s => { const n = new Set(s); n.delete(p.id); return n; });
+        if (this.modo() === 'pendientes') {
+          this.publicaciones.update(l => l.filter(x => x.id !== p.id));
+        } else {
+          this.publicaciones.update(l => l.map(x => x.id === p.id ? { ...x, respuestasCount: x.respuestasCount + 1 } : x));
+        }
+        this.docenteService.refrescarPendientes();
+        this.snackBar.open('Respuesta oficial publicada', 'Cerrar', { duration: 3000 });
+      },
+      error: (err) => {
+        this.enviandoRapido.set(false);
+        this.snackBar.open(err?.message || 'No se pudo publicar la respuesta', 'Cerrar', { duration: 3500 });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.modo.set(this.route.snapshot.data['modo'] === 'todas' ? 'todas' : 'pendientes');

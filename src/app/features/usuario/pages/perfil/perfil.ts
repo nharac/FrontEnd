@@ -1,3 +1,5 @@
+import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
+import { RouterLink } from '@angular/router';
 import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
@@ -16,8 +18,17 @@ import { PracticaService } from '../../../practica/services/practica.service';
 import { Progreso, TEMAS } from '../../../practica/models/practica.model';
 import { esDocente, esEstudiante } from '../../../../shared/utils/rol';
 import { LogrosGrid } from '../../../gamificacion/components/logros-grid/logros-grid';
+import { Insignia } from '../../../gamificacion/components/insignia/insignia';
+import { LogrosService } from '../../../gamificacion/services/logros.service';
+import { MiPosicion } from '../../../gamificacion/models/ranking.model';
+import { CODIGO_DESARROLLADOR, Logro, RAREZAS, avanceDe, proximosLogros } from '../../../gamificacion/models/logro.model';
+import { nivelDe } from '../../../gamificacion/models/ranking.model';
+import { MetaSemanalCard } from '../../../practica/components/meta-semanal/meta-semanal';
+import { CalendarioActividad } from '../../../practica/components/calendario-actividad/calendario-actividad';
+import { AnalisisTemas } from '../../../practica/components/analisis-temas/analisis-temas';
 import { RankingService } from '../../../gamificacion/services/ranking.service';
 import { Medalla } from '../../../../shared/components/medalla/medalla';
+import { SumiDev } from '../../../../shared/components/sumi-dev/sumi-dev';
 
 /** Misma regla de contraseña que el backend (RegistroRequest / ActualizarPerfilRequest). */
 const PASSWORD_SEGURA = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/;
@@ -30,11 +41,16 @@ const coincidenValidator: ValidatorFn = (grupo: AbstractControl): ValidationErro
   grupo.get('passwordNueva')?.value === grupo.get('confirmar')?.value ? null : { noCoinciden: true };
 
 /**
- * /perfil: datos del usuario, progreso por tema (estudiantes),
- * edición del nombre y cambio de contraseña (PUT /api/auth/perfil).
+ * /perfil: datos del usuario y, para estudiantes, su nivel, cifras, meta semanal, calendario de actividad,
+ * progreso por tema, fortalezas y debilidades, próximos logros y la colección de logros e insignias especiales.
+ * También permite editar el nombre y cambiar la contraseña (PUT /api/auth/perfil).
  */
+/** Insignias que caben junto al rol en la cabecera del perfil. */
+const MAX_INSIGNIAS_CABECERA = 6;
+
 @Component({
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, LogrosGrid, Medalla],
+  imports: [RouterLink, DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, LogrosGrid, Insignia, Medalla, PuntosSumi, SumiDev, MetaSemanalCard, CalendarioActividad,
+    AnalisisTemas],
   selector: 'app-perfil',
   styleUrl: './perfil.scss',
   templateUrl: './perfil.html',
@@ -45,6 +61,7 @@ export class Perfil implements OnInit {
   private perfilService = inject(PerfilService);
   private practicaService = inject(PracticaService);
   private snackBar = inject(MatSnackBar);
+  private logrosService = inject(LogrosService);
 
   readonly usuario = this.perfilService.usuario;
   readonly iniciales = this.perfilService.iniciales;
@@ -62,6 +79,47 @@ export class Perfil implements OnInit {
   /** Puesto en el ranking (para la medalla del top 3). */
   miLugar = computed(() => this.esEstudiante() ? this.rankingService.lugarDe(this.usuario()?.id) : null);
   esDocente = computed(() => esDocente(this.usuario()?.rol));
+  /** Logros (GET /api/logros): los usa la cuadrícula, las cifras y los próximos logros. */
+  logros = signal<Logro[]>([]);
+  cargandoLogros = signal(true);
+  errorLogros = signal(false);
+  logrosObtenidos = computed(() => this.logros().filter(l => l.obtenido && l.rareza !== 'EXCLUSIVO').length);
+  /** Tiene la insignia exclusiva de desarrollador (solo la reciben los correos configurados en el backend). */
+  esDesarrollador = computed(() => this.logros().some(l => l.codigo === CODIGO_DESARROLLADOR && l.obtenido));
+  proximos = computed(() => proximosLogros(this.logros(), 3));
+
+  /** Puesto en el ranking histórico aunque no esté en el top 10 (GET /api/ranking/yo). */
+  miPosicion = signal<MiPosicion | null>(null);
+  puesto = computed(() => this.miLugar() ?? this.miPosicion()?.posicion ?? null);
+
+  /**
+   * Insignias que se muestran junto al rol: primero las especiales (retos), luego las más raras.
+   * Se ven hasta MAX_INSIGNIAS_CABECERA y el resto como "+N".
+   */
+  insigniasObtenidas = computed(() => this.logros()
+    .filter(l => l.obtenido && l.rareza !== 'EXCLUSIVO')
+    .sort((a, b) => Number(b.categoria === 'RETOS') - Number(a.categoria === 'RETOS')
+      || RAREZAS[b.rareza].orden - RAREZAS[a.rareza].orden));
+  insigniasCabecera = computed(() => this.insigniasObtenidas().slice(0, MAX_INSIGNIAS_CABECERA));
+  insigniasRestantes = computed(() => Math.max(0, this.insigniasObtenidas().length - MAX_INSIGNIAS_CABECERA));
+  readonly avance = avanceDe;
+
+  /** Nivel según los Puntos Sumi (mismos niveles del ranking). */
+  nivel = computed(() => nivelDe(this.usuario()?.puntosTotales ?? 0));
+
+  totalCorrectas = computed(() => {
+    const p = this.progreso();
+    return p ? p.limites.correctas + p.derivadas.correctas + p.integrales.correctas : 0;
+  });
+
+  /** Porcentaje de acierto en todos los temas. */
+  precision = computed(() => {
+    const p = this.progreso();
+    const total = this.totalRespondidas();
+    if (!p || !total) return 0;
+    return Math.round(((p.limites.correctas + p.derivadas.correctas + p.integrales.correctas) / total) * 100);
+  });
+
   totalRespondidas = computed(() => {
     const p = this.progreso();
     return p ? p.limites.respondidas + p.derivadas.respondidas + p.integrales.respondidas : 0;
@@ -90,10 +148,30 @@ export class Perfil implements OnInit {
   ngOnInit(): void {
     this.perfilService.cargar(true);
     this.rankingService.obtenerTop().subscribe({ error: () => {} });
+    this.rankingService.miPosicion().subscribe({ next: (p) => this.miPosicion.set(p), error: () => this.miPosicion.set(null) });
+    // Solo se muestran a estudiantes; si es docente la respuesta simplemente no se usa
+    this.logrosService.listar().subscribe({
+      next: (l) => { this.logros.set(l ?? []); this.cargandoLogros.set(false); },
+      error: () => { this.cargandoLogros.set(false); this.errorLogros.set(true); }
+    });
     this.practicaService.obtenerProgreso().subscribe({
       next: (p) => this.progreso.set(p),
       error: () => this.progreso.set(null) // docentes o error: no se muestra
     });
+  }
+
+  /** Baja hasta la colección de logros (sin cambiar la URL). */
+  irAColeccion(evento: Event): void {
+    evento.preventDefault();
+    document.querySelector<HTMLElement>('app-logros-grid')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  }
+
+  /** Cómo va en un tema según lo que ha respondido. */
+  estadoTema(respondidas: number, porcentaje: number): string {
+    if (!respondidas) return 'Por empezar';
+    if (porcentaje >= 80) return 'Excelente';
+    if (porcentaje >= 50) return 'Vas bien';
+    return 'En camino';
   }
 
   guardarNombre(): void {

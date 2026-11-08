@@ -1,12 +1,12 @@
 import { Component, ElementRef, OnDestroy, OnInit, computed, inject, signal, viewChildren } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../services/auth.service';
-import { Aviso } from '../../../../shared/components/aviso/aviso';
-import { DatosAviso } from '../../../../shared/components/aviso/aviso.model';
+import { BienvenidaService } from '../../../../core/services/bienvenida.service';
 import { esDocente } from '../../../../shared/utils/rol';
+import { SumiDice, TonoSumi } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { EstadoMascota, Mascota } from '../../../../shared/components/mascota/mascota';
 
 /**
  * /auth/verificar?correo=... — doble verificación al crear la cuenta.
@@ -16,7 +16,7 @@ import { esDocente } from '../../../../shared/utils/rol';
  */
 @Component({
   selector: 'app-verificar-correo',
-  imports: [RouterLink, MatIconModule],
+  imports: [RouterLink, MatIconModule, SumiDice, Mascota],
   templateUrl: './verificar-correo.html',
   styleUrl: '../recuperar-password/recuperar-password.scss',
 })
@@ -25,7 +25,7 @@ export class VerificarCorreo implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private bienvenida = inject(BienvenidaService);
 
   readonly simbolos = ['∫', '∂', 'π', '√x', '∑', 'lim', 'dx', '∞', 'f(x)'];
   readonly posiciones = [0, 1, 2, 3, 4, 5];
@@ -43,6 +43,18 @@ export class VerificarCorreo implements OnInit, OnDestroy {
   private timer: ReturnType<typeof setInterval> | undefined;
 
   codigo = computed(() => this.digitos().join(''));
+
+  /** Lo que dice Sumi mientras el estudiante activa su cuenta. */
+  sumi = computed<{ estado: EstadoMascota; titulo: string; texto: string; tono: TonoSumi }>(() => {
+    if (this.error()) {
+      return { estado: 'nervioso', titulo: 'Uy, algo falló', texto: 'No pasa nada: revisa el aviso en rojo e inténtalo otra vez.', tono: 'alerta' };
+    }
+    if (this.codigo().length === 6 || this.enviando()) {
+      return { estado: 'pensando', titulo: 'Comprobando…', texto: 'Un segundo, estoy revisando tu código.', tono: 'normal' };
+    }
+    return { estado: 'saludo', titulo: '¡Ya casi!', tono: 'info',
+      texto: 'Te envié un código a tu correo. Escríbelo aquí y tu cuenta queda creada. Puedes pegarlo de una vez.' };
+  });
 
   /** l•••••@ucundinamarca.edu.co */
   correoOculto = computed(() => {
@@ -79,16 +91,8 @@ export class VerificarCorreo implements OnInit, OnDestroy {
         this.enviando.set(false);
         this.listo.set(true);
         clearInterval(this.timer);
-        this.snackBar.openFromComponent(Aviso, {
-          data: {
-            tipo: 'bienvenida',
-            mensaje: 'Tu cuenta está lista. ¡Empieza a practicar!',
-            nombre: res.usuario.nombre
-          } satisfies DatosAviso,
-          duration: 5000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end'
-        });
+        // Primera vez en SAESU: Sumi celebra la cuenta nueva
+        this.bienvenida.mostrar({ nombre: res.usuario.nombre, nuevo: true, esDocente: esDocente(res.usuario.rol) });
         setTimeout(() => this.router.navigate([esDocente(res.usuario.rol) ? '/docente' : '/dashboard']), 1400);
       },
       error: (err) => {

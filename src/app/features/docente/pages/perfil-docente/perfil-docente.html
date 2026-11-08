@@ -1,0 +1,91 @@
+<div class="dp-pagina pd">
+
+  <!-- Tarjeta de la cuenta -->
+  <section class="pd-hero">
+    <label class="pd-foto" [class.pd-foto--cargando]="subiendoFoto()" title="Cambiar foto de perfil">
+      @if (foto()) { <img [src]="foto()" alt="Tu foto de perfil"> } @else { <span>{{ iniciales() || 'D' }}</span> }
+      <span class="pd-foto__camara" aria-hidden="true"><mat-icon>{{ subiendoFoto() ? 'hourglass_top' : 'photo_camera' }}</mat-icon></span>
+      <input type="file" accept="image/*" class="sr-only" aria-label="Cambiar foto de perfil" (change)="elegirFoto($event)" [disabled]="subiendoFoto()">
+    </label>
+    <div class="pd-hero__datos">
+      <span class="pd-hero__rol"><mat-icon>school</mat-icon> Docente</span>
+      <h1>{{ usuario()?.nombre || 'Mi perfil' }}</h1>
+      <p><mat-icon>mail</mat-icon> {{ usuario()?.correo }}</p>
+      @if (desde()) { <p><mat-icon>event</mat-icon> {{ desde() }}</p> }
+    </div>
+    <app-sumi-dice class="pd-sumi" accesorio="birrete" estado="feliz" compacto lado="derecha" [tamano]="80" [aleatorio]="false"
+                   titulo="Tu cuenta" mensajes="Aquí cambias tu foto, tu nombre y tu contraseña. Tus estudiantes ven tu nombre y tu foto en el foro." />
+  </section>
+
+  <!-- Resumen del grupo -->
+  <div class="dp-kpis">
+    <a class="dp-kpi" routerLink="/docente/estudiantes">
+      <span class="dp-kpi__icono"><mat-icon>groups</mat-icon></span>
+      <div><strong>{{ grupo()?.totalEstudiantes ?? '…' }}</strong><span>Estudiantes</span></div>
+    </a>
+    <a class="dp-kpi dp-kpi--ambar" routerLink="/docente/notificaciones">
+      <span class="dp-kpi__icono"><mat-icon>mark_chat_unread</mat-icon></span>
+      <div><strong>{{ pendientes() ?? "…" }}</strong><span>Consultas pendientes</span></div>
+    </a>
+    <a class="dp-kpi dp-kpi--verde" routerLink="/docente/preguntas">
+      <span class="dp-kpi__icono"><mat-icon>quiz</mat-icon></span>
+      <div><strong>{{ grupo()?.preguntasActivas ?? '…' }}</strong><span>Preguntas activas</span></div>
+    </a>
+    <a class="dp-kpi" routerLink="/docente/estadisticas">
+      <span class="dp-kpi__icono"><mat-icon>task_alt</mat-icon></span>
+      <div><strong>{{ grupo() ? grupo()!.porcentajeAciertoGeneral + ' %' : '…' }}</strong><span>Aciertos del grupo</span></div>
+    </a>
+  </div>
+
+  <div class="dp-grid-2">
+    <!-- Datos -->
+    <form class="dp-tarjeta pd-form" (ngSubmit)="guardarNombre()">
+      <h2><mat-icon>badge</mat-icon> Mis datos</h2>
+      <label class="pd-campo">
+        <span>Nombre completo</span>
+        <input class="dp-input" name="nombre" autocomplete="name" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)">
+      </label>
+      @if (nombre() && nombre().trim().length < 3) { <small class="pd-mal">El nombre debe tener al menos 3 caracteres</small> }
+      <label class="pd-campo">
+        <span>Correo institucional</span>
+        <input class="dp-input" [value]="usuario()?.correo ?? ''" disabled>
+        <small>El correo no se puede cambiar.</small>
+      </label>
+      <button type="submit" class="dp-btn" [disabled]="!nombreCambio() || guardandoNombre()">
+        <mat-icon>save</mat-icon> {{ guardandoNombre() ? 'Guardando…' : 'Guardar nombre' }}
+      </button>
+    </form>
+
+    <!-- Seguridad -->
+    <form class="dp-tarjeta pd-form" (ngSubmit)="cambiarPassword()">
+      <h2><mat-icon>lock</mat-icon> Seguridad</h2>
+      <label class="pd-campo">
+        <span>Contraseña actual</span>
+        <span class="pd-clave">
+          <input class="dp-input" name="actual" autocomplete="current-password" [type]="verActual() ? 'text' : 'password'"
+                 [ngModel]="passwordActual()" (ngModelChange)="passwordActual.set($event)">
+          <app-ojo-password [visible]="verActual()" (alternar)="verActual.set(!verActual())" />
+        </span>
+      </label>
+      <label class="pd-campo">
+        <span>Nueva contraseña</span>
+        <span class="pd-clave">
+          <input class="dp-input" name="nueva" autocomplete="new-password" [type]="verNueva() ? 'text' : 'password'"
+                 [ngModel]="passwordNueva()" (ngModelChange)="passwordNueva.set($event)">
+          <app-ojo-password [visible]="verNueva()" (alternar)="verNueva.set(!verNueva())" />
+        </span>
+      </label>
+      @if (passwordNueva()) { <app-fuerza-password [password]="passwordNueva()" /> }
+      <label class="pd-campo">
+        <span>Confirmar nueva contraseña</span>
+        <input class="dp-input" name="confirmar" autocomplete="new-password" type="password"
+               [class.pd-input--mal]="confirmar() && !coinciden()"
+               [ngModel]="confirmar()" (ngModelChange)="confirmar.set($event)">
+      </label>
+      @if (confirmar() && !coinciden()) { <small class="pd-mal">Las contraseñas no coinciden</small> }
+      <button type="submit" class="dp-btn" [disabled]="!puedeCambiarPassword() || guardandoPassword()">
+        <mat-icon>key</mat-icon> {{ guardandoPassword() ? 'Guardando…' : 'Cambiar contraseña' }}
+      </button>
+    </form>
+  </div>
+</div>

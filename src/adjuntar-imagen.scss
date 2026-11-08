@@ -1,0 +1,28 @@
+// Adjuntar foto en respuestas del foro + imagen dentro de cada respuesta (global para no inflar budgets)
+app-adjuntar-imagen { display: inline-flex; align-items: center; }
+.adj__boton {
+  display: inline-flex; align-items: center; gap: .3rem; cursor: pointer;
+  padding: .35rem .7rem; border-radius: 999px; font-size: .85rem; font-weight: 600;
+  color: #4f46e5; background: #eef2ff; border: 1px dashed #c7d2fe;
+  transition: background .15s, border-color .15s;
+  mat-icon { font-size: 1.15rem; width: 1.15rem; height: 1.15rem; }
+  &:hover { background: #e0e7ff; border-color: #818cf8; }
+  &:focus-within { outline: 2px solid #4f46e5; outline-offset: 2px; }
+}
+.adj__vista {
+  position: relative; display: inline-block;
+  img { display: block; max-height: 72px; max-width: 120px; border-radius: .5rem; border: 1px solid #c7d2fe; object-fit: cover; }
+  button {
+    position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; padding: 0;
+    display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+    background: #1e1b4b; color: #fff;
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  }
+}
+.responder__pie, .nueva__pie {
+  display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; margin-top: .4rem;
+}
+.respuesta__imagen {
+  display: inline-block; margin-top: .5rem;
+  img { display: block; max-width: min(100%, 420px); max-height: 320px; border-radius: .6rem; border: 1px solid #e5e7eb; object-fit: contain; background: #f9fafb; }
+}

@@ -40,6 +40,8 @@ export interface Respuesta {
   respuestasHijas: Respuesta[];
   /** Ocultada por un docente: el backend reemplaza el contenido por un aviso. */
   oculta?: boolean;
+  /** Imagen opcional de la respuesta (V24). */
+  imagenUrl?: string | null;
 }
 
 /** Publicación completa con su árbol de respuestas (PublicacionDetalleResponse). */
@@ -60,6 +62,8 @@ export interface ResponderRequest {
   contenido: string;
   /** null = respuesta directa a la publicación. */
   respuestaPadreId?: number | null;
+  /** URL de una imagen subida antes con subirImagen (opcional). */
+  imagenUrl?: string | null;
 }
 
 export const NOMBRES_TEMA: Record<string, string> = {

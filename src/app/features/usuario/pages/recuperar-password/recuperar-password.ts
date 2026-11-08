@@ -4,10 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from '../../services/auth.service';
-import { Logo } from '../../../../shared/components/logo/logo';
+import { SumiDice, TonoSumi } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { AccesorioMascota, EstadoMascota, Mascota } from '../../../../shared/components/mascota/mascota';
+import { FuerzaPassword } from '../../../../shared/components/fuerza-password/fuerza-password';
+import { reglasPassword } from '../../../../shared/utils/password';
 import { OjoPassword } from '../../../../shared/components/ojo-password/ojo-password';
 
 type Paso = 'correo' | 'codigo' | 'password' | 'listo';
+
+interface MensajeSumi {
+  estado: EstadoMascota;
+  accesorio: AccesorioMascota;
+  titulo: string;
+  texto: string;
+  tono: TonoSumi;
+}
 
 /**
  * /auth/recuperar — "¿Olvidaste tu contraseña?"
@@ -18,7 +29,7 @@ type Paso = 'correo' | 'codigo' | 'password' | 'listo';
  */
 @Component({
   selector: 'app-recuperar-password',
-  imports: [RouterLink, FormsModule, MatIconModule, Logo, OjoPassword],
+  imports: [RouterLink, FormsModule, MatIconModule, OjoPassword, SumiDice, Mascota, FuerzaPassword],
   templateUrl: './recuperar-password.html',
   styleUrl: './recuperar-password.scss',
 })
@@ -61,20 +72,42 @@ export class RecuperarPassword implements OnInit, OnDestroy {
   });
 
   /** Reglas de la contraseña (las mismas que valida el backend). */
-  reglas = computed(() => {
-    const p = this.password();
-    return [
-      { texto: 'Mínimo 8 caracteres', ok: p.length >= 8 },
-      { texto: 'Una mayúscula', ok: /[A-Z]/.test(p) },
-      { texto: 'Una minúscula', ok: /[a-z]/.test(p) },
-      { texto: 'Un número', ok: /[0-9]/.test(p) },
-      { texto: 'Un carácter especial (@#$%^&+=!)', ok: /[@#$%^&+=!]/.test(p) },
-    ];
-  });
+  reglas = computed(() => reglasPassword(this.password()));
 
   passwordValida = computed(() => this.reglas().every(r => r.ok));
   coinciden = computed(() => this.confirmar().length > 0 && this.confirmar() === this.password());
   puedeCambiar = computed(() => this.passwordValida() && this.coinciden());
+
+  /** Campo de la contraseña nueva en el que está el usuario (para la indicación de Sumi). */
+  campo = signal<'password' | 'confirmar'>('password');
+
+  /** Lo que dice Sumi en cada paso. */
+  sumi = computed<MensajeSumi>(() => {
+    if (this.error()) {
+      return { estado: 'nervioso', accesorio: 'ninguno', titulo: 'Uy, algo falló', texto: 'No pasa nada: revisa el aviso en rojo e inténtalo otra vez.', tono: 'alerta' };
+    }
+    switch (this.paso()) {
+      case 'correo':
+        return { estado: 'pensando', accesorio: 'lupa', titulo: 'Tranquilo, te ayudo', tono: 'normal',
+          texto: 'Escribe tu correo institucional y te envío un código de 6 dígitos para crear una contraseña nueva.' };
+      case 'codigo':
+        return { estado: 'saludo', accesorio: 'ninguno', titulo: 'Te envié un código', tono: 'info',
+          texto: 'Búscalo en tu correo y escríbelo aquí. Vence en 15 minutos y puedes pegarlo de una vez.' };
+      case 'password':
+        if (this.puedeCambiar()) {
+          return { estado: 'celebra', accesorio: 'ninguno', titulo: '¡Perfecta!', tono: 'exito',
+            texto: 'Tu contraseña es segura y coincide. Toca «Cambiar contraseña».' };
+        }
+        return this.campo() === 'confirmar' && this.passwordValida()
+          ? { estado: 'pensando', accesorio: 'ninguno', titulo: 'Repítela', tono: 'normal',
+              texto: 'Escribe la misma contraseña para confirmar que no haya un error de tecleo.' }
+          : { estado: 'feliz', accesorio: 'ninguno', titulo: '¡El código es correcto!', tono: 'normal',
+              texto: 'Elige una contraseña que no uses en otros sitios. Te marco abajo lo que le falta.' };
+      default:
+        return { estado: 'celebra', accesorio: 'trofeo', titulo: '¡Listo!', tono: 'exito',
+          texto: 'Ya puedes entrar con tu nueva contraseña.' };
+    }
+  });
 
   ngOnInit(): void {
     const correo = this.route.snapshot.queryParamMap.get('correo');

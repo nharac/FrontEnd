@@ -1,4 +1,6 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { AdjuntarImagen } from '../adjuntar-imagen/adjuntar-imagen';
+import { UtilesService } from '../../../features/foro/services/utiles.service';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -15,13 +17,17 @@ import { colorAvatar } from '../../utils/avatar';
  * anidamiento. Por eso el botón "Responder" solo aparece en respuestas directas
  * a la publicación (nivel 0).
  */
+import { TextoRicoDirective } from '../../directives/texto-rico.directive';
 @Component({
   selector: 'app-respuesta-item',
-  imports: [FormsModule, MatIconModule],
+  imports: [TextoRicoDirective, AdjuntarImagen, FormsModule, MatIconModule],
   templateUrl: './respuesta-item.html',
   styleUrl: './respuesta-item.scss',
 })
 export class RespuestaItem {
+
+  /** "Me sirvió" de la publicación abierta (lo carga la página). */
+  readonly utiles = inject(UtilesService);
 
   respuesta = input.required<Respuesta>();
   nivel = input(0);
@@ -35,10 +41,12 @@ export class RespuestaItem {
   marcarOficial = output<number>();
   quitarOficial = output<number>();
   ocultar = output<number>();
-  responder = output<{ padreId: number; contenido: string }>();
+  responder = output<{ padreId: number; contenido: string; archivo: File | null }>();
 
   respondiendo = signal(false);
   texto = signal('');
+  /** Imagen para adjuntar a la respuesta anidada (la sube la página al enviar). */
+  archivo = signal<File | null>(null);
 
   /** Solo se puede responder a respuestas directas (1 nivel de anidamiento). */
   puedeResponder = computed(() => this.nivel() === 0 && !this.respuesta().oculta);
@@ -70,8 +78,9 @@ export class RespuestaItem {
     if (!contenido) {
       return;
     }
-    this.responder.emit({ padreId: this.respuesta().id, contenido });
+    this.responder.emit({ padreId: this.respuesta().id, contenido, archivo: this.archivo() });
     this.texto.set('');
+    this.archivo.set(null);
     this.respondiendo.set(false);
   }
 }

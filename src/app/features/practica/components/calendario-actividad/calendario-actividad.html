@@ -1,0 +1,56 @@
+<section class="tarjeta cal">
+  <div class="cal__cabecera">
+    <h2><mat-icon>calendar_month</mat-icon> Mi actividad</h2>
+    @if (datos(); as d) {
+      <span class="cal__chip">{{ d.diasActivos }} {{ d.diasActivos === 1 ? 'día activo' : 'días activos' }}</span>
+    }
+  </div>
+
+  @if (error()) {
+    <p class="cal__estado">No se pudo cargar tu actividad.</p>
+  } @else if (!datos()) {
+    <p class="cal__estado">Cargando actividad...</p>
+  } @else {
+    <div class="cal__marco">
+      <div class="cal__rejilla" role="img" [attr.aria-label]="resumen()" [style.--semanas]="semanas()">
+        @for (m of meses(); track m.columna) {
+          <span class="cal__mes" [style.grid-column]="m.columna + 1">{{ m.mes }}</span>
+        }
+        @for (d of diasSemana; track $index) {
+          <span class="cal__dia-semana" [style.grid-row]="$index + 2">{{ d }}</span>
+        }
+        @for (c of celdas(); track $index) {
+          @if (c) {
+            <span class="cal__celda cal__celda--{{ c.nivel }}" [class.cal__celda--hoy]="c.hoy"
+                  [style.grid-row]="($index % 7) + 2" [style.grid-column]="($index - $index % 7) / 7 + 2"
+                  [title]="titulo(c)" (mouseenter)="elegido.set(c)" (click)="elegido.set(c)" aria-hidden="true"></span>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="cal__pie">
+      <p class="cal__detalle" aria-live="polite">
+        @if (elegido(); as e) {
+          <b>{{ fechaLarga(e.fecha) }}</b> ·
+          {{ e.respondidas ? e.respondidas + ' respondidas, ' + e.aciertos + ' aciertos' : 'sin práctica' }}
+        } @else if (datos()!.mejorDia; as m) {
+          🏅 Tu mejor día: <b>{{ fechaLarga(m.fecha, false) }}</b> con {{ m.respondidas }} preguntas
+        } @else {
+          Cada día que practicas se pinta aquí. ¡Empieza hoy!
+        }
+      </p>
+      <div class="cal__leyenda" aria-hidden="true">
+        Menos
+        @for (n of [0, 1, 2, 3, 4]; track n) { <span class="cal__celda cal__celda--{{ n }}"></span> }
+        Más
+      </div>
+    </div>
+
+    <ul class="cal__cifras">
+      <li><strong>{{ datos()!.totalRespondidas }}</strong><small>respondidas</small></li>
+      <li><strong>{{ datos()!.totalAciertos }}</strong><small>aciertos</small></li>
+      <li><strong>{{ precision() }}%</strong><small>precisión</small></li>
+    </ul>
+  }
+</section>

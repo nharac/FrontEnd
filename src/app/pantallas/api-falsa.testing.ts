@@ -63,9 +63,18 @@ const historialQuiz = { intentos: 2, promedio: 70, mejor: 90, ultimos: [
   { id: 8, tema: null, correctas: 9, total: 10, porcentaje: 90, duracionSegundos: 300, fueraDeTiempo: false, fecha: AYER },
   { id: 7, tema: 'derivadas', correctas: 5, total: 10, porcentaje: 50, duracionSegundos: 900, fueraDeTiempo: true, fecha: AYER }] };
 
+const logro = (codigo: string, nombre: string, categoria: string, rareza: string, progreso: number, meta: number,
+  extra: { secreto?: boolean; fecha?: string } = {}) => ({
+  codigo, nombre, descripcion: 'Descripción de ' + nombre, icono: 'task_alt', categoria, rareza, secreto: !!extra.secreto,
+  obtenido: !!extra.fecha, fechaObtenido: extra.fecha ?? null, progreso, meta });
 const logros = [
-  { codigo: 'PRIMER_ACIERTO', nombre: 'Primer acierto', descripcion: 'Acierta una pregunta', icono: 'task_alt', obtenido: true, fechaObtenido: AYER },
-  { codigo: 'RACHA_7', nombre: 'Racha de 7', descripcion: '7 días seguidos', icono: 'local_fire_department', obtenido: false, fechaObtenido: null }];
+  logro('PRIMER_ACIERTO', 'Primer paso', 'PRACTICA', 'COMUN', 1, 1, { fecha: AYER }),
+  logro('ACIERTOS_100', 'Centenario', 'PRACTICA', 'RARO', 60, 100),
+  logro('RACHA_7', 'Semana perfecta', 'RACHAS', 'RARO', 3, 7),
+  logro('CURIOSO', 'Curioso', 'COMUNIDAD', 'COMUN', 1, 1, { fecha: AYER }),
+  logro('EN_LA_ZONA', 'En la zona', 'RETOS', 'EPICO', 4, 10),
+  logro('BUHO_NOCTURNO', '???', 'RETOS', 'RARO', 0, 1, { secreto: true }),
+  logro('MARATON', 'Maratón', 'RETOS', 'EPICO', 30, 30, { fecha: AYER })];
 
 const ranking = [1, 2, 3, 4].map(i => ({ usuarioId: i + 3, nombre: 'Estudiante ' + i, fotoPerfilUrl: null, puntosTotales: 500 - i * 50, rachaActual: i }));
 
@@ -75,6 +84,20 @@ const miPosicion = { periodo: 'semana', posicion: 2, puntos: 400, participantes:
 
 const progreso = { limites: { respondidas: 10, correctas: 8, porcentaje: 80 }, derivadas: { respondidas: 4, correctas: 1, porcentaje: 25 },
   integrales: { respondidas: 0, correctas: 0, porcentaje: 0 } };
+
+// Lunes 2 a domingo 8 de noviembre de 2026 (el 2 es lunes)
+const actividadEstudiante = { dias: [0, 3, 0, 12, 25, 1, 6].map((r, i) => ({ fecha: `2026-11-0${i + 2}`, respondidas: r, aciertos: Math.floor(r * 0.7) })),
+  diasActivos: 5, totalRespondidas: 47, totalAciertos: 31, mejorDia: { fecha: '2026-11-06', respondidas: 25, aciertos: 17 } };
+const rend = (tema: string, dificultad: string, respondidas: number, correctas: number) =>
+  ({ tema, dificultad, respondidas, correctas, porcentaje: respondidas ? Math.round(correctas * 100 / respondidas) : 0 });
+const analisis = {
+  detalle: [rend('limites', 'basico', 10, 9), rend('limites', 'intermedio', 5, 3), rend('limites', 'avanzado', 0, 0),
+    rend('derivadas', 'basico', 4, 3), rend('derivadas', 'intermedio', 0, 0), rend('derivadas', 'avanzado', 5, 1),
+    rend('integrales', 'basico', 2, 1), rend('integrales', 'intermedio', 0, 0), rend('integrales', 'avanzado', 0, 0)],
+  fortalezas: [rend('limites', 'basico', 10, 9), rend('derivadas', 'basico', 4, 3)],
+  debilidades: [rend('derivadas', 'avanzado', 5, 1)],
+  recomendacion: { tema: 'derivadas', dificultad: 'avanzado', motivo: 'En Derivadas avanzado llevas 20 % de acierto.' } };
+const meta = { meta: 20, respondidas: 12, aciertos: 9, inicioSemana: '2026-11-02', finSemana: '2026-11-08', diasRestantes: 5, cumplida: false };
 
 const chatMensaje = (id: number, rolEmisor: 'usuario' | 'ia', mensaje: string) => ({ id, rolEmisor, mensaje, preguntaId: null, fechaHora: AYER });
 
@@ -104,9 +127,15 @@ const RUTAS: [string, RegExp, () => unknown][] = [
     mensaje: 'Casi', habilitarSiguiente: false, chatIaHabilitado: true, puntosGanados: 0, puntosEnJuego: 15, nuevosLogros: [] })],
   ['GET', /\/practica\/preguntas/, () => [pregunta(7), pregunta(8)]],
   ['GET', /\/practica\/progreso$/, () => progreso],
+  ['GET', /\/practica\/actividad/, () => actividadEstudiante],
+  ['GET', /\/practica\/analisis$/, () => analisis],
+  ['GET', /\/practica\/meta$/, () => meta],
+  ['PUT', /\/practica\/meta$/, () => ({ ...meta, meta: 10, cumplida: true })],
   ['GET', /\/chat\/historial/, () => ({ preguntaId: null, mensajes: [chatMensaje(1, 'usuario', 'Hola'), chatMensaje(2, 'ia', '**Claro**, ¿qué intentaste?\n- paso 1\n- paso 2')] })],
   ['POST', /\/chat\/mensaje$/, () => ({ mensajeUsuario: chatMensaje(3, 'usuario', 'Ayuda'), respuestaIa: chatMensaje(4, 'ia', '¿Qué pasa si factorizas?'), mensajesRestantesHoy: 19 })],
   ['DELETE', /\/chat\/historial/, () => null],
+  ['GET', /\/foro\/publicaciones\/\d+\/utiles$/, () => ({ conteos: { '11': 2 }, mias: [11] })],
+  ['POST', /\/foro\/respuestas\/\d+\/util$/, () => ({ respuestaId: 11, utiles: 1, marcada: false })],
   ['GET', /\/foro\/publicaciones\/\d+$/, () => publicacionDetalle],
   ['GET', /\/foro\/publicaciones/, () => [publicacionResumen(1), publicacionResumen(2), publicacionResumen(3)]],
   ['POST', /\/foro\/publicaciones\/\d+\/respuestas$/, () => respuesta(20)],

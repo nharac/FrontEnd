@@ -1,5 +1,4 @@
-import { Aviso } from '../../../../../shared/components/aviso/aviso';
-import { DatosAviso } from '../../../../../shared/components/aviso/aviso.model';
+import { BienvenidaService } from '../../../../../core/services/bienvenida.service';
 import { RouterLink } from '@angular/router';
 import { OjoPassword } from '../../../../../shared/components/ojo-password/ojo-password';
 import { Logo } from '../../../../../shared/components/logo/logo';
@@ -19,6 +18,23 @@ import { AuthService } from '../../../services/auth.service';
 import { LoginRequest } from '../../../models';
 import { esDocente } from '../../../../../shared/utils/rol';
 
+const CLAVE_RECORDAR = 'saesu-recordar';
+
+export interface Recordado { correo: string; nombre: string; }
+
+export function leerRecordado(): Recordado | null {
+  try {
+    const r = JSON.parse(localStorage.getItem(CLAVE_RECORDAR) ?? 'null');
+    return r?.correo ? r : null;
+  } catch { return null; }
+}
+
+export function guardarRecordado(r: Recordado | null): void {
+  try {
+    if (r) localStorage.setItem(CLAVE_RECORDAR, JSON.stringify(r)); else localStorage.removeItem(CLAVE_RECORDAR);
+  } catch { /* sin almacenamiento */ }
+}
+
 @Component({
   selector: 'app-login-form',
   imports: [OjoPassword, Logo, RouterLink, 
@@ -33,6 +49,7 @@ export class LoginForm {
 
   @Output() cambiarModo = new EventEmitter<void>();
 
+  private bienvenida = inject(BienvenidaService);
   cargando = signal(false);
   mostrarPassword = signal(false);
 
@@ -40,6 +57,10 @@ export class LoginForm {
   private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   loginForm: FormGroup;
+
+  /** Correo y primer nombre recordados en este navegador (si el usuario lo pidió). */
+  recordado = signal<Recordado | null>(leerRecordado());
+  recordar = signal(!!leerRecordado());
 
   constructor(
     private fb: FormBuilder,
@@ -51,6 +72,16 @@ export class LoginForm {
       correo: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]]
     });
+    const r = this.recordado();
+    if (r) this.loginForm.patchValue({ correo: r.correo });
+  }
+
+  /** "No soy yo": olvida el correo guardado. */
+  olvidar(): void {
+    this.recordado.set(null);
+    this.recordar.set(false);
+    this.loginForm.patchValue({ correo: '' });
+    try { localStorage.removeItem(CLAVE_RECORDAR); } catch { /* sin almacenamiento */ }
   }
 
   get correo() { return this.loginForm.get('correo'); }
@@ -72,18 +103,14 @@ export class LoginForm {
     this.authService.login(request).subscribe({
       next: (res) => {
         this.cargando.set(false);
-        // Bienvenida con saludo según la hora, foto o iniciales y una mano que saluda
-        this.snackBar.openFromComponent(Aviso, {
-          data: {
-            tipo: 'bienvenida',
-            mensaje: 'Qué bueno verte de nuevo en SAESU.',
-            nombre: res.usuario.nombre,
-            fotoUrl: res.usuario.fotoPerfilUrl ?? null,
-            esDocente: esDocente(res.usuario.rol)
-          } satisfies DatosAviso,
-          duration: 4500,
-          verticalPosition: 'top',
-          horizontalPosition: 'end'
+        guardarRecordado(this.recordar() ? { correo: request.correo, nombre: res.usuario.nombre.trim().split(/\s+/)[0] } : null);
+        // Sumi le da la bienvenida encima de la pantalla de inicio
+        this.bienvenida.mostrar({
+          nombre: res.usuario.nombre,
+          nuevo: false,
+          esDocente: esDocente(res.usuario.rol),
+          racha: res.usuario.rachaActual ?? null,
+          puntos: res.usuario.puntosTotales ?? null
         });
 
         // La tarjeta se despide y luego redirige según el rol

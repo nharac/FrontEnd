@@ -13,6 +13,20 @@ import { diasDesde, haceCuanto } from '../../../../shared/utils/tiempo';
 /**
  * Inicio del docente: cifras de las consultas pendientes y las más antiguas.
  */
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+/** "Buenos días" hasta el mediodía, "Buenas tardes" hasta las 7 p. m. y luego "Buenas noches". */
+export function saludoPorHora(hora: number): string {
+  if (hora < 12) return 'Buenos días';
+  return hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+}
+
+/** "sábado 7 de noviembre" (sin depender del idioma del navegador). */
+export function fechaLarga(d: Date): string {
+  return `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`;
+}
+
 @Component({
   selector: 'app-dashboard-docente',
   standalone: true,
@@ -33,6 +47,21 @@ export class DashboardDocente implements OnInit {
 
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
+
+  /** "sábado 7 de noviembre" */
+  readonly hoy = fechaLarga(new Date());
+  readonly saludoHora = signal(saludoPorHora(new Date().getHours()));
+  primerNombre = computed(() => this.nombreDocente().trim().split(/\s+/)[0] ?? '');
+
+  /** Una frase con lo más importante del día. */
+  resumen = computed(() => {
+    if (this.cargando()) return 'Estoy revisando el foro y tu grupo…';
+    const n = this.pendientes().length;
+    const riesgo = this.grupo()?.estudiantesEnRiesgo ?? 0;
+    const consultas = n === 0 ? 'No tienes consultas pendientes' : `Tienes ${n} ${n === 1 ? 'consulta' : 'consultas'} esperando respuesta oficial`;
+    const grupo = riesgo === 0 ? 'nadie del grupo está en riesgo.' : `${riesgo} ${riesgo === 1 ? 'estudiante necesita' : 'estudiantes necesitan'} atención.`;
+    return `${consultas} y ${grupo}`;
+  });
 
   /** Pendientes sin ninguna respuesta (ni de estudiantes). */
   sumiDocente = computed(() => saludoDocente(this.nombreDocente(), this.cargando() || this.error() ? null : this.pendientes().length));

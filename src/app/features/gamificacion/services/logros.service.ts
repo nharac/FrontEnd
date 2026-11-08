@@ -16,7 +16,7 @@ export class LogrosService {
   private http = inject(HttpClient);
 
   /**
-   * Los 11 logros con su estado. El backend evalúa antes si se desbloqueó alguno.
+   * Los 40 logros con su estado, categoría, rareza y avance. El backend evalúa antes si se desbloqueó alguno.
    * GET /api/logros
    */
   listar(): Observable<Logro[]> {

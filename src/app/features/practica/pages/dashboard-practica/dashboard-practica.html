@@ -82,7 +82,7 @@
       }
 
       <section class="pr-como" aria-label="Cómo funciona">
-        <div><mat-icon>bolt</mat-icon><b>+20 pts</b><span>si aciertas al primer intento</span></div>
+        <div><app-puntos-sumi [tamano]="22" /><b>+20 Puntos Sumi</b><span>si aciertas al primer intento</span></div>
         <div><mat-icon>trending_down</mat-icon><b>15 · 10 · 5</b><span>lo que vale después de cada fallo</span></div>
         <div><mat-icon>tips_and_updates</mat-icon><b>Pista</b><span>se desbloquea cuando te equivocas</span></div>
         <div><mat-icon>smart_toy</mat-icon><b>Tutor IA</b><span>te guía sin darte la respuesta</span></div>
@@ -109,8 +109,12 @@
             <li [class]="'pr-puntos__p' + (r ? ' pr-puntos__p--' + r : '') + (i === indice() ? ' pr-puntos__p--actual' : '')"></li>
           }
         </ol>
-        <span class="pr-barra__pts" [title]="'Puntos ganados en esta práctica'">
-          <mat-icon>stars</mat-icon> <span [appContador]="puntosSesion()"></span>
+        <button type="button" class="pr-barra__enfoque" [class.pr-barra__enfoque--on]="enfoque()" (click)="enfoque.set(!enfoque())"
+                [attr.aria-pressed]="enfoque()" [title]="enfoque() ? 'Salir del modo enfoque' : 'Modo enfoque: oculta el menú'">
+          <mat-icon>{{ enfoque() ? 'fullscreen_exit' : 'center_focus_strong' }}</mat-icon>
+        </button>
+        <span class="pr-barra__pts" title="Puntos Sumi ganados en esta práctica">
+          <app-puntos-sumi [tamano]="18" /> <span [appContador]="puntosSesion()"></span>
         </span>
       </div>
 
@@ -136,7 +140,7 @@
                   [attr.stroke-dasharray]="perimetro" [attr.stroke-dashoffset]="trazo(porcentajeSesion())" />
           <text x="32" y="36" text-anchor="middle">{{ porcentajeSesion() }}%</text>
         </svg>
-        <h1>¡Terminaste {{ infoTema()?.nombre }}!</h1>
+        <h1>{{ repasando() ? '¡Repaso terminado!' : '¡Terminaste ' + infoTema()?.nombre + '!' }}</h1>
         @let reaccion = reaccionSesion();
         <app-sumi-dice class="pr-resumen__sumi" [estado]="reaccion.estado" [tono]="reaccion.tono"
                        [accesorio]="porcentajeSesion() >= 80 ? 'trofeo' : 'lapiz'" [tamano]="96"
@@ -149,7 +153,7 @@
         <div class="pr-resumen__cifras">
           <div class="verde"><mat-icon>bolt</mat-icon><strong>{{ aciertosPrimerIntento() }}/{{ preguntas().length }}</strong><span>al primer intento</span></div>
           <div class="ambar"><mat-icon>replay</mat-icon><strong>{{ reintentos() }}</strong><span>con reintentos</span></div>
-          <div class="indigo"><mat-icon>stars</mat-icon><strong>+<span [appContador]="puntosSesion()" [retraso]="500"></span></strong><span>puntos ganados</span></div>
+          <div class="indigo"><app-puntos-sumi [tamano]="30" destacado /><strong>+<span [appContador]="puntosSesion()" [retraso]="500"></span></strong><span>Puntos Sumi ganados</span></div>
         </div>
 
         <ol class="pr-puntos pr-puntos--resumen" aria-hidden="true">
@@ -158,10 +162,22 @@
           }
         </ol>
         @if (puntosSesion() === 0) {
-          <p class="pr-resumen__nota">Esta vez no sumaste puntos: solo cuenta la primera vez que resuelves cada pregunta.</p>
+          <p class="pr-resumen__nota">Esta vez no sumaste Puntos Sumi: solo cuenta la primera vez que resuelves cada pregunta.</p>
+        }
+
+        @if (errores().length) {
+          <div class="pr-errores">
+            <h2><mat-icon>assignment_late</mat-icon> Necesitaste más de un intento en {{ errores().length }} {{ errores().length === 1 ? 'pregunta' : 'preguntas' }}</h2>
+            <ol>
+              @for (e of errores(); track e.id) { <li>{{ e.enunciado }}</li> }
+            </ol>
+          </div>
         }
 
         <div class="pr-resumen__acciones">
+          @if (errores().length) {
+            <button type="button" class="pr-btn pr-btn--ambar" (click)="repasarErrores()"><mat-icon>replay_circle_filled</mat-icon> Repasar mis errores</button>
+          }
           <button type="button" class="pr-btn pr-btn--claro" (click)="volverASeleccion()"><mat-icon>grid_view</mat-icon> Otro tema</button>
           <a class="pr-btn pr-btn--claro" routerLink="/chat"><mat-icon>smart_toy</mat-icon> Hablar con el tutor</a>
           <button type="button" class="pr-btn" (click)="empezar()"><mat-icon>replay</mat-icon> Practicar de nuevo</button>
