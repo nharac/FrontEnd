@@ -5,7 +5,7 @@ import { provideRouter, ActivatedRoute, Router, convertToParamMap } from '@angul
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
-import { apiFalsa, peticiones, errores } from './api-falsa.testing';
+import { apiFalsa, peticiones, errores, reiniciarVestidorFalso } from './api-falsa.testing';
 import { errorInterceptor } from '../core/interceptors/error.interceptor';
 
 /** Monta un componente con el backend falso y la ruta indicada. */
@@ -52,6 +52,7 @@ export async function pintar(f: ComponentFixture<unknown>): Promise<void> {
 export function limpiar(): void {
   peticiones.length = 0;
   errores.clear();
+  reiniciarVestidorFalso();
   localStorage.clear();
   sessionStorage.clear();
   vi.useRealTimers();

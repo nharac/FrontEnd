@@ -37,6 +37,8 @@ export class SumiDice implements OnDestroy {
   /** Versión más pequeña para encabezados y tarjetas. */
   compacto = input(false, { transform: booleanAttribute });
   animada = input(true);
+  /** Muestra el fondo que la persona eligió en el vestidor. */
+  conFondo = input(false, { transform: booleanAttribute });
   /** false = empieza siempre por el primer mensaje (útil cuando el primero es el más importante). */
   aleatorio = input(true, { transform: booleanAttribute });
 

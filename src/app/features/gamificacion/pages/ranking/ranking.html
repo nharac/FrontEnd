@@ -135,7 +135,7 @@
 
     <aside class="rk-lateral">
       @if (sumiRanking(); as m) {
-        <app-sumi-dice class="rk-sumi" [estado]="m.estado" accesorio="trofeo" [tamano]="80" compacto
+        <app-sumi-dice class="rk-sumi" [estado]="m.estado" accesorio="trofeo" [tamano]="80" compacto conFondo
                        [tono]="m.estado === 'celebra' ? 'exito' : 'normal'" [titulo]="m.titulo" [mensajes]="m.texto" />
       }
       @if (yo(); as yo) {

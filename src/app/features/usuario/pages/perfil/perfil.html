@@ -83,6 +83,10 @@
           <app-puntos-sumi [tamano]="34" />
           <div><strong>{{ u.puntosTotales ?? 0 }}</strong><small>Puntos Sumi</small></div>
         </div>
+        <div class="cifra cifra--oro" title="Se gastan en el vestidor de Sumi">
+          <app-moneda-sumi [tamano]="34" />
+          <div><strong>{{ tienda.monedas() }}</strong><small>Sumi Monedas</small></div>
+        </div>
         <div class="cifra cifra--fuego">
           <mat-icon>local_fire_department</mat-icon>
           <div><strong>{{ u.rachaActual ?? 0 }}</strong><small>{{ u.rachaActual === 1 ? 'día de racha' : 'días de racha' }}</small></div>
@@ -161,6 +165,8 @@
       }
 
       <app-logros-grid [logros]="logros()" [cargando]="cargandoLogros()" [error]="errorLogros()" />
+
+      <app-vestidor-sumi />
     }
 
     <div class="formularios">

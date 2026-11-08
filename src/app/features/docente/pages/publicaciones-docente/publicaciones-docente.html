@@ -42,7 +42,7 @@
         }
         <div class="pub__abajo">
           <span class="avatar">{{ p.autor.iniciales }}</span>
-          <span>{{ p.autor.nombre }} · {{ haceCuanto(p.fechaCreacion) }}</span>
+          <span>{{ p.autor.nombre }}@if (p.autor.rol === 'DOCENTE') {<app-verificado />} · {{ haceCuanto(p.fechaCreacion) }}</span>
           <span class="pub__respuestas"><mat-icon>chat_bubble_outline</mat-icon>{{ p.respuestasCount }}</span>
         </div>
       </button>

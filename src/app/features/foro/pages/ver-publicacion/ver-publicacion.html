@@ -20,7 +20,7 @@
               [style.background]="esDocente(p.autor.rol) ? null : color.fondo"
               [style.color]="esDocente(p.autor.rol) ? null : color.texto">{{ p.autor.iniciales }}</span>
         <div>
-          <b>{{ p.autor.nombre }}</b>
+          <b>{{ p.autor.nombre }}@if (esDocente(p.autor.rol)) {<app-verificado />}</b>
           @if (esDocente(p.autor.rol)) { <span class="fo-etiqueta">Docente</span> }
           @if (esAutor()) { <span class="fo-etiqueta fo-etiqueta--tu">Tú</span> }
           <small>Publicado {{ haceCuanto(p.fechaCreacion) }}</small>

@@ -1,14 +1,14 @@
 import { Component, booleanAttribute, computed, input } from '@angular/core';
 import { Mascota } from '../mascota/mascota';
 
-/** Nombre visible de la moneda del juego. */
-export const PUNTOS_SUMI = 'Puntos Sumi';
+/** Nombre visible de la moneda que se gasta en el vestidor. */
+export const MONEDAS_SUMI = 'Sumi Monedas';
 
 let siguienteId = 0;
 
 /**
  * Moneda dorada con Sumi completa adentro (como su foto de perfil en el chat):
- * el ícono de los Puntos Sumi. Es decorativa (aria-hidden) salvo que se le dé una etiqueta.
+ * el ícono de las Sumi Monedas (las que se gastan en el vestidor). Es decorativa (aria-hidden) salvo que se le dé una etiqueta.
  */
 @Component({
   selector: 'app-moneda-sumi',

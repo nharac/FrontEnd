@@ -113,7 +113,7 @@ const oculto = [{ tipo: 'PUBLICACION', id: 1, publicacionId: 1, tituloPublicacio
     ocultadoPor: null, fechaOculta: null }];
 
 /** Respuesta de ejemplo para cada ruta de la API (la primera regla que coincida). */
-const RUTAS: [string, RegExp, () => unknown][] = [
+const RUTAS: [string, RegExp, (cuerpo?: unknown) => unknown][] = [
   ['GET', /\/auth\/perfil$/, () => usuario],
   ['GET', /\/perfil$/, () => usuario],
   ['PUT', /\/perfil$/, () => usuario],
@@ -142,6 +142,10 @@ const RUTAS: [string, RegExp, () => unknown][] = [
   ['POST', /\/foro\/publicaciones$/, () => publicacionDetalle],
   ['POST', /\/foro\/imagenes$/, () => ({ url: 'https://img/1.png' })],
   ['DELETE', /\/foro\/publicaciones\/\d+$/, () => null],
+  ['GET', /\/sumi\/vestidor$/, () => vestidorFalso()],
+  ['POST', /\/sumi\/vestidor\/comprar$/, (compra) => comprarFalso(compra)],
+  ['PUT', /\/sumi\/vestidor\/estilo$/, (estilo) => { vestidor = { ...vestidor, estilo: estilo ?? vestidor.estilo }; return vestidorFalso(); }],
+  ['GET', /\/sumi\/monedas\/historial$/, () => [{ cantidad: 3, motivo: 'Respondió en el foro', fecha: AYER }, { cantidad: -20, motivo: 'Compra en el vestidor: sombrero gorra', fecha: AYER }]],
   ['GET', /\/ranking\/yo/, () => miPosicion],
   ['GET', /\/ranking/, () => ranking],
   ['GET', /\/logros/, () => logros],
@@ -165,6 +169,22 @@ const RUTAS: [string, RegExp, () => unknown][] = [
 ];
 
 export interface PeticionHecha { metodo: string; url: string; cuerpo: unknown }
+/** Vestidor de Sumi: 80 monedas, la gorra comprada; los docentes tienen todo gratis. Recuerda las compras. */
+const ESTILO_INICIAL = { sombrero: 'gorra', cara: 'ninguno', objeto: 'ninguno', espalda: 'ninguno', bufanda: 'saesu', fondo: 'ninguno' };
+let vestidor = { monedas: 80, inventario: ['sombrero:gorra'], estilo: { ...ESTILO_INICIAL } as unknown };
+function vestidorFalso() {
+  return { ...vestidor, docente: localStorage.getItem('saesu_rol') === 'DOCENTE' };
+}
+function comprarFalso(compra: unknown) {
+  const { categoria, prenda } = compra as { categoria: string; prenda: string };
+  vestidor = { ...vestidor, monedas: 30, inventario: [...vestidor.inventario, `${categoria}:${prenda}`].sort() };
+  return vestidorFalso();
+}
+/** Vuelve el vestidor falso a como empieza (se llama entre pruebas). */
+export function reiniciarVestidorFalso(): void {
+  vestidor = { monedas: 80, inventario: ['sombrero:gorra'], estilo: { ...ESTILO_INICIAL } };
+}
+
 export const peticiones: PeticionHecha[] = [];
 /** URL (regex) → status de error a devolver en la siguiente llamada que coincida. */
 export const errores = new Map<RegExp, number>();
@@ -178,5 +198,5 @@ export const apiFalsa: HttpInterceptorFn = (req: HttpRequest<unknown>): Observab
     }
   }
   const regla = RUTAS.find(([m, re]) => m === req.method && re.test(req.url));
-  return of(new HttpResponse({ status: 200, body: regla ? regla[2]() : null, url: req.url }));
+  return of(new HttpResponse({ status: 200, body: regla ? regla[2](req.body) : null, url: req.url }));
 };

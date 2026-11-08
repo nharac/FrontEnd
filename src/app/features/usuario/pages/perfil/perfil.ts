@@ -29,6 +29,9 @@ import { AnalisisTemas } from '../../../practica/components/analisis-temas/anali
 import { RankingService } from '../../../gamificacion/services/ranking.service';
 import { Medalla } from '../../../../shared/components/medalla/medalla';
 import { SumiDev } from '../../../../shared/components/sumi-dev/sumi-dev';
+import { VestidorSumi } from '../../../gamificacion/components/vestidor-sumi/vestidor-sumi';
+import { MonedaSumi } from '../../../../shared/components/moneda-sumi/moneda-sumi';
+import { TiendaSumiService } from '../../../gamificacion/services/tienda-sumi.service';
 
 /** Misma regla de contraseña que el backend (RegistroRequest / ActualizarPerfilRequest). */
 const PASSWORD_SEGURA = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/;
@@ -49,7 +52,7 @@ const coincidenValidator: ValidatorFn = (grupo: AbstractControl): ValidationErro
 const MAX_INSIGNIAS_CABECERA = 6;
 
 @Component({
-  imports: [RouterLink, DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, LogrosGrid, Insignia, Medalla, PuntosSumi, SumiDev, MetaSemanalCard, CalendarioActividad,
+  imports: [MonedaSumi, VestidorSumi, RouterLink, DatePipe, DecimalPipe, ReactiveFormsModule, MatIconModule, LogrosGrid, Insignia, Medalla, PuntosSumi, SumiDev, MetaSemanalCard, CalendarioActividad,
     AnalisisTemas],
   selector: 'app-perfil',
   styleUrl: './perfil.scss',
@@ -64,6 +67,8 @@ export class Perfil implements OnInit {
   private logrosService = inject(LogrosService);
 
   readonly usuario = this.perfilService.usuario;
+  /** Sumi Monedas (se gastan en el vestidor). */
+  readonly tienda = inject(TiendaSumiService);
   readonly iniciales = this.perfilService.iniciales;
   readonly fotoUrl = this.perfilService.fotoUrl;
   subiendoFoto = signal(false);

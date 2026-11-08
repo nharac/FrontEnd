@@ -11,6 +11,7 @@ import { NOMBRES_TEMA, OrdenForo, PublicacionResumen } from '../../models/foro.m
 import { haceCuanto } from '../../../../shared/utils/tiempo';
 import { esDocente } from '../../../../shared/utils/rol';
 import { colorAvatar } from '../../../../shared/utils/avatar';
+import { Verificado } from '../../../../shared/components/verificado/verificado';
 
 /** Publicaciones por página (el backend pagina con page/size). */
 const TAMANO_PAGINA = 10;
@@ -20,7 +21,7 @@ const TAMANO_PAGINA = 10;
  * Búsqueda, filtro por tema, orden y "Cargar más".
  */
 @Component({
-  imports: [RouterLink, FormsModule, MatIconModule, SumiDice],
+  imports: [Verificado, RouterLink, FormsModule, MatIconModule, SumiDice],
   selector: 'app-lista-publicaciones',
   styleUrl: './lista-publicaciones.scss',
   templateUrl: './lista-publicaciones.html',

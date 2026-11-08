@@ -9,7 +9,7 @@
     <span class="avatar" [class.avatar--docente]="autorDocente()"
           [style.background]="autorDocente() ? null : colorAutor().fondo"
           [style.color]="autorDocente() ? null : colorAutor().texto">{{ r.autor.iniciales }}</span>
-    <strong>{{ r.autor.nombre }}</strong>
+    <strong>{{ r.autor.nombre }}@if (autorDocente()) {<app-verificado />}</strong>
     @if (autorDocente()) {
       <span class="etiqueta">Docente</span>
     }

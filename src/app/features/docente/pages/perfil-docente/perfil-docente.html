@@ -9,7 +9,7 @@
     </label>
     <div class="pd-hero__datos">
       <span class="pd-hero__rol"><mat-icon>school</mat-icon> Docente</span>
-      <h1>{{ usuario()?.nombre || 'Mi perfil' }}</h1>
+      <h1>{{ usuario()?.nombre || 'Mi perfil' }}<app-verificado [tam]="24" /></h1>
       <p><mat-icon>mail</mat-icon> {{ usuario()?.correo }}</p>
       @if (desde()) { <p><mat-icon>event</mat-icon> {{ desde() }}</p> }
     </div>
@@ -88,4 +88,6 @@
       </button>
     </form>
   </div>
+
+  <app-vestidor-sumi class="pd-vestidor" />
 </div>

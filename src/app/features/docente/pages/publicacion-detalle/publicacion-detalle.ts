@@ -18,9 +18,10 @@ import { haceCuanto } from '../../../../shared/utils/tiempo';
 import { UtilesService } from '../../../foro/services/utiles.service';
 import { AdjuntarImagen } from '../../../../shared/components/adjuntar-imagen/adjuntar-imagen';
 import { Observable, map, of, switchMap } from 'rxjs';
+import { Verificado } from '../../../../shared/components/verificado/verificado';
 @Component({
   selector: 'app-publicacion-detalle',
-  imports: [RouterLink, FormsModule, MatIconModule, RespuestaItem, AdjuntarImagen],
+  imports: [Verificado, RouterLink, FormsModule, MatIconModule, RespuestaItem, AdjuntarImagen],
   templateUrl: './publicacion-detalle.html',
   styleUrl: './publicacion-detalle.scss',
 })

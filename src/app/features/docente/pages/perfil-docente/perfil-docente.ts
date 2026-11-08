@@ -11,6 +11,8 @@ import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { OjoPassword } from '../../../../shared/components/ojo-password/ojo-password';
 import { FuerzaPassword } from '../../../../shared/components/fuerza-password/fuerza-password';
 import { reglasPassword } from '../../../../shared/utils/password';
+import { Verificado } from '../../../../shared/components/verificado/verificado';
+import { VestidorSumi } from '../../../gamificacion/components/vestidor-sumi/vestidor-sumi';
 
 const MAX_FOTO_MB = 10;
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -21,7 +23,7 @@ const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', '
  */
 @Component({
   selector: 'app-perfil-docente',
-  imports: [RouterLink, FormsModule, MatIconModule, SumiDice, OjoPassword, FuerzaPassword],
+  imports: [VestidorSumi, Verificado, RouterLink, FormsModule, MatIconModule, SumiDice, OjoPassword, FuerzaPassword],
   templateUrl: './perfil-docente.html',
 })
 export class PerfilDocente implements OnInit {

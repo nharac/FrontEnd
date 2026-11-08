@@ -65,7 +65,7 @@
                   [style.color]="esDocente(p.autor.rol) ? null : color.texto">{{ p.autor.iniciales }}</span>
             <div class="fo-pub__cuerpo">
               <div class="fo-pub__meta">
-                <b>{{ p.autor.nombre }}</b>
+                <b>{{ p.autor.nombre }}@if (esDocente(p.autor.rol)) {<app-verificado />}</b>
                 @if (esDocente(p.autor.rol)) { <span class="fo-etiqueta">Docente</span> }
                 <span>· {{ haceCuanto(p.fechaCreacion) }}</span>
               </div>

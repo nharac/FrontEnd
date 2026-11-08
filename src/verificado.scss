@@ -1,0 +1,10 @@
+// Chulito de docente verificado (global para no inflar los budgets de cada pantalla)
+.verificado {
+  display: inline-flex; vertical-align: -0.15em; flex-shrink: 0;
+  width: var(--tam, 16px); height: var(--tam, 16px); margin-left: .25em;
+  svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  &__sello { fill: #1d9bf0; stroke: #1d9bf0; }
+  &__check { stroke: #fff; }
+}
+// En el modo oscuro la página se invierte; el chulito se re-invierte para que siga azul
+.tema-oscuro .verificado { filter: invert(1) hue-rotate(180deg); }

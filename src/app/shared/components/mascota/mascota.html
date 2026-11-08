@@ -1,7 +1,16 @@
 <svg viewBox="0 0 160 180" xmlns="http://www.w3.org/2000/svg">
+  @if (dibujoFondo()) {
+    <!-- Fondo del vestidor: escena recortada en un medallón redondo -->
+    <defs><clipPath [attr.id]="idFondo"><circle cx="80" cy="100" r="80" /></clipPath></defs>
+    <g class="sumi__fondo" [attr.clip-path]="'url(#' + idFondo + ')'" [sumiDibujo]="dibujoFondo()" />
+    <circle class="sumi__fondo-borde" cx="80" cy="100" r="80" />
+  }
   <ellipse class="sumi__sombra" cx="80" cy="173" rx="40" ry="6" />
 
   <g class="sumi__todo">
+    <!-- Vestidor: lo de la espalda va detrás de todo -->
+    <g class="sumi__vestidor-espalda" [sumiDibujo]="dibujoEspaldaAtras()" />
+
     <!-- Roseta de hojas peludas y plateadas del frailejón (el "pelo") -->
     <g class="sumi__hojas">
       <g class="sumi__hojas-atras">
@@ -97,6 +106,13 @@
     <!-- Brazos (hojitas) -->
     <g class="sumi__brazo sumi__brazo--izq"><path d="M46 126 C 34 128 28 140 31 152 C 40 150 47 140 46 126 Z" /><path class="sumi__nervio" d="M44 131 Q38 140 33 149" /></g>
     <g class="sumi__brazo sumi__brazo--der"><path d="M114 126 C 126 128 132 140 129 152 C 120 150 113 140 114 126 Z" /><path class="sumi__nervio" d="M116 131 Q122 140 127 149" /></g>
+
+
+    <!-- ===== Vestidor: solo se dibuja lo que lleva puesto (dibujos en sumi-prendas.ts) ===== -->
+    <g class="sumi__vestidor-frente" [sumiDibujo]="dibujoEspaldaFrente()" />
+    <g class="sumi__vestidor-cara" [sumiDibujo]="dibujoCara()" />
+    <g class="sumi__vestidor-cabeza" [sumiDibujo]="dibujoSombrero()" />
+    <g class="sumi__vestidor-mano" [sumiDibujo]="dibujoObjeto()" />
 
     <!-- ===== Accesorios (se muestra solo el que pida el componente) ===== -->
     <!-- Gafas redondas -->

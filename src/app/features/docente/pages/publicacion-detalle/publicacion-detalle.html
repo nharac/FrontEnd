@@ -38,7 +38,7 @@
       <h1>{{ p.titulo }}</h1>
       <p class="publicacion__autor">
         <span class="avatar">{{ p.autor.iniciales }}</span>
-        {{ p.autor.nombre }} · {{ haceCuanto(p.fechaCreacion) }}
+        {{ p.autor.nombre }}@if (p.autor.rol === 'DOCENTE') {<app-verificado />} · {{ haceCuanto(p.fechaCreacion) }}
       </p>
       <p class="publicacion__contenido">{{ p.contenido }}</p>
       @if (p.imagenUrl) {

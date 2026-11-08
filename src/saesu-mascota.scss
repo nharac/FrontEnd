@@ -27,12 +27,13 @@ app-mascota.sumi {
   .sumi__cuerpo-sombra { fill: #e6d2ad; opacity: 0.8; }
   .sumi__panza { fill: #fbf3e3; }
   .sumi__lana { fill: none; stroke: #dcc49c; stroke-width: 1.8; opacity: 0.8; stroke-linecap: round; stroke-linejoin: round; }
-  .sumi__bufanda { fill: #4f46e5; }
-  .sumi__bufanda-raya { fill: none; stroke: #818cf8; stroke-width: 2.2; stroke-linecap: round; }
-  .sumi__bufanda-punta { fill: #6366f1; }
-  .sumi__bufanda-punta--2 { fill: #4338ca; }
-  .sumi__bufanda-nudo { fill: #4338ca; }
-  .sumi__integral { fill: #fff; font: italic 700 14px/1 Georgia, 'Times New Roman', serif; }
+  // Colores de la bufanda: los pone el componente según la elegida en el vestidor
+  .sumi__bufanda { fill: var(--sumi-buf-base, #4f46e5); }
+  .sumi__bufanda-raya { fill: none; stroke: var(--sumi-buf-raya, #818cf8); stroke-width: 2.2; stroke-linecap: round; }
+  .sumi__bufanda-punta { fill: var(--sumi-buf-punta, #6366f1); }
+  .sumi__bufanda-punta--2 { fill: var(--sumi-buf-atras, #4338ca); }
+  .sumi__bufanda-nudo { fill: var(--sumi-buf-atras, #4338ca); }
+  .sumi__integral { fill: var(--sumi-buf-texto, #fff); font: italic 700 14px/1 Georgia, 'Times New Roman', serif; }
   .sumi__cachete { fill: #f4a09d; opacity: 0.55; }
   .sumi__ojo ellipse { fill: $sumi-tinta; }
   .sumi__ojo circle { fill: #fff; }
@@ -63,6 +64,18 @@ app-mascota.sumi {
     &.sumi--feliz, &.sumi--pensando, &.sumi--nervioso { .sumi__brazo--der { transform: rotate(-38deg); } }
   }
   &.sumi--con-birrete .sumi__flor { display: none; }
+
+  // ---------- Vestidor (los dibujos están en mascota/sumi-prendas.ts) ----------
+  // Lo que va encima de la cabeza tapa la flor
+  &.sumi--sin-flor .sumi__flor { display: none; }
+  // Con algo en la mano, el brazo izquierdo no se levanta al celebrar
+  &.sumi--con-objeto.sumi--celebra .sumi__brazo--izq { transform: rotate(8deg); }
+  // Medallón del fondo: borde blanco suave
+  .sumi__fondo-borde { fill: none; stroke: rgba(255, 255, 255, 0.9); stroke-width: 3; }
+  // La notita de los audífonos no choca con la burbuja de "pensando"
+  &.sumi--pensando .sumi__nota { display: none; }
+  &.sumi--b-colombia .sumi__bufanda-raya { stroke-width: 3.4; }
+  &.sumi--b-noche .sumi__bufanda-raya { stroke-dasharray: 1 5; stroke-width: 2.8; }
 
   .sumi__acc--gafas circle { fill: rgba(255, 255, 255, 0.25); stroke: #1f2f3f; stroke-width: 2.4; }
   .sumi__acc--gafas path { fill: none; stroke: #1f2f3f; stroke-width: 2.4; stroke-linecap: round; }

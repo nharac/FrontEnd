@@ -58,7 +58,7 @@
     <span class="navbar__avatar">
       @if (foto()) { <img [src]="foto()" alt=""> } @else { {{ iniciales() }} }
     </span>
-    <span class="navbar__name">{{ nombreDocente() }}</span>
+    <span class="navbar__name">{{ nombreDocente() }}<app-verificado [tam]="14" /></span>
     <mat-icon>expand_more</mat-icon>
   </button>
 

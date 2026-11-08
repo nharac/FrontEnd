@@ -18,9 +18,10 @@ import { colorAvatar } from '../../utils/avatar';
  * a la publicación (nivel 0).
  */
 import { TextoRicoDirective } from '../../directives/texto-rico.directive';
+import { Verificado } from '../verificado/verificado';
 @Component({
   selector: 'app-respuesta-item',
-  imports: [TextoRicoDirective, AdjuntarImagen, FormsModule, MatIconModule],
+  imports: [Verificado, TextoRicoDirective, AdjuntarImagen, FormsModule, MatIconModule],
   templateUrl: './respuesta-item.html',
   styleUrl: './respuesta-item.scss',
 })

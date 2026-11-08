@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DocenteService } from '../../services/docente.service';
 import { NOMBRES_TEMA, PublicacionResumen } from '../../../foro/models/foro.model';
 import { diasDesde, haceCuanto } from '../../../../shared/utils/tiempo';
+import { Verificado } from '../../../../shared/components/verificado/verificado';
 
 type Modo = 'pendientes' | 'todas';
 type Estado = 'sin-respuestas' | 'sin-oficial' | 'oficial';
@@ -21,7 +22,7 @@ type Estado = 'sin-respuestas' | 'sin-oficial' | 'oficial';
  */
 @Component({
   selector: 'app-publicaciones-docente',
-  imports: [MatIconModule, SumiDice, FormsModule],
+  imports: [Verificado, MatIconModule, SumiDice, FormsModule],
   templateUrl: './publicaciones-docente.html',
   styleUrl: './publicaciones-docente.scss',
 })

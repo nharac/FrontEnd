@@ -20,9 +20,10 @@ import { TextoRicoDirective } from '../../../../shared/directives/texto-rico.dir
 import { AdjuntarImagen } from '../../../../shared/components/adjuntar-imagen/adjuntar-imagen';
 import { Observable, map, of, switchMap } from 'rxjs';
 import { UtilesService } from '../../services/utiles.service';
+import { Verificado } from '../../../../shared/components/verificado/verificado';
 @Component({
   selector: 'app-ver-publicacion',
-  imports: [TextoRicoDirective, AdjuntarImagen, RouterLink, FormsModule, MatIconModule, RespuestaItem],
+  imports: [Verificado, TextoRicoDirective, AdjuntarImagen, RouterLink, FormsModule, MatIconModule, RespuestaItem],
   templateUrl: './ver-publicacion.html',
   styleUrl: './ver-publicacion.scss',
 })

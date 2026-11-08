@@ -114,7 +114,7 @@
     <aside class="columnas__lateral">
       <!-- ===== Sumi con el consejo del día ===== -->
       @let sumiHoy = saludoSumi();
-      <app-sumi-dice class="inicio-sumi" [estado]="sumiHoy.estado" accesorio="libro" [tamano]="84" compacto
+      <app-sumi-dice class="inicio-sumi" [estado]="sumiHoy.estado" accesorio="libro" [tamano]="84" compacto conFondo
                      [titulo]="sumiHoy.titulo" [mensajes]="consejos" />
       <!-- ===== Próximo logro ===== -->
       @if (proximoLogro(); as l) {

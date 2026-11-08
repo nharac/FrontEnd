@@ -13,11 +13,12 @@ import { AuthService } from '../../../features/usuario/services/auth.service';
 import { DocenteService } from '../../../features/docente/services/docente.service';
 import { DespedidaService } from '../../../core/services/despedida.service';
 import { PerfilService } from '../../../core/services/perfil.service';
+import { Verificado } from '../verificado/verificado';
 
 @Component({
   selector: 'app-navbar-docente',
   standalone: true,
-  imports: [Logo, BotonTema, 
+  imports: [Verificado, Logo, BotonTema, 
     CommonModule,
     RouterLink,
     RouterLinkActive,
