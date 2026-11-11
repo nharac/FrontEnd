@@ -1,4 +1,5 @@
 import { VARIANTES, VARIANTES_NO_TAPAN_FLOR } from './sumi-variantes';
+import { VARIANTES_DISFRACES, VARIANTES_ROPA } from './sumi-ropa';
 
 /**
  * Dibujos (SVG) de las prendas del vestidor de Sumi. Coordenadas del viewBox 0 0 160 180:
@@ -274,6 +275,18 @@ for (const [dibujos, lista] of [
   for (const v of lista) dibujos[v.id] = v.dibujo;
 }
 for (const v of VARIANTES.espalda) DIBUJOS_ESPALDA[v.id] = { atras: v.dibujo, frente: '' };
+
+/** Ropa: el torso va debajo de la bufanda, la cara y los brazos; las mangas, encima de los brazos. */
+export const DIBUJOS_ROPA: Record<string, { cuerpo: string; mangas: string }> = {};
+/** Trajes completos: Sumi se quita la bufanda para lucirlos. */
+export const TAPAN_BUFANDA = new Set<string>();
+/** Disfraces de cuerpo entero: tapan hojas, flor, brazos, pies, bufanda y sombrero. */
+export const DISFRAZ_COMPLETO = new Set<string>();
+for (const v of [...VARIANTES_ROPA, ...VARIANTES_DISFRACES]) {
+  DIBUJOS_ROPA[v.id] = { cuerpo: v.dibujo, mangas: v.mangas ?? '' };
+  if (v.traje || v.disfraz) TAPAN_BUFANDA.add(v.id);
+  if (v.disfraz) DISFRAZ_COMPLETO.add(v.id);
+}
 for (const v of VARIANTES.cabeza) {
   if (!VARIANTES_NO_TAPAN_FLOR.some(base => v.id.startsWith(base + '-'))) TAPAN_FLOR.add(v.id);
 }

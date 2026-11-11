@@ -8,7 +8,7 @@ type Genero = 'm' | 'f' | 'mp' | 'fp';
 type ColorPaleta = [string, string, string, string, string, string, string, string, number];
 /** Color propio de una familia: [id, nombre, principal, oscuro, claro] */
 type ColorPropio = [string, string, string, string, string];
-interface Familia {
+export interface Familia {
   base: string;
   /** Nombre con {color} */
   nombre: string;
@@ -17,6 +17,12 @@ interface Familia {
   descripcion: string;
   /** SVG con {C} principal, {D} oscuro y {L} claro */
   dibujo: string;
+  /** Ropa: lo que va encima de los brazos (mangas, hombreras). */
+  mangas?: string;
+  /** Ropa: traje completo, reemplaza la bufanda. */
+  traje?: boolean;
+  /** Disfraz de cuerpo entero: tapa toda a Sumi menos la carita. */
+  disfraz?: boolean;
   colores: (string | ColorPropio)[];
 }
 export interface Variante {
@@ -25,6 +31,9 @@ export interface Variante {
   precio: number;
   descripcion: string;
   dibujo: string;
+  mangas?: string;
+  traje?: boolean;
+  disfraz?: boolean;
 }
 const PALETA: ColorPaleta[] = [
   ["rojo", "rojo", "roja", "rojos", "rojas", "#ef4444", "#b91c1c", "#fecaca", 0],
@@ -194,7 +203,11 @@ const FONDO: Familia[] = [
 ];
 const GENERO: Record<Genero, number> = { m: 1, f: 2, mp: 3, fp: 4 };
 
-function expandir(f: Familia): Variante[] {
+function pintar(plantilla: string, principal: string, oscuro: string, claro: string): string {
+  return plantilla.replaceAll('{C}', principal).replaceAll('{D}', oscuro).replaceAll('{L}', claro);
+}
+
+export function expandir(f: Familia): Variante[] {
   return f.colores.map(c => {
     const p = typeof c === 'string' ? PALETA.find(x => x[0] === c)! : null;
     const [id, nombreColor, principal, oscuro, claro, recargo] = p
@@ -205,7 +218,10 @@ function expandir(f: Familia): Variante[] {
       nombre: f.nombre.replace('{color}', nombreColor),
       precio: f.precio + recargo,
       descripcion: f.descripcion,
-      dibujo: f.dibujo.replaceAll('{C}', principal).replaceAll('{D}', oscuro).replaceAll('{L}', claro),
+      dibujo: pintar(f.dibujo, principal, oscuro, claro),
+      ...(f.mangas !== undefined ? { mangas: pintar(f.mangas, principal, oscuro, claro) } : {}),
+      ...(f.traje ? { traje: true } : {}),
+      ...(f.disfraz ? { disfraz: true } : {}),
     };
   });
 }

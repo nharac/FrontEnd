@@ -75,6 +75,10 @@ app-mascota.sumi {
   // La notita de los audífonos no choca con la burbuja de "pensando"
   &.sumi--pensando .sumi__nota { display: none; }
   &.sumi--b-colombia .sumi__bufanda-raya { stroke-width: 3.4; }
+  // Con un traje completo Sumi se quita la bufanda
+  &.sumi--sin-bufanda :is(.sumi__bufanda, .sumi__bufanda-raya, .sumi__bufanda-punta, .sumi__bufanda-nudo, .sumi__integral) { display: none; }
+  // Disfraz de cuerpo entero: solo asoma la carita por la capucha
+  &.sumi--disfraz :is(.sumi__hojas, .sumi__flor, .sumi__brazo, .sumi__pies, .sumi__lana, .sumi__vestidor-cabeza, .sumi__acc--birrete) { display: none; }
   &.sumi--b-noche .sumi__bufanda-raya { stroke-dasharray: 1 5; stroke-width: 2.8; }
 
   .sumi__acc--gafas circle { fill: rgba(255, 255, 255, 0.25); stroke: #1f2f3f; stroke-width: 2.4; }

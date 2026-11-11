@@ -1,10 +1,13 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, WritableSignal, computed, signal } from '@angular/core';
 import { BUFANDAS_VARIANTES, VARIANTES, Variante } from '../../shared/components/mascota/sumi-variantes';
+import { VARIANTES_DISFRACES, VARIANTES_ROPA } from '../../shared/components/mascota/sumi-ropa';
 
 /** Lo que Sumi lleva en la cabeza. */
 export type SombreroSumi = string;
 /** Lo que Sumi lleva en la cara. */
 export type CaraSumi = string;
+/** Camiseta o traje completo. */
+export type RopaSumi = string;
 /** Lo que Sumi lleva en la mano izquierda (la derecha es para los accesorios de cada módulo). */
 export type ObjetoSumi = string;
 /** Lo que Sumi lleva en la espalda. */
@@ -18,11 +21,15 @@ export type BufandaSumi = string;
 export interface EstiloSumi {
   sombrero: SombreroSumi;
   cara: CaraSumi;
+  ropa: RopaSumi;
   objeto: ObjetoSumi;
   espalda: EspaldaSumi;
   bufanda: BufandaSumi;
   fondo: FondoSumi;
 }
+
+/** Una parte del vestidor (es también la categoría del catálogo en el backend: ParteSumi). */
+export type ParteSumi = keyof EstiloSumi;
 
 export interface PrendaSumi<T extends string> {
   id: T;
@@ -271,6 +278,17 @@ export const ESPALDAS: PrendaSumi<EspaldaSumi>[] = ordenar([
   ...VARIANTES.espalda.map(prenda),
 ]);
 
+export const ROPAS: PrendaSumi<RopaSumi>[] = ordenar([
+  { id: 'ninguno', nombre: 'Sin ropa', precio: 0, descripcion: 'Sumi al natural, con su bufanda.' },
+  ...VARIANTES_ROPA.map(prenda),
+]);
+
+/** Disfraces de cuerpo entero: van en la misma parte que la ropa (se pone uno u otro). */
+export const DISFRACES: PrendaSumi<RopaSumi>[] = ordenar([
+  { id: 'ninguno', nombre: 'Sin disfraz', precio: 0, descripcion: 'Sumi al natural, con su bufanda.' },
+  ...VARIANTES_DISFRACES.map(prenda),
+]);
+
 export const FONDOS: PrendaSumi<FondoSumi>[] = ordenar([
   { id: 'ninguno', nombre: 'Sin fondo', precio: 0, descripcion: 'Sumi sola.' },
   { id: 'cielo', nombre: 'Cielo despejado', precio: 0, descripcion: 'Un día bonito.' },
@@ -375,13 +393,28 @@ const CLAVE_SESION = 'saesu_token';
 export class EstiloSumiService {
   readonly sombrero = signal<SombreroSumi>('ninguno');
   readonly cara = signal<CaraSumi>('ninguno');
+  readonly ropa = signal<RopaSumi>('ninguno');
   readonly objeto = signal<ObjetoSumi>('ninguno');
   readonly espalda = signal<EspaldaSumi>('ninguno');
   readonly fondo = signal<FondoSumi>('ninguno');
   readonly bufanda = signal<BufandaSumi>('saesu');
+  /**
+   * Única tabla de partes del frontend: con qué catálogo se valida cada una y cómo es la Sumi clásica.
+   * Agregar una parte = agregarla aquí (y en ParteSumi del backend); el vestidor no se toca.
+   */
+  private readonly partes: Record<ParteSumi, { senal: WritableSignal<string>; clasica: string; catalogo: () => PrendaSumi<string>[] }> = {
+    sombrero: { senal: this.sombrero, clasica: 'ninguno', catalogo: () => SOMBREROS },
+    cara: { senal: this.cara, clasica: 'ninguno', catalogo: () => CARAS },
+    ropa: { senal: this.ropa, clasica: 'ninguno', catalogo: () => [...ROPAS, ...DISFRACES] },
+    objeto: { senal: this.objeto, clasica: 'ninguno', catalogo: () => OBJETOS },
+    espalda: { senal: this.espalda, clasica: 'ninguno', catalogo: () => ESPALDAS },
+    bufanda: { senal: this.bufanda, clasica: 'saesu', catalogo: () => BUFANDAS },
+    fondo: { senal: this.fondo, clasica: 'ninguno', catalogo: () => FONDOS },
+  };
+  private readonly nombresPartes = Object.keys(this.partes) as ParteSumi[];
+
   /** true cuando lleva algo distinto a lo de siempre. */
-  readonly personalizado = computed(() => this.sombrero() !== 'ninguno' || this.cara() !== 'ninguno'
-    || this.objeto() !== 'ninguno' || this.espalda() !== 'ninguno' || this.fondo() !== 'ninguno' || this.bufanda() !== 'saesu');
+  readonly personalizado = computed(() => this.nombresPartes.some(p => this.partes[p].senal() !== this.partes[p].clasica));
 
   /** Quienes deben limpiar su copia cuando se cierra la sesión (la tienda de monedas). */
   private readonly alCerrarSesion: (() => void)[] = [];
@@ -418,50 +451,25 @@ export class EstiloSumiService {
 
   /** Pone lo que venga (del servidor o del navegador), ignorando prendas que no existen. */
   aplicar(e: Partial<EstiloSumi>, guardar = true): void {
-    if (SOMBREROS.some(s => s.id === e?.sombrero)) this.sombrero.set(e.sombrero!);
-    if (CARAS.some(c => c.id === e?.cara)) this.cara.set(e.cara!);
-    if (OBJETOS.some(o => o.id === e?.objeto)) this.objeto.set(e.objeto!);
-    if (ESPALDAS.some(x => x.id === e?.espalda)) this.espalda.set(e.espalda!);
-    if (FONDOS.some(f => f.id === e?.fondo)) this.fondo.set(e.fondo!);
-    if (BUFANDAS.some(b => b.id === e?.bufanda)) this.bufanda.set(e.bufanda!);
+    for (const p of this.nombresPartes) {
+      const id = e?.[p];
+      if (this.partes[p].catalogo().some(x => x.id === id)) this.partes[p].senal.set(id!);
+    }
     if (guardar) this.guardar();
   }
 
   comoMapa(): EstiloSumi {
-    return {
-      sombrero: this.sombrero(), cara: this.cara(), objeto: this.objeto(),
-      espalda: this.espalda(), bufanda: this.bufanda(), fondo: this.fondo(),
-    };
+    return Object.fromEntries(this.nombresPartes.map(p => [p, this.partes[p].senal()])) as unknown as EstiloSumi;
   }
 
-
-  ponerSombrero(id: SombreroSumi): void {
-    this.sombrero.set(id);
-    this.guardar();
+  /** Lo que lleva puesto en una parte. */
+  parte(p: ParteSumi): string {
+    return this.partes[p].senal();
   }
 
-  ponerCara(id: CaraSumi): void {
-    this.cara.set(id);
-    this.guardar();
-  }
-
-  ponerObjeto(id: ObjetoSumi): void {
-    this.objeto.set(id);
-    this.guardar();
-  }
-
-  ponerEspalda(id: EspaldaSumi): void {
-    this.espalda.set(id);
-    this.guardar();
-  }
-
-  ponerFondo(id: FondoSumi): void {
-    this.fondo.set(id);
-    this.guardar();
-  }
-
-  ponerBufanda(id: BufandaSumi): void {
-    this.bufanda.set(id);
+  /** Se pone una prenda en una parte y se guarda en este navegador. */
+  poner(p: ParteSumi, id: string): void {
+    this.partes[p].senal.set(id);
     this.guardar();
   }
 
@@ -472,14 +480,8 @@ export class EstiloSumiService {
 
   /** Sumi en su forma base: sin nada y con la bufanda índigo de SAESU. */
   private clasica(): void {
-    this.sombrero.set('ninguno');
-    this.cara.set('ninguno');
-    this.objeto.set('ninguno');
-    this.espalda.set('ninguno');
-    this.fondo.set('ninguno');
-    this.bufanda.set('saesu');
+    for (const p of this.nombresPartes) this.partes[p].senal.set(this.partes[p].clasica);
   }
-
 
   private guardar(): void {
     try {

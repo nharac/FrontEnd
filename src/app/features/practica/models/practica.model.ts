@@ -24,6 +24,21 @@ export interface Pregunta {
   opciones: Opcion[];
 }
 
+/** Reto del día (RetoDiarioResponse): una sola oportunidad por día. */
+export interface RetoDiario {
+  fecha: string;
+  estado: 'pendiente' | 'ganado' | 'perdido';
+  pregunta: Pregunta;
+  /** Lo que respondió (null si aún no). */
+  opcionElegida: number | null;
+  /** Solo viene después de responder. */
+  opcionCorrecta: number | null;
+  /** Explicación, solo después de responder. */
+  pista: string | null;
+  /** Puntos Sumi que da acertarlo (30). */
+  puntos: number;
+}
+
 /** Cuerpo de POST /api/practica/preguntas/{id}/responder. */
 export interface ResponderRequest {
   opcionId: number;

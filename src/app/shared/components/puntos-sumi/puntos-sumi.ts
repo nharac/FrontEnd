@@ -17,7 +17,7 @@ export const PUNTOS_SUMI = 'Puntos Sumi';
           [attr.role]="etiqueta() ? 'img' : null" [attr.aria-label]="etiqueta() || null"
           [attr.aria-hidden]="etiqueta() ? null : 'true'">
       <span class="p__burbuja">
-        <app-mascota [tamano]="tamanoSumi()" [animada]="destacado()" [estado]="destacado() ? 'celebra' : 'feliz'" />
+        <app-mascota clasica [tamano]="tamanoSumi()" [animada]="destacado()" [estado]="destacado() ? 'celebra' : 'feliz'" />
       </span>
       <svg class="p__estrella" viewBox="0 0 24 24" focusable="false">
         <path d="M12 1.8l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 16.6l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z" />

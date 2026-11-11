@@ -38,7 +38,7 @@ let siguienteId = 0;
       </svg>
       <!-- Sumi completa, como en su foto de perfil -->
       <span class="m__ventana">
-        <app-mascota [tamano]="tamanoSumi()" [animada]="gira()" [estado]="gira() ? 'celebra' : 'feliz'" />
+        <app-mascota clasica [tamano]="tamanoSumi()" [animada]="gira()" [estado]="gira() ? 'celebra' : 'feliz'" />
       </span>
       <svg class="m__brillo" viewBox="0 0 64 64" focusable="false">
         <path d="M11 24 A22 22 0 0 1 23 9" fill="none" stroke="#fff" stroke-width="2.6"

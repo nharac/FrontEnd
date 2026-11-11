@@ -3,12 +3,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { Mascota } from '../../../../shared/components/mascota/mascota';
 import { MonedaSumi } from '../../../../shared/components/moneda-sumi/moneda-sumi';
 import {
-  BUFANDAS, BufandaSumi, CARAS, CaraSumi, ESPALDAS, EspaldaSumi, EstiloSumiService, FONDOS, FondoSumi, OBJETOS, ObjetoSumi,
-  PrendaSumi, SOMBREROS, SombreroSumi
+  BUFANDAS, CARAS, DISFRACES, ESPALDAS, EstiloSumiService, FONDOS, OBJETOS, PrendaSumi, ROPAS, SOMBREROS
 } from '../../../../core/services/estilo-sumi.service';
 import { CategoriaSumi, MovimientoMoneda, TiendaSumiService } from '../../services/tienda-sumi.service';
+import { DISFRAZ_COMPLETO, TAPAN_BUFANDA } from '../../../../shared/components/mascota/sumi-prendas';
 
-type Pestana = 'sombreros' | 'caras' | 'objetos' | 'espaldas' | 'bufandas' | 'fondos';
+type Pestana = 'sombreros' | 'caras' | 'ropa' | 'disfraces' | 'objetos' | 'espaldas' | 'bufandas' | 'fondos';
 
 interface InfoPestana { id: Pestana; categoria: CategoriaSumi; nombre: string; icono: string; lista: PrendaSumi<string>[] }
 
@@ -16,6 +16,8 @@ interface InfoPestana { id: Pestana; categoria: CategoriaSumi; nombre: string; i
 const PESTANAS: InfoPestana[] = [
   { id: 'sombreros', categoria: 'sombrero', nombre: 'Cabeza', icono: 'face', lista: SOMBREROS },
   { id: 'caras', categoria: 'cara', nombre: 'Cara', icono: 'eyeglasses', lista: CARAS },
+  { id: 'ropa', categoria: 'ropa', nombre: 'Ropa', icono: 'checkroom', lista: ROPAS },
+  { id: 'disfraces', categoria: 'ropa', nombre: 'Disfraces', icono: 'pets', lista: DISFRACES },
   { id: 'objetos', categoria: 'objeto', nombre: 'Mano', icono: 'devices', lista: OBJETOS },
   { id: 'espaldas', categoria: 'espalda', nombre: 'Espalda', icono: 'backpack', lista: ESPALDAS },
   { id: 'bufandas', categoria: 'bufanda', nombre: 'Bufanda', icono: 'dry_cleaning', lista: BUFANDAS },
@@ -57,7 +59,7 @@ interface Prueba { pestana: InfoPestana; prenda: PrendaSumi<string> }
       <div class="vs__cuerpo">
         <div class="vs__escenario">
           <app-mascota [estado]="saluda() ? 'celebra' : 'feliz'" [tamano]="150" conFondo
-                       [sombrero]="$any(prueba('sombreros'))" [cara]="$any(prueba('caras'))" [objeto]="$any(prueba('objetos'))"
+                       [sombrero]="$any(prueba('sombreros'))" [cara]="$any(prueba('caras'))" [ropa]="$any(prueba('ropa') ?? prueba('disfraces'))" [objeto]="$any(prueba('objetos'))"
                        [espalda]="$any(prueba('espaldas'))" [bufanda]="$any(prueba('bufandas'))" [fondo]="$any(prueba('fondos'))"
                        etiqueta="Sumi con el estilo que elegiste" />
           @if (probando(); as pr) {
@@ -111,14 +113,12 @@ interface Prueba { pestana: InfoPestana; prenda: PrendaSumi<string> }
                         [attr.aria-pressed]="puesta(p.id)"
                         [title]="mia ? p.descripcion : p.descripcion + ' Cuesta ' + p.precio + ' Sumi Monedas.'"
                         (click)="elegir(p)">
-                  @switch (pestana()) {
-                    @case ('sombreros') { <app-mascota [tamano]="62" [animada]="false" cara="ninguno" objeto="ninguno" espalda="ninguno" [sombrero]="$any(p.id)" /> }
-                    @case ('caras') { <app-mascota [tamano]="62" [animada]="false" sombrero="ninguno" objeto="ninguno" espalda="ninguno" [cara]="$any(p.id)" /> }
-                    @case ('objetos') { <app-mascota [tamano]="62" [animada]="false" sombrero="ninguno" cara="ninguno" espalda="ninguno" [objeto]="$any(p.id)" /> }
-                    @case ('espaldas') { <app-mascota [tamano]="62" [animada]="false" sombrero="ninguno" cara="ninguno" objeto="ninguno" [espalda]="$any(p.id)" /> }
-                    @case ('fondos') { <app-mascota [tamano]="62" [animada]="false" sombrero="ninguno" cara="ninguno" objeto="ninguno" espalda="ninguno" [fondo]="$any(p.id)" /> }
-                    @default { <app-mascota [tamano]="62" [animada]="false" sombrero="ninguno" cara="ninguno" objeto="ninguno" espalda="ninguno" [bufanda]="$any(p.id)" /> }
-                  }
+                  <!-- Vista previa: solo la parte de esta pestaña (el resto, sin nada) -->
+                  <app-mascota [tamano]="62" [animada]="false"
+                               [sombrero]="$any(vistaPrevia('sombrero', p.id))" [cara]="$any(vistaPrevia('cara', p.id))"
+                               [ropa]="$any(vistaPrevia('ropa', p.id))" [objeto]="$any(vistaPrevia('objeto', p.id))"
+                               [espalda]="$any(vistaPrevia('espalda', p.id))" [fondo]="$any(vistaPrevia('fondo', p.id))"
+                               [bufanda]="$any(vistaPrevia('bufanda', p.id))" />
                   <span class="vs__nombre">{{ p.nombre }}</span>
                   @if (!mia) {
                     <span class="vs__precio" [class.vs__precio--caro]="faltan(p) > 0"><app-moneda-sumi [tamano]="14" /> {{ p.precio }}</span>
@@ -183,11 +183,14 @@ export class VestidorSumi implements OnInit {
   readonly nombreBufanda = computed(() => 'Bufanda ' + minuscula(BUFANDAS.find(b => b.id === this.estilo.bufanda())?.nombre ?? ''));
   /** Resumen de lo que lleva puesto: "Gorra SAESU · Gafas de sol · Café · Bufanda lila". */
   readonly lleva = computed(() => [
-    this.nombreSombrero(),
+    // El disfraz tapa el sombrero
+    DISFRAZ_COMPLETO.has(this.estilo.ropa()) ? '' : this.nombreSombrero(),
     this.estilo.cara() === 'ninguno' ? '' : CARAS.find(c => c.id === this.estilo.cara())?.nombre,
+    this.estilo.ropa() === 'ninguno' ? '' : [...ROPAS, ...DISFRACES].find(r => r.id === this.estilo.ropa())?.nombre,
     this.estilo.objeto() === 'ninguno' ? '' : OBJETOS.find(o => o.id === this.estilo.objeto())?.nombre,
     this.estilo.espalda() === 'ninguno' ? '' : ESPALDAS.find(e => e.id === this.estilo.espalda())?.nombre,
-    this.nombreBufanda(),
+    // Con traje completo Sumi no lleva la bufanda
+    TAPAN_BUFANDA.has(this.estilo.ropa()) ? '' : this.nombreBufanda(),
     this.estilo.fondo() === 'ninguno' ? '' : 'Fondo ' + minuscula(FONDOS.find(f => f.id === this.estilo.fondo())?.nombre ?? ''),
   ].filter(Boolean).join(' · '));
 
@@ -280,9 +283,9 @@ export class VestidorSumi implements OnInit {
 
   /** "Compra en el vestidor: sombrero gorra" → "Compraste «Gorra SAESU»". */
   textoMovimiento(m: MovimientoMoneda): string {
-    const compra = /^Compra en el vestidor: (\w+) (\w+)$/.exec(m.motivo);
+    const compra = /^Compra en el vestidor: (\w+) ([\w-]+)$/.exec(m.motivo);
     if (!compra) return m.motivo;
-    const prenda = PESTANAS.find(t => t.categoria === compra[1])?.lista.find(p => p.id === compra[2]);
+    const prenda = PESTANAS.filter(t => t.categoria === compra[1]).flatMap(t => t.lista).find(p => p.id === compra[2]);
     return prenda ? `Compraste «${prenda.nombre}»` : m.motivo;
   }
 
@@ -303,27 +306,27 @@ export class VestidorSumi implements OnInit {
     });
   }
 
+  /** La parte que maneja una pestaña (Ropa y Disfraces comparten la parte "ropa"). */
+  private parteDe(pestana: Pestana): CategoriaSumi {
+    return PESTANAS.find(t => t.id === pestana)!.categoria;
+  }
+
   private poner(pestana: Pestana, id: string): void {
-    switch (pestana) {
-      case 'sombreros': this.estilo.ponerSombrero(id as SombreroSumi); break;
-      case 'caras': this.estilo.ponerCara(id as CaraSumi); break;
-      case 'objetos': this.estilo.ponerObjeto(id as ObjetoSumi); break;
-      case 'espaldas': this.estilo.ponerEspalda(id as EspaldaSumi); break;
-      case 'fondos': this.estilo.ponerFondo(id as FondoSumi); break;
-      default: this.estilo.ponerBufanda(id as BufandaSumi);
-    }
+    this.estilo.poner(this.parteDe(pestana), id);
   }
 
   /** Lo que lleva puesto en una parte. */
   private actual(pestana: Pestana): string {
-    switch (pestana) {
-      case 'sombreros': return this.estilo.sombrero();
-      case 'caras': return this.estilo.cara();
-      case 'objetos': return this.estilo.objeto();
-      case 'espaldas': return this.estilo.espalda();
-      case 'fondos': return this.estilo.fondo();
-      default: return this.estilo.bufanda();
-    }
+    return this.estilo.parte(this.parteDe(pestana));
+  }
+
+  /**
+   * Qué se dibuja en la vista previa de cada prenda: la prenda en su parte y nada en las demás.
+   * La bufanda y el fondo quedan como los tiene puestos (null = usar el vestidor; sin fondo en la lista).
+   */
+  vistaPrevia(parte: CategoriaSumi, id: string): string | null {
+    if (this.parteDe(this.pestana()) === parte) return id;
+    return parte === 'bufanda' || parte === 'fondo' ? null : 'ninguno';
   }
 
   private mensajePuesta(p: PrendaSumi<string>): string {

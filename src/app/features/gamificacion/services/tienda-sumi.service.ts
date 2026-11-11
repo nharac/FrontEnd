@@ -3,10 +3,11 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { EstiloSumi, EstiloSumiService, PrendaSumi } from '../../../core/services/estilo-sumi.service';
+import { EstiloSumi, EstiloSumiService, ParteSumi, PrendaSumi } from '../../../core/services/estilo-sumi.service';
 
 /** Partes del vestidor tal como las nombra el backend (columnas de sumi_estilo). */
-export type CategoriaSumi = 'sombrero' | 'cara' | 'objeto' | 'espalda' | 'bufanda' | 'fondo';
+/** Categoría del catálogo = parte del vestidor (una sola definición). */
+export type CategoriaSumi = ParteSumi;
 
 /** GET /api/sumi/vestidor (y respuesta de comprar y vestir) */
 export interface EstadoVestidor {

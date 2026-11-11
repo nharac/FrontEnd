@@ -122,6 +122,8 @@ const RUTAS: [string, RegExp, (cuerpo?: unknown) => unknown][] = [
   ['POST', /\/auth\/registro$/, () => ({ correo: usuario.correo, mensaje: 'Revisa tu correo', minutosVigencia: 15 })],
   ['POST', /\/auth\/verificar-correo$/, () => ({ usuario, token: 'token-falso' })],
   ['POST', /\/auth\/(reenviar-verificacion|recuperar|recuperar\/validar|restablecer)$/, () => ({ mensaje: 'Listo' })],
+  ['GET', /\/practica\/reto$/, () => retoFalso()],
+  ['POST', /\/practica\/reto\/responder$/, (r) => responderRetoFalso(r)],
   ['GET', /\/practica\/preguntas\/\d+\/pista$/, () => ({ preguntaId: 7, pista: 'Usa la regla de la potencia', mensaje: null })],
   ['POST', /\/practica\/preguntas\/\d+\/responder$/, () => ({ esCorrecta: false, opcionCorrectaId: 1, pista: 'Baja el exponente',
     mensaje: 'Casi', habilitarSiguiente: false, chatIaHabilitado: true, puntosGanados: 0, puntosEnJuego: 15, nuevosLogros: [] })],
@@ -170,7 +172,7 @@ const RUTAS: [string, RegExp, (cuerpo?: unknown) => unknown][] = [
 
 export interface PeticionHecha { metodo: string; url: string; cuerpo: unknown }
 /** Vestidor de Sumi: 80 monedas, la gorra comprada; los docentes tienen todo gratis. Recuerda las compras. */
-const ESTILO_INICIAL = { sombrero: 'gorra', cara: 'ninguno', objeto: 'ninguno', espalda: 'ninguno', bufanda: 'saesu', fondo: 'ninguno' };
+const ESTILO_INICIAL = { sombrero: 'gorra', cara: 'ninguno', ropa: 'ninguno', objeto: 'ninguno', espalda: 'ninguno', bufanda: 'saesu', fondo: 'ninguno' };
 let vestidor = { monedas: 80, inventario: ['sombrero:gorra'], estilo: { ...ESTILO_INICIAL } as unknown };
 function vestidorFalso() {
   return { ...vestidor, docente: localStorage.getItem('saesu_rol') === 'DOCENTE' };
@@ -180,9 +182,23 @@ function comprarFalso(compra: unknown) {
   vestidor = { ...vestidor, monedas: 30, inventario: [...vestidor.inventario, `${categoria}:${prenda}`].sort() };
   return vestidorFalso();
 }
+/** Reto del día: pendiente hasta que se responde; la opción 1 es la correcta. */
+let reto: { estado: string; opcionElegida: number | null } = { estado: 'pendiente', opcionElegida: null };
+function retoFalso() {
+  const respondido = reto.estado !== 'pendiente';
+  return { fecha: '2026-11-08', estado: reto.estado, pregunta: pregunta(7), opcionElegida: reto.opcionElegida,
+    opcionCorrecta: respondido ? 1 : null, pista: respondido ? 'Baja el exponente: 2x' : null, puntos: 30 };
+}
+function responderRetoFalso(cuerpo: unknown) {
+  const opcionId = (cuerpo as { opcionId: number }).opcionId;
+  reto = { estado: opcionId === 1 ? 'ganado' : 'perdido', opcionElegida: opcionId };
+  return retoFalso();
+}
+
 /** Vuelve el vestidor falso a como empieza (se llama entre pruebas). */
 export function reiniciarVestidorFalso(): void {
   vestidor = { monedas: 80, inventario: ['sombrero:gorra'], estilo: { ...ESTILO_INICIAL } };
+  reto = { estado: 'pendiente', opcionElegida: null };
 }
 
 export const peticiones: PeticionHecha[] = [];

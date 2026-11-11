@@ -70,6 +70,9 @@
     <ellipse class="sumi__panza" cx="80" cy="152" rx="24" ry="14" />
     <path class="sumi__lana" d="M45 147 q4 4 8 0 M107 147 q4 4 8 0 M64 163 q4 4 8 0 M88 163 q4 4 8 0" />
 
+    <!-- Vestidor: camiseta o traje (debajo de la bufanda, la cara y los brazos) -->
+    <g class="sumi__vestidor-ropa" [sumiDibujo]="dibujoRopa()" />
+
     <!-- Bufanda de la U con nudo y dos puntas, una con la integral -->
     <path class="sumi__bufanda" d="M39 128 Q80 142 121 128 L121 139 Q80 153 39 139 Z" />
     <path class="sumi__bufanda-raya" d="M40 134.5 Q80 148 120 134.5" />
@@ -109,6 +112,7 @@
 
 
     <!-- ===== Vestidor: solo se dibuja lo que lleva puesto (dibujos en sumi-prendas.ts) ===== -->
+    <g class="sumi__vestidor-mangas" [sumiDibujo]="dibujoMangas()" />
     <g class="sumi__vestidor-frente" [sumiDibujo]="dibujoEspaldaFrente()" />
     <g class="sumi__vestidor-cara" [sumiDibujo]="dibujoCara()" />
     <g class="sumi__vestidor-cabeza" [sumiDibujo]="dibujoSombrero()" />

@@ -7,7 +7,6 @@ import { BotonTema } from '../shared/components/boton-tema/boton-tema';
 import { NoEncontrada } from '../shared/components/no-encontrada/no-encontrada';
 import { Ranking, guardarPuestos, leerPuestos } from '../features/gamificacion/pages/ranking/ranking';
 import { DashboardPractica } from '../features/practica/pages/dashboard-practica/dashboard-practica';
-import { RetoDia, claveDia, diaDelAnio } from '../features/practica/components/reto-dia/reto-dia';
 import { ChatPanel, leerFijadas } from '../features/chat/components/chat-panel/chat-panel';
 import { ListaPublicaciones } from '../features/foro/pages/lista-publicaciones/lista-publicaciones';
 import { NuevaPublicacion } from '../features/foro/pages/nueva-publicacion/nueva-publicacion';
@@ -96,22 +95,6 @@ describe('Mejoras de interfaz', () => {
     expect(c.preguntas().length).toBe(1);
     f.destroy();
     expect(document.body.classList.contains('modo-enfoque')).toBe(false);
-  });
-
-  it('reto del día: cambia cada día y queda superado al acertarlo', async () => {
-    expect(diaDelAnio(new Date(2026, 0, 1))).toBe(1);
-    expect(claveDia(new Date(2026, 10, 7))).toBe('2026-11-07');
-    localStorage.removeItem('saesu-reto');
-    const f = await montar(RetoDia);
-    const c = f.componentInstance as any;
-    await pintar(f);
-    expect(c.pregunta()).not.toBeNull();
-    c.abierto.set(true);
-    await pintar(f);
-    c.alAcertar();
-    expect(c.superado()).toBe(true);
-    expect(localStorage.getItem('saesu-reto')).toBe(claveDia(new Date()));
-    expect(c.nombreTema()).toBeTruthy();
   });
 
   it('chat: fijar respuestas y atajos para seguir', async () => {

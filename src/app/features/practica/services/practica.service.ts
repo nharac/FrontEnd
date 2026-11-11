@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { Dificultad, Pista, Pregunta, Progreso, Tema, Validacion } from '../models/practica.model';
+import { Dificultad, Pista, Pregunta, Progreso, RetoDiario, Tema, Validacion } from '../models/practica.model';
 
 /**
  * Servicio del módulo de práctica.
@@ -61,6 +61,22 @@ export class PracticaService {
    */
   responder(preguntaId: number, opcionId: number): Observable<Validacion> {
     return this.http.post<Validacion>(`${this.API}/preguntas/${preguntaId}/responder`, { opcionId });
+  }
+
+  /**
+   * Reto del día de quien está en sesión (pendiente, ganado o perdido).
+   * GET /api/practica/reto
+   */
+  retoDeHoy(): Observable<RetoDiario> {
+    return this.http.get<RetoDiario>(`${this.API}/reto`);
+  }
+
+  /**
+   * La única respuesta del reto del día. 409 si ya respondió.
+   * POST /api/practica/reto/responder
+   */
+  responderReto(opcionId: number): Observable<RetoDiario> {
+    return this.http.post<RetoDiario>(`${this.API}/reto/responder`, { opcionId });
   }
 
   /**

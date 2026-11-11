@@ -42,7 +42,7 @@ describe('Vestidor de Sumi', () => {
     e.restablecer();
     expect(e.personalizado()).toBe(false);
     expect(JSON.parse(localStorage.getItem('saesu-sumi-estilo')!))
-      .toEqual({ sombrero: 'ninguno', cara: 'ninguno', objeto: 'ninguno', espalda: 'ninguno', fondo: 'ninguno', bufanda: 'saesu' });
+      .toEqual({ sombrero: 'ninguno', cara: 'ninguno', ropa: 'ninguno', objeto: 'ninguno', espalda: 'ninguno', fondo: 'ninguno', bufanda: 'saesu' });
 
     TestBed.resetTestingModule();
     localStorage.setItem('saesu_token', 'token-falso');
@@ -69,7 +69,7 @@ describe('Vestidor de Sumi', () => {
     const tienda = TestBed.inject(TiendaSumiService);
     tienda.cargar().subscribe();
     await new Promise(r => setTimeout(r));
-    estilo.ponerFondo('playa');
+    estilo.poner('fondo', 'playa');
     expect(estilo.personalizado()).toBe(true);
     expect(tienda.monedas()).toBe(80);
 
@@ -91,7 +91,7 @@ describe('Vestidor de Sumi', () => {
   it('servicio: sin localStorage no se rompe', () => {
     const e = TestBed.inject(EstiloSumiService);
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('lleno'); });
-    e.ponerSombrero('gorra');
+    e.poner('sombrero', 'gorra');
     expect(e.sombrero()).toBe('gorra');
   });
 
@@ -103,11 +103,11 @@ describe('Vestidor de Sumi', () => {
     expect(piezas()).toEqual([0, 0, 0, 0, 0]);
 
     const e = TestBed.inject(EstiloSumiService);
-    e.ponerSombrero('vikingo');
-    e.ponerCara('bigote');
-    e.ponerObjeto('arepa');
-    e.ponerEspalda('mochila');
-    e.ponerBufanda('nieve');
+    e.poner('sombrero', 'vikingo');
+    e.poner('cara', 'bigote');
+    e.poner('objeto', 'arepa');
+    e.poner('espalda', 'mochila');
+    e.poner('bufanda', 'nieve');
     await pintar(f);
     expect(piezas().every(n => n > 0)).toBe(true);
     expect(el.className).toContain('sumi--sin-flor');
@@ -127,7 +127,7 @@ describe('Vestidor de Sumi', () => {
     expect(piezas()[2]).toBe(0);
 
     // El fondo solo aparece donde se pide (Sumi grande) y cada Sumi tiene su propio recorte
-    e.ponerFondo('espacio');
+    e.poner('fondo', 'espacio');
     await pintar(f);
     expect(el.querySelector('.sumi__fondo')).toBeNull();
     f.componentRef.setInput('conFondo', true);
@@ -163,7 +163,7 @@ describe('Vestidor de Sumi', () => {
   it('servicio: aplica estilos del servidor y los devuelve como mapa', () => {
     const e = TestBed.inject(EstiloSumiService);
     e.aplicar({ sombrero: 'chef', fondo: 'playa', cara: 'nada-raro' as any });
-    expect(e.comoMapa()).toEqual({ sombrero: 'chef', cara: 'ninguno', objeto: 'ninguno', espalda: 'ninguno', bufanda: 'saesu', fondo: 'playa' });
+    expect(e.comoMapa()).toEqual({ sombrero: 'chef', cara: 'ninguno', ropa: 'ninguno', objeto: 'ninguno', espalda: 'ninguno', bufanda: 'saesu', fondo: 'playa' });
     expect(JSON.parse(localStorage.getItem('saesu-sumi-estilo')!).sombrero).toBe('chef');
   });
 
@@ -180,7 +180,7 @@ describe('Vestidor de Sumi', () => {
     expect(tienda.tiene('sombrero', SOMBREROS.find(p => p.id === 'corona')!)).toBe(false);
     expect(tienda.tiene('sombrero', SOMBREROS.find(p => p.id === 'gorro')!)).toBe(true);
 
-    estilo.ponerSombrero('chef');
+    estilo.poner('sombrero', 'chef');
     tienda.comprar('fondo', 'playa').subscribe();
     await new Promise(r => setTimeout(r));
     expect(tienda.monedas()).toBe(30);
