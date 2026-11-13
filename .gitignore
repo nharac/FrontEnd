@@ -50,3 +50,8 @@ Thumbs.db
 
 # Parches temporales
 *.patch
+
+# Pruebas E2E (Playwright)
+/test-results/
+/e2e-reporte/
+/playwright/.cache/
