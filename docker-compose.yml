@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     container_name: saesu-frontend
     restart: unless-stopped
+    # NGINX sirviendo archivos estáticos gasta unos 10-20 MB; el tope evita sorpresas
+    mem_limit: 64m
     ports:
       - "80:80"
     networks:
