@@ -7,6 +7,7 @@ import {
 } from '../../../../core/services/estilo-sumi.service';
 import { CategoriaSumi, MovimientoMoneda, TiendaSumiService } from '../../services/tienda-sumi.service';
 import { DISFRAZ_COMPLETO, TAPAN_BUFANDA } from '../../../../shared/components/mascota/sumi-prendas';
+import { azar } from '../../../../shared/utils/azar';
 
 type Pestana = 'sombreros' | 'caras' | 'ropa' | 'disfraces' | 'objetos' | 'espaldas' | 'bufandas' | 'fondos';
 
@@ -268,7 +269,7 @@ export class VestidorSumi implements OnInit {
   sorprender(): void {
     for (const t of PESTANAS) {
       const mias = t.lista.filter(p => this.tienda.tiene(t.categoria, p));
-      this.poner(t.id, mias[Math.floor(Math.random() * mias.length)].id);
+      this.poner(t.id, mias[Math.floor(azar() * mias.length)].id);
     }
     this.aviso.set('¡Estilo sorpresa!');
     this.celebrar();

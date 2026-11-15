@@ -57,9 +57,9 @@ function formatoEnLinea(linea: string): string {
     .replace(/\^(-?[\w.]+)/g, '<sup>$1</sup>');
 }
 
-/** Marca que reemplaza cada fórmula mientras se procesa el markdown (caracteres que la IA no escribe). */
-const MARCA = (i: number) => `\u0001${i}\u0002`;
-const MARCA_RE = /\u0001(\d+)\u0002/g;
+/** Marca que reemplaza cada fórmula mientras se procesa el markdown (caracteres de uso privado que la IA no escribe). */
+const MARCA = (i: number) => `\uE000${i}\uE001`;
+const MARCA_RE = /\uE000(\d+)\uE001/g;
 
 /** Delimitadores de fórmula: los de bloque se dibujan centrados en su propia línea. */
 const DELIMITADORES = [
