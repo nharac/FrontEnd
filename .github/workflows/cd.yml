@@ -47,5 +47,11 @@ jobs:
             git reset --hard origin/main
             docker compose up -d --build
             docker image prune -f
-            sleep 20
-            curl -fsS -o /dev/null http://localhost/
+            # Se reintenta hasta 1 minuto mientras NGINX arranca
+            for i in $(seq 1 12); do
+              if curl -fsS -o /dev/null http://localhost/; then echo "Frontend OK"; exit 0; fi
+              echo "Esperando a que arranque el frontend ($i/12)..."
+              sleep 5
+            done
+            docker logs --tail 40 saesu-frontend
+            exit 1
