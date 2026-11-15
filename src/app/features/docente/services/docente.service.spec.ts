@@ -11,6 +11,7 @@ describe('DocenteService', () => {
   let backend: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.setItem('saesu_rol', 'DOCENTE');
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
     servicio = TestBed.inject(DocenteService);
     backend = TestBed.inject(HttpTestingController);
@@ -22,6 +23,13 @@ describe('DocenteService', () => {
     servicio.refrescarPendientes();
     backend.expectOne(`${API}/docente/notificaciones`).flush([{ id: 1 }, { id: 2 }]);
     expect(servicio.pendientes()).toBe(2);
+  });
+
+  it('con sesión de estudiante (otra pestaña) no pide las consultas pendientes', () => {
+    localStorage.setItem('saesu_rol', 'ESTUDIANTE');
+    servicio.refrescarPendientes();
+    backend.expectNone(`${API}/docente/notificaciones`);
+    expect(servicio.pendientes()).toBeNull();
   });
 
   it('si no hay conexión conserva el último conteo', () => {

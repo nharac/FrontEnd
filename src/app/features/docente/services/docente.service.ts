@@ -4,6 +4,7 @@ import { Observable, shareReplay } from 'rxjs';
 
 import { ResultadoQuiz } from '../../quiz/models/quiz.model';
 import { environment } from '../../../../environments/environment';
+import { TokenService } from '../../../core/services/token.service';
 import { Usuario } from '../../usuario/models/usuario.model';
 import {
   ContenidoOculto,
@@ -34,12 +35,18 @@ export class DocenteService {
   private readonly API = environment.apiUrl;
 
   private http = inject(HttpClient);
+  private token = inject(TokenService);
 
   /** Consultas sin respuesta oficial (contador de la navbar). null = todavía no se sabe. */
   readonly pendientes = signal<number | null>(null);
 
   /** Vuelve a contar las consultas pendientes (la navbar lo hace cada minuto y al navegar). */
   refrescarPendientes(): void {
+    // Si en otra pestaña se inició sesión como estudiante, el token compartido ya no es de docente:
+    // no se pregunta (el backend respondería 403 cada minuto).
+    if (!this.token.esDocente()) {
+      return;
+    }
     this.notificaciones().subscribe({
       next: (lista) => this.pendientes.set(lista.length),
       error: () => { /* sin conexión: se deja el último valor */ }
