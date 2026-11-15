@@ -96,7 +96,7 @@ describe('Ropa de Sumi', () => {
       .toBe('Compraste «Traje de oficina azul»');
     c.elegir(ROPAS[0]);
     expect(estilo.ropa()).toBe('ninguno');
-  }, 30000);
+  }, 90_000); // pinta las 400+ prendas del vestidor: en equipos cargados tarda
 
   it('disfraces: 93 de cuerpo entero con los mismos ids y precios que el backend (V29)', () => {
     expect(VARIANTES_DISFRACES).toHaveLength(93);
@@ -139,5 +139,5 @@ describe('Ropa de Sumi', () => {
     expect(c.lleva()).toBe('Disfraz de oso pardo');
     expect(c.textoMovimiento({ cantidad: -90, motivo: 'Compra en el vestidor: ropa oso-pardo', fecha: '' }))
       .toBe('Compraste «Disfraz de oso pardo»');
-  }, 30000);
+  }, 90_000); // pinta las 400+ prendas del vestidor: en equipos cargados tarda
 });

@@ -288,7 +288,7 @@ describe('Vestidor de Sumi', () => {
     expect(f.nativeElement.querySelector('.vs__gasto')).not.toBeNull();
     expect(f.nativeElement.querySelector('.vs__movs')!.textContent).toContain('Compraste «Gorra SAESU»');
     expect(c.textoMovimiento({ cantidad: -5, motivo: 'Compra en el vestidor: sombrero inventado', fecha: '' })).toContain('inventado');
-  }, 20000); // recorre todo el vestidor (con 700+ prendas)
+  }, 90_000); // recorre todo el vestidor (con 700+ prendas): en equipos cargados tarda
 
   it('vestidor: avisa si no puede traer las monedas', async () => {
     errores.set(/sumi\/vestidor$/, 500);
