@@ -12,5 +12,6 @@ export async function iniciarSesion(page: Page): Promise<void> {
   await page.locator('#login-correo').fill(CORREO);
   await page.locator('#login-password').fill(PASSWORD);
   await page.getByRole('button', { name: /^Ingresar/ }).click();
-  await expect(page).toHaveURL(/\/dashboard/);
+  // El primer login tras arrancar el backend es lento (JIT de Java + primera conexión a la base)
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
 }
