@@ -1,0 +1,13 @@
+# HTTPS en el servidor de AWS. Se usa junto con docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
+# o, para no escribirlo cada vez, en el .env de esta carpeta del servidor:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.https.yml
+# Requiere el certificado en /etc/letsencrypt del servidor (ver docs/https.md).
+services:
+  frontend:
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx-https.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
