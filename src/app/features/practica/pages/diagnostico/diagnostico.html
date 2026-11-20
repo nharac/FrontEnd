@@ -1,0 +1,71 @@
+<div class="dg">
+  @switch (etapa()) {
+    @case ('inicio') {
+      <section class="dg-caja dg-centro">
+        <mat-icon class="dg-icono" aria-hidden="true">quiz</mat-icon>
+        <h1>Diagnóstico de bases</h1>
+        <p>Son <strong>12 preguntas básicas</strong> (2 de cada tema, de fundamentos a integrales). No da miedo:
+          sirve para saber qué bases te faltan y por dónde te conviene empezar. Si no sabes una, marca <em>"No sé"</em>.</p>
+        <button type="button" class="dg-btn" (click)="empezar()">Empezar diagnóstico</button>
+      </section>
+    }
+    @case ('cargando') { <p class="dg-aviso">Preparando las preguntas…</p> }
+    @case ('error') {
+      <section class="dg-caja dg-centro">
+        <p>No pudimos cargar las preguntas. Intenta de nuevo en un momento.</p>
+        <button type="button" class="dg-btn" (click)="empezar()">Reintentar</button>
+      </section>
+    }
+    @case ('preguntas') {
+      @if (pregunta(); as p) {
+        <section class="dg-caja" aria-live="polite">
+          <div class="dg-cabecera">
+            <span class="dg-tema">{{ nombreTema() }}</span>
+            <span>Pregunta {{ actual() + 1 }} de {{ preguntas().length }}</span>
+          </div>
+          <div class="dg-barra"><span [style.width.%]="(actual() / preguntas().length) * 100"></span></div>
+          <h2>{{ p.enunciado }}</h2>
+          <div class="dg-opciones" role="radiogroup" aria-label="Opciones">
+            @for (o of p.opciones; track o.id) {
+              <button type="button" role="radio" class="dg-opcion" [class.activa]="elegida() === o.id"
+                      [attr.aria-checked]="elegida() === o.id" (click)="elegida.set(o.id)">
+                <strong>{{ o.letra }}</strong> {{ o.texto }}
+              </button>
+            }
+          </div>
+          <div class="dg-acciones">
+            <button type="button" class="dg-btn dg-btn--claro" (click)="noSe()" [disabled]="enviando()">No sé</button>
+            <button type="button" class="dg-btn" (click)="responder()" [disabled]="elegida() === null || enviando()">Responder</button>
+          </div>
+        </section>
+      }
+    }
+    @case ('resultado') {
+      <section class="dg-caja">
+        <h1>Tu diagnóstico</h1>
+        <ul class="dg-resultados">
+          @for (r of resultados(); track r.tema) {
+            <li [class.dg-ok]="r.aciertos === r.total">
+              <span>{{ r.nombre }}</span>
+              <strong>{{ r.aciertos }} / {{ r.total }}</strong>
+            </li>
+          }
+        </ul>
+        @if (recomendado(); as r) {
+          <p class="dg-reco">
+            <mat-icon aria-hidden="true">tips_and_updates</mat-icon>
+            @if (r.aciertos < r.total) {
+              Te recomendamos empezar por <strong>{{ r.nombre }}</strong>: reforzar esa base te hará más fácil todo lo que viene después.
+            } @else {
+              ¡Tus bases están muy bien! Puedes ir directo a practicar <strong>{{ r.nombre }}</strong> y subir de nivel.
+            }
+          </p>
+          <div class="dg-acciones">
+            <a class="dg-btn" routerLink="/practica" [queryParams]="{ tema: r.tema }">Practicar {{ r.nombre }}</a>
+            <a class="dg-btn dg-btn--claro" routerLink="/ruta">Ver mi ruta</a>
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

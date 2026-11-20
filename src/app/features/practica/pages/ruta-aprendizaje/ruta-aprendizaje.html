@@ -8,6 +8,12 @@
     }
   </header>
 
+  <a class="ru-diagnostico" routerLink="/diagnostico">
+    <mat-icon aria-hidden="true">quiz</mat-icon>
+    <span><strong>¿No sabes por dónde empezar?</strong> Haz el diagnóstico de bases: 12 preguntas rápidas.</span>
+    <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+  </a>
+
   @if (cargando()) {
     <p class="ru-aviso">Cargando tu progreso…</p>
   } @else if (error()) {

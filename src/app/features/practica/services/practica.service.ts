@@ -56,6 +56,14 @@ export class PracticaService {
   }
 
   /**
+   * GET /api/practica/preguntas/repaso
+   * Preguntas que el estudiante falló la última vez que las respondió.
+   */
+  repaso(size = 20): Observable<Pregunta[]> {
+    return this.http.get<Pregunta[]>(`${this.API}/preguntas/repaso`, { params: { size } });
+  }
+
+  /**
    * Valida la opción elegida.
    * POST /api/practica/preguntas/{id}/responder
    */

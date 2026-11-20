@@ -1,0 +1,26 @@
+$indigo: #4f46e5;
+$suave: #eef2ff;
+$gris: #6b7280;
+:host { display: block; color: #1f2f3f; }
+.dg { max-width: 720px; margin: 0 auto; }
+.dg-caja { background: #fff; border-radius: 20px; padding: 22px; box-shadow: 0 6px 22px rgba(31, 50, 71, 0.07); display: flex; flex-direction: column; gap: 12px;
+  h1 { margin: 0; font-size: 26px; } h2 { margin: 4px 0; font-size: 19px; line-height: 1.4; } p { margin: 0; line-height: 1.5; color: #374151; } }
+.dg-centro { align-items: center; text-align: center; }
+.dg-icono { font-size: 48px; width: 48px; height: 48px; color: $indigo; }
+.dg-aviso { color: $gris; text-align: center; }
+.dg-cabecera { display: flex; justify-content: space-between; font-size: 13px; color: $gris; }
+.dg-tema { font-weight: 700; color: $indigo; background: $suave; padding: 3px 10px; border-radius: 999px; }
+.dg-barra { height: 6px; background: #f1f5f9; border-radius: 6px; overflow: hidden; span { display: block; height: 100%; background: $indigo; transition: width 0.3s; } }
+.dg-opciones { display: flex; flex-direction: column; gap: 8px; }
+.dg-opcion { text-align: left; font: inherit; padding: 12px 14px; border-radius: 12px; border: 2px solid #e5e7eb; background: #fff; cursor: pointer;
+  strong { color: $indigo; margin-right: 6px; } &.activa { border-color: $indigo; background: $suave; }
+  &:focus-visible { outline: 3px solid rgba(79, 70, 229, 0.4); } }
+.dg-acciones { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.dg-btn { display: inline-flex; align-items: center; font: inherit; font-weight: 600; font-size: 14.5px; text-decoration: none; color: #fff; border: 0; border-radius: 12px;
+  padding: 10px 18px; cursor: pointer; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  &--claro { color: $indigo; background: $suave; } &:disabled { opacity: 0.55; cursor: default; } }
+.dg-resultados { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  li { display: flex; justify-content: space-between; padding: 10px 14px; border-radius: 12px; background: #fef2f2; color: #b91c1c; }
+  li.dg-ok { background: #ecfdf5; color: #047857; } }
+.dg-reco { display: flex; gap: 8px; align-items: flex-start; background: $suave; border-radius: 12px; padding: 12px 14px;
+  mat-icon { color: #d97706; flex: none; } }

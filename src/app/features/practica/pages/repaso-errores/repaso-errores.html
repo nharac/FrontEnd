@@ -1,0 +1,47 @@
+<div class="re">
+  <header class="re-hero">
+    <h1>Repaso de errores</h1>
+    <p>Aquí están las preguntas que fallaste la última vez. Equivocarse es parte de aprender: inténtalas de nuevo
+      y, cuando aciertes, saldrán de la lista.</p>
+    @if (corregidas() > 0) {
+      <span class="re-logro"><mat-icon aria-hidden="true">celebration</mat-icon> ¡Corregiste {{ corregidas() }}!</span>
+    }
+  </header>
+
+  @if (cargando()) {
+    <p class="re-aviso">Buscando tus errores…</p>
+  } @else if (error()) {
+    <p class="re-aviso">No pudimos cargar tu repaso. Intenta de nuevo en un momento.</p>
+  } @else if (pendientes() === 0) {
+    <section class="re-caja re-vacio">
+      <mat-icon aria-hidden="true">task_alt</mat-icon>
+      <h2>¡No tienes errores pendientes!</h2>
+      <p>Sigue practicando; si fallas alguna, aparecerá aquí para que la repases.</p>
+      <a class="re-btn" routerLink="/practica">Ir a practicar</a>
+    </section>
+  } @else {
+    <p class="re-cuenta">{{ pendientes() }} por repasar</p>
+    @for (p of preguntas(); track p.id) {
+      <section class="re-caja">
+        <span class="re-tema">{{ nombreTema(p.tema) }}</span>
+        <h2>{{ p.enunciado }}</h2>
+        <div class="re-opciones" role="radiogroup" [attr.aria-label]="'Opciones de la pregunta ' + p.id">
+          @for (o of p.opciones; track o.id) {
+            <button type="button" role="radio" class="re-opcion" [class.activa]="elegida()[p.id] === o.id"
+                    [attr.aria-checked]="elegida()[p.id] === o.id" (click)="elegir(p.id, o.id)">
+              <strong>{{ o.letra }}</strong> {{ o.texto }}
+            </button>
+          }
+        </div>
+        @if (pistas()[p.id]; as pista) {
+          <p class="re-pista"><mat-icon aria-hidden="true">lightbulb</mat-icon> {{ pista }}</p>
+        }
+        <div class="re-acciones">
+          <a class="re-link" routerLink="/chat">Pedir ayuda al tutor</a>
+          <button type="button" class="re-btn" (click)="responder(p)"
+                  [disabled]="elegida()[p.id] === undefined || enviando() !== null">Responder</button>
+        </div>
+      </section>
+    }
+  }
+</div>
