@@ -26,6 +26,9 @@
         </div>
       </div>
       <div class="perfil__estado">
+        <a class="dp-btn dp-btn--claro dp-no-imprimir" routerLink="/docente/reporte" [queryParams]="{ estudiante: e.id }">
+          <mat-icon>picture_as_pdf</mat-icon> Reporte PDF
+        </a>
         @if (e.estado === 'nuevo') {
           <span class="dp-chip dp-chip--indigo"><mat-icon>fiber_new</mat-icon> Nuevo</span>
           <small>Tiene {{ e.diasDeGracia }} {{ e.diasDeGracia === 1 ? 'día' : 'días' }} para empezar a practicar o hacer un quiz</small>

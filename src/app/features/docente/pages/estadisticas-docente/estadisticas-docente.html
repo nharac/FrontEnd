@@ -2,12 +2,15 @@
   <header class="dp-cabecera">
     <div>
       <h1>Estadísticas del grupo</h1>
-      <p>Cómo van tus estudiantes en límites, derivadas e integrales.</p>
+      <p>Cómo van tus estudiantes en cada tema, de las bases al cálculo y el álgebra lineal.</p>
     </div>
     <div class="dp-acciones dp-no-imprimir">
       <button type="button" class="dp-btn" (click)="imprimir()" [disabled]="!datos()">
         <mat-icon>picture_as_pdf</mat-icon> Descargar PDF
       </button>
+      <a class="dp-btn dp-btn--claro" routerLink="/docente/reporte">
+        <mat-icon>description</mat-icon> Reporte completo
+      </a>
       <a class="dp-btn dp-btn--claro" routerLink="/docente/estudiantes">
         <mat-icon>groups</mat-icon> Ver estudiantes
       </a>

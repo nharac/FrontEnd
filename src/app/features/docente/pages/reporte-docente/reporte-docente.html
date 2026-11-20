@@ -1,0 +1,130 @@
+<div class="rp">
+  <div class="rp-barra no-imprimir">
+    <a class="rp-volver" routerLink="/docente/estadisticas"><mat-icon aria-hidden="true">arrow_back</mat-icon> Volver</a>
+    <p>Pulsa <b>Descargar PDF</b> y en el destino elige <b>"Guardar como PDF"</b>.</p>
+    <button type="button" class="rp-btn" (click)="imprimir()" [disabled]="cargando() || error()">
+      <mat-icon aria-hidden="true">picture_as_pdf</mat-icon> Descargar PDF
+    </button>
+  </div>
+
+  @if (cargando()) {
+    <p class="rp-aviso">Preparando el reporte…</p>
+  } @else if (error()) {
+    <p class="rp-aviso">No se pudo armar el reporte. Intenta de nuevo.</p>
+  } @else {
+    <article class="rp-hoja">
+      <header class="rp-cabeza">
+        <app-logo [size]="44" />
+        <div>
+          <h1>{{ detalle() ? 'Reporte de ' + detalle()!.resumen.nombre : 'Reporte del grupo' }}</h1>
+          <p>SAESU · Universidad de Cundinamarca · {{ hoy | date: 'd MMM y, h:mm a' }}{{ nombreDocente() ? ' · Docente: ' + nombreDocente() : '' }}</p>
+        </div>
+      </header>
+
+      @if (grupo(); as g) {
+        <section class="rp-kpis">
+          <div><b>{{ g.totalEstudiantes }}</b><span>Estudiantes</span></div>
+          <div><b>{{ g.activosSemana }}</b><span>Activos esta semana</span></div>
+          <div><b>{{ g.porcentajeAciertoGeneral | number: '1.0-1' }} %</b><span>Acierto general</span></div>
+          <div [class.rp-alerta]="g.estudiantesEnRiesgo > 0"><b>{{ g.estudiantesEnRiesgo }}</b><span>En riesgo</span></div>
+        </section>
+
+        <h2>Rendimiento por tema</h2>
+        <table class="rp-tabla">
+          <thead><tr><th>Tema</th><th>Intentos</th><th>Correctas</th><th>Acierto</th><th>Estudiantes</th><th></th></tr></thead>
+          <tbody>
+            @for (t of g.porTema; track t.tema) {
+              <tr>
+                <td>{{ nombresTema[t.tema] ?? t.tema }}</td><td>{{ t.intentos }}</td><td>{{ t.correctas }}</td>
+                <td><b [class.rp-bajo]="t.intentos > 0 && t.porcentaje < 50">{{ t.porcentaje | number: '1.0-1' }} %</b></td>
+                <td>{{ t.estudiantes }}</td>
+                <td class="rp-barrita"><span [style.width.%]="t.porcentaje"></span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (g.preguntasDificiles.length) {
+          <h2>Preguntas que más fallan</h2>
+          <ol class="rp-lista">
+            @for (p of g.preguntasDificiles; track p.id) {
+              <li><b>{{ p.porcentajeFallo | number: '1.0-0' }} % de fallo</b> · {{ nombresTema[p.tema] ?? p.tema }} — {{ p.enunciado }}
+                @if (p.errorFrecuente) { <small>Error más común: {{ p.errorFrecuente }}</small> }</li>
+            }
+          </ol>
+        }
+
+        <h2>Estudiantes</h2>
+        <table class="rp-tabla">
+          <thead><tr><th>Nombre</th><th>Estado</th><th>Intentos</th><th>Acierto</th><th>Quices</th><th>Puntos</th></tr></thead>
+          <tbody>
+            @for (e of ordenados(); track e.id) {
+              <tr [class.rp-fila-riesgo]="e.estado === 'en-riesgo'">
+                <td>{{ e.nombre }}</td><td>{{ estado(e) }}</td><td>{{ e.intentos }}</td><td>{{ e.porcentaje | number: '1.0-1' }} %</td>
+                <td>{{ e.quices }}{{ e.promedioQuiz !== null ? ' (' + (e.promedioQuiz | number: '1.0-0') + ' %)' : '' }}</td><td>{{ e.puntos }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (enRiesgo().length) {
+          <h2>Para atender</h2>
+          <ul class="rp-lista">
+            @for (e of enRiesgo(); track e.id) { <li><b>{{ e.nombre }}:</b> {{ e.motivosRiesgo.join('; ') }}</li> }
+          </ul>
+        }
+      }
+
+      @if (detalle(); as d) {
+        <section class="rp-kpis">
+          <div><b>{{ d.resumen.intentos }}</b><span>Preguntas respondidas</span></div>
+          <div><b>{{ d.resumen.porcentaje | number: '1.0-1' }} %</b><span>Acierto</span></div>
+          <div><b>{{ d.resumen.quices }}</b><span>Quices{{ d.resumen.promedioQuiz !== null ? ' (prom. ' + (d.resumen.promedioQuiz | number: '1.0-0') + ' %)' : '' }}</span></div>
+          <div [class.rp-alerta]="d.resumen.estado === 'en-riesgo'"><b>{{ estado(d.resumen) }}</b><span>Estado</span></div>
+        </section>
+        <p class="rp-dato">{{ d.resumen.correo }} · Registrado el {{ d.fechaRegistro | date: 'd MMM y' }} · {{ d.logrosObtenidos }} logros · {{ d.resumen.puntos }} Puntos Sumi · racha de {{ d.resumen.racha }} días</p>
+        @if (d.resumen.motivosRiesgo.length) { <p class="rp-dato rp-bajo">Motivos de riesgo: {{ d.resumen.motivosRiesgo.join('; ') }}</p> }
+
+        <h2>Progreso por tema</h2>
+        <table class="rp-tabla">
+          <thead><tr><th>Tema</th><th>Intentos</th><th>Acierto</th><th>Resueltas</th><th></th></tr></thead>
+          <tbody>
+            @for (t of d.resumen.porTema; track t.tema) {
+              <tr>
+                <td>{{ nombresTema[t.tema] ?? t.tema }}</td><td>{{ t.intentos }}</td>
+                <td><b [class.rp-bajo]="t.intentos > 0 && t.porcentaje < 50">{{ t.porcentaje | number: '1.0-1' }} %</b></td>
+                <td>{{ t.resueltas }} / {{ t.totalPreguntas }}</td>
+                <td class="rp-barrita"><span [style.width.%]="t.totalPreguntas ? (t.resueltas / t.totalPreguntas) * 100 : 0"></span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (d.preguntasConMasFallos.length) {
+          <h2>Preguntas que más falla</h2>
+          <ol class="rp-lista">
+            @for (p of d.preguntasConMasFallos; track p.preguntaId) {
+              <li><b>{{ p.fallos }} fallo{{ p.fallos === 1 ? '' : 's' }}</b>{{ p.resuelta ? ' (ya la resolvió)' : '' }} · {{ nombresTema[p.tema] ?? p.tema }} — {{ p.enunciado }}</li>
+            }
+          </ol>
+        }
+
+        @if (d.quices.length) {
+          <h2>Últimos quices</h2>
+          <table class="rp-tabla">
+            <thead><tr><th>Fecha</th><th>Tema</th><th>Resultado</th><th>Tiempo</th></tr></thead>
+            <tbody>
+              @for (q of d.quices; track q.id) {
+                <tr><td>{{ q.fecha | date: 'd MMM y' }}</td><td>{{ q.tema ? (nombresTema[q.tema] ?? q.tema) : 'Mixto' }}</td>
+                  <td>{{ q.correctas }}/{{ q.total }} ({{ q.porcentaje | number: '1.0-0' }} %)</td><td>{{ (q.duracionSegundos / 60) | number: '1.0-0' }} min</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+        <p class="rp-dato">Participación en el foro: {{ d.publicaciones }} publicaciones, {{ d.respuestasForo }} respuestas ({{ d.respuestasOficiales }} oficiales).</p>
+      }
+
+      <footer class="rp-pie">Generado por SAESU — Sistema de Apoyo al Estudio Superior Universitario</footer>
+    </article>
+  }
+</div>
