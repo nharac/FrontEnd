@@ -36,7 +36,7 @@ export class BancoPreguntas implements OnInit {
     { id: 'basico', nombre: 'Básico' }, { id: 'intermedio', nombre: 'Intermedio' }, { id: 'avanzado', nombre: 'Avanzado' },
   ];
   /** Preguntas activas por tema y dificultad. */
-  matriz = computed(() => (['limites', 'derivadas', 'integrales'] as const).map(tema => {
+  matriz = computed(() => (['fundamentos', 'algebra', 'trigonometria', 'limites', 'derivadas', 'integrales'] as const).map(tema => {
     const delTema = this.preguntas().filter(p => p.tema === tema && p.activa);
     return {
       tema, nombre: NOMBRES_TEMA[tema],

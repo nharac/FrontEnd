@@ -82,7 +82,8 @@ const miPosicion = { periodo: 'semana', posicion: 2, puntos: 400, participantes:
   rachaActual: 3, puntosHoy: 20, puntosSemana: 140, puntosTotales: 640,
   ultimosMovimientos: [{ cantidad: 20, motivo: 'Acierto en práctica: limites', fecha: AYER }, { cantidad: 10, motivo: 'Respondió en el foro', fecha: AYER }] };
 
-const progreso = { limites: { respondidas: 10, correctas: 8, porcentaje: 80 }, derivadas: { respondidas: 4, correctas: 1, porcentaje: 25 },
+const progreso = { fundamentos: { respondidas: 0, correctas: 0, porcentaje: 0 }, algebra: { respondidas: 0, correctas: 0, porcentaje: 0 },
+  trigonometria: { respondidas: 0, correctas: 0, porcentaje: 0 }, limites: { respondidas: 10, correctas: 8, porcentaje: 80 }, derivadas: { respondidas: 4, correctas: 1, porcentaje: 25 },
   integrales: { respondidas: 0, correctas: 0, porcentaje: 0 } };
 
 // Lunes 2 a domingo 8 de noviembre de 2026 (el 2 es lunes)

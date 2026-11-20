@@ -20,6 +20,12 @@ export class ChatTutor {
   private panel = viewChild.required(ChatPanel);
 
   readonly temas = [
+    { id: 'fundamentos', nombre: 'Fundamentos', icono: 'calculate',
+      preguntas: ['¿Cómo sumo fracciones con distinto denominador?', '¿En qué orden se hacen las operaciones?'] },
+    { id: 'algebra', nombre: 'Álgebra', icono: 'exposure',
+      preguntas: ['¿Cómo factorizo x² + 5x + 6?', '¿Cuándo uso la fórmula cuadrática?'] },
+    { id: 'trigonometria', nombre: 'Trigonometría', icono: 'change_history',
+      preguntas: ['¿Qué es el círculo unitario?', '¿Cuándo uso la ley de senos?'] },
     { id: 'limites', nombre: 'Límites', icono: 'trending_flat',
       preguntas: ['¿Qué hago si me da 0/0?', '¿Cómo calculo un límite al infinito?'] },
     { id: 'derivadas', nombre: 'Derivadas', icono: 'show_chart',

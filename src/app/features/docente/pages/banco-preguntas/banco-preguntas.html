@@ -37,6 +37,9 @@
     <div class="dp-filtros">
       <select class="dp-select" aria-label="Tema" [ngModel]="tema()" (ngModelChange)="tema.set($event); cargar()">
         <option value="">Todos los temas</option>
+        <option value="fundamentos">Fundamentos</option>
+        <option value="algebra">Álgebra</option>
+        <option value="trigonometria">Trigonometría</option>
         <option value="limites">Límites</option>
         <option value="derivadas">Derivadas</option>
         <option value="integrales">Integrales</option>

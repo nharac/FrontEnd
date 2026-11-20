@@ -4,7 +4,7 @@
  */
 
 /** null = mixto (los tres temas). */
-export type TemaQuiz = 'limites' | 'derivadas' | 'integrales' | null;
+export type TemaQuiz = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | null;
 
 /** Cuerpo de POST /api/quiz/iniciar. */
 export interface IniciarQuizRequest {
@@ -91,7 +91,10 @@ export interface HistorialQuiz {
 }
 
 export const OPCIONES_TEMA: { id: TemaQuiz; nombre: string; simbolo: string; descripcion: string }[] = [
-  { id: null, nombre: 'Mixto', simbolo: '∑', descripcion: 'Un poco de los tres temas' },
+  { id: null, nombre: 'Mixto', simbolo: '∑', descripcion: 'Un poco de todos los temas' },
+  { id: 'fundamentos', nombre: 'Fundamentos', simbolo: '½', descripcion: 'Operaciones, fracciones y potencias' },
+  { id: 'algebra', nombre: 'Álgebra', simbolo: 'x²', descripcion: 'Factorización, ecuaciones y logaritmos' },
+  { id: 'trigonometria', nombre: 'Trigonometría', simbolo: 'sen', descripcion: 'Razones, identidades y triángulos' },
   { id: 'limites', nombre: 'Límites', simbolo: 'lim', descripcion: 'Indeterminaciones y al infinito' },
   { id: 'derivadas', nombre: 'Derivadas', simbolo: 'f′', descripcion: 'Reglas, cadena y aplicaciones' },
   { id: 'integrales', nombre: 'Integrales', simbolo: '∫', descripcion: 'Inmediatas, sustitución y partes' },

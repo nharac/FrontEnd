@@ -66,7 +66,7 @@ export class EstadisticasDocente implements OnInit {
   consejosGrupo = computed(() => {
     const temas = (this.datos()?.porTema ?? []).filter(t => t.intentos > 0);
     const bajo = temas.length ? temas.reduce((a, b) => (b.porcentaje < a.porcentaje ? b : a), temas[0]) : null;
-    const nombres: Record<string, string> = { limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales' };
+    const nombres: Record<string, string> = { fundamentos: 'Fundamentos', algebra: 'Álgebra', trigonometria: 'Trigonometría', limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales' };
     return mensajeEstadisticas(bajo ? nombres[bajo.tema] ?? bajo.tema : null, bajo ? Math.round(bajo.porcentaje) : null);
   });
 

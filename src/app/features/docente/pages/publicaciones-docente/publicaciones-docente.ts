@@ -47,6 +47,9 @@ export class PublicacionesDocente implements OnInit {
 
   readonly temas = [
     { id: null, nombre: 'Todos' },
+    { id: 'fundamentos', nombre: 'Fundamentos' },
+    { id: 'algebra', nombre: 'Álgebra' },
+    { id: 'trigonometria', nombre: 'Trigonometría' },
     { id: 'limites', nombre: 'Límites' },
     { id: 'derivadas', nombre: 'Derivadas' },
     { id: 'integrales', nombre: 'Integrales' },

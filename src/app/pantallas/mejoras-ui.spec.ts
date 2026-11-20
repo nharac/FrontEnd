@@ -190,7 +190,7 @@ describe('Mejoras de interfaz', () => {
     const b = await montar(BancoPreguntas, {}, 'DOCENTE');
     const cb = b.componentInstance as any;
     await pintar(b);
-    expect(cb.matriz().length).toBe(3);
+    expect(cb.matriz().length).toBe(6);
     cb.filtrarMatriz('limites', 'basico');
     expect(cb.tema()).toBe('limites');
   });

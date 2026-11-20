@@ -17,6 +17,9 @@
         <div class="fila">
           <label>Tema
             <select class="dp-select" name="tema" [ngModel]="tema()" (ngModelChange)="tema.set($event)">
+              <option value="fundamentos">Fundamentos</option>
+              <option value="algebra">Álgebra</option>
+              <option value="trigonometria">Trigonometría</option>
               <option value="limites">Límites</option>
               <option value="derivadas">Derivadas</option>
               <option value="integrales">Integrales</option>

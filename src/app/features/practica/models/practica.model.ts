@@ -5,7 +5,7 @@ import { Logro } from '../../gamificacion/models/logro.model';
  * Reflejan los DTOs del backend (paquete practica.application.dto).
  */
 
-export type Tema = 'limites' | 'derivadas' | 'integrales';
+export type Tema = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales';
 export type Dificultad = 'basico' | 'intermedio' | 'avanzado';
 
 /** Opción de respuesta (OpcionResponse). No incluye cuál es la correcta. */
@@ -78,6 +78,9 @@ export interface ProgresoTema {
 
 /** GET /api/practica/progreso (ProgresoResponse). */
 export interface Progreso {
+  fundamentos: ProgresoTema;
+  algebra: ProgresoTema;
+  trigonometria: ProgresoTema;
   limites: ProgresoTema;
   derivadas: ProgresoTema;
   integrales: ProgresoTema;
@@ -92,6 +95,9 @@ export interface InfoTema {
 }
 
 export const TEMAS: InfoTema[] = [
+  { id: 'fundamentos', nombre: 'Fundamentos', descripcion: 'Operaciones, fracciones, potencias, raíces y porcentajes', icono: 'calculate' },
+  { id: 'algebra', nombre: 'Álgebra', descripcion: 'Productos notables, factorización, ecuaciones y logaritmos', icono: 'exposure' },
+  { id: 'trigonometria', nombre: 'Trigonometría', descripcion: 'Razones, círculo unitario, identidades y triángulos', icono: 'change_history' },
   { id: 'limites', nombre: 'Límites', descripcion: 'Sustitución, indeterminaciones y límites al infinito', icono: 'trending_flat' },
   { id: 'derivadas', nombre: 'Derivadas', descripcion: 'Reglas de derivación, cadena y aplicaciones', icono: 'show_chart' },
   { id: 'integrales', nombre: 'Integrales', descripcion: 'Integrales inmediatas, sustitución y por partes', icono: 'functions' },

@@ -68,7 +68,7 @@ export function nivelDe(puntos: number) {
 
 /** Texto e ícono amigables para un motivo del historial ("Acierto en práctica: limites" → "Acierto en Límites"). */
 export function describirMovimiento(motivo: string): { texto: string; icono: string } {
-  const temas: Record<string, string> = { limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales' };
+  const temas: Record<string, string> = { fundamentos: 'Fundamentos', algebra: 'Álgebra', trigonometria: 'Trigonometría', limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales' };
   const practica = /^Acierto en práctica: (\w+)/.exec(motivo);
   if (practica) return { texto: `Acierto en ${temas[practica[1]] ?? practica[1]}`, icono: 'task_alt' };
   if (motivo.startsWith('Respuesta oficial')) return { texto: 'Respuesta oficial en el foro', icono: 'verified' };

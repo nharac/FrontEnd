@@ -36,6 +36,9 @@ export class NuevaPublicacion implements OnDestroy {
 
   readonly maxTitulo = MAX_TITULO;
   readonly temas = [
+    { id: 'fundamentos', nombre: 'Fundamentos', icono: 'calculate' },
+    { id: 'algebra', nombre: 'Álgebra', icono: 'exposure' },
+    { id: 'trigonometria', nombre: 'Trigonometría', icono: 'change_history' },
     { id: 'limites', nombre: 'Límites', icono: 'trending_flat' },
     { id: 'derivadas', nombre: 'Derivadas', icono: 'show_chart' },
     { id: 'integrales', nombre: 'Integrales', icono: 'functions' },
