@@ -18,8 +18,8 @@ export class DuelosService {
     return this.http.get<Companero[]>(`${this.API}/companeros`);
   }
 
-  retar(rivalId: number, tema: string): Observable<Duelo> {
-    return this.http.post<Duelo>(this.API, { rivalId, tema });
+  retar(rivalId: number, tema: string, modo: string = 'CLASICO'): Observable<Duelo> {
+    return this.http.post<Duelo>(this.API, { rivalId, tema, modo });
   }
 
   preguntas(id: number): Observable<PreguntaDuelo[]> {

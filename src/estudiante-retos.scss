@@ -130,3 +130,26 @@ app-retos {
 
 @keyframes rt-entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { app-retos .rt-pregunta, app-retos .rt-resultado { animation: none; } }
+
+// ---------- Modos de reto ----------
+app-retos {
+  .rt-modos { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .rt-modo { --c: #f97316; --f: #fff7ed;
+    display: flex; align-items: center; gap: 10px; text-align: left; font: inherit; cursor: pointer; padding: 10px 12px;
+    border-radius: 14px; border: 2px solid #eef0f4; background: #fafbff; color: inherit; transition: transform 0.15s, border-color 0.15s;
+    &:hover { transform: translateY(-2px); }
+    &[data-modo='MUERTE_SUBITA'] { --c: #1f2937; --f: #f3f4f6; }
+    &[data-modo='PUNTOS'] { --c: #d97706; --f: #fffbeb; }
+    &[data-modo='RELAMPAGO'] { --c: #7c3aed; --f: #f5f3ff; }
+    &.activo { border-color: var(--c); background: var(--f); .rt-modo__icono { background: var(--c); color: #fff; } } }
+  .rt-modo__icono { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--f); color: var(--c); }
+  .rt-modo__texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; strong { font-size: 14px; } small { font-size: 12px; color: #6b7280; line-height: 1.3; } }
+  .rt-pregunta__cabeza { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .rt-valor { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; color: #92400e; background: #fef3c7;
+    &[data-v='2'] { color: #9a3412; background: #ffedd5; } &[data-v='3'] { color: #fff; background: linear-gradient(135deg, #f59e0b, #dc2626); } }
+  .rt-reloj--rayo { color: #6d28d9; background: #f5f3ff; }
+  .rt-reloj--urgente { color: #fff; background: #dc2626; animation: rt-latido 0.8s ease-in-out infinite; }
+  .rt-score__lado em { font-style: normal; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; }
+}
+@keyframes rt-latido { 50% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { app-retos .rt-reloj--urgente { animation: none; } }

@@ -193,10 +193,20 @@ export function sumiRetos(pendientes: number, ganados: number, jugados: number, 
 }
 
 /** Sumi mientras se juega un reto. */
-export function sumiJugando(contestadas: number, total: number, segundos: number): DialogoSumi {
-  if (contestadas === 0) return { estado: 'animo', titulo: '¡Tú puedes!', mensajes: ['Lee bien cada pregunta. La velocidad solo cuenta si empatan.'], tono: 'normal' };
+export function sumiJugando(contestadas: number, total: number, segundos: number, modo = 'CLASICO', restantes: number | null = null): DialogoSumi {
+  if (modo === 'RELAMPAGO' && restantes !== null && restantes <= 10 && contestadas < total) {
+    return { estado: 'nervioso', titulo: '¡Se acaba el tiempo!', mensajes: ['Responde lo que puedas, ¡rápido!'], tono: 'alerta' };
+  }
+  if (contestadas === 0) {
+    const inicio: Record<string, string> = {
+      MUERTE_SUBITA: 'A muerte: cuenta tu racha hasta el primer error. ¡Ve con cuidado!',
+      PUNTOS: 'Las preguntas difíciles valen más. Fíjate en los puntos de cada una.',
+      RELAMPAGO: '¡60 segundos! Si dudas, pasa a la siguiente y vuelve después.',
+    };
+    return { estado: 'animo', titulo: '¡Tú puedes!', mensajes: [inicio[modo] ?? 'Lee bien cada pregunta. La velocidad solo cuenta si empatan.'], tono: 'normal' };
+  }
   if (contestadas >= total) return { estado: 'celebra', titulo: '¡Todas respondidas!', mensajes: ['Revisa si quieres y entrega cuando estés listo.'], tono: 'exito' };
-  if (segundos > 120) return { estado: 'nervioso', titulo: 'Sin afán, pero…', mensajes: ['El reloj sigue corriendo. ¡Confía en lo que sabes!'], tono: 'alerta' };
+  if (modo !== 'RELAMPAGO' && segundos > 120) return { estado: 'nervioso', titulo: 'Sin afán, pero…', mensajes: ['El reloj sigue corriendo. ¡Confía en lo que sabes!'], tono: 'alerta' };
   return { estado: 'feliz', titulo: `Vas ${contestadas} de ${total}`, mensajes: ['¡Buen ritmo! Sigue así.'], tono: 'normal' };
 }
 

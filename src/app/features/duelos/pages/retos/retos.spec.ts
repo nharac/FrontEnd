@@ -5,7 +5,7 @@ import { Retos, iniciales } from './retos';
 import { DuelosService } from '../../services/duelos.service';
 import { Duelo } from '../../models/duelo.model';
 
-const duelo = (o: Partial<Duelo>): Duelo => ({ id: 1, tema: 'algebra', temaNombre: 'Álgebra', rival: 'Beto Ruiz', soyRetador: false,
+const duelo = (o: Partial<Duelo>): Duelo => ({ id: 1, tema: 'algebra', temaNombre: 'Álgebra', rival: 'Beto Ruiz', soyRetador: false, modo: 'CLASICO', modoNombre: 'Clásico', puntajeMaximo: 5, limiteSegundos: null,
   estado: 'POR_JUGAR', resultado: null, misCorrectas: null, misSegundos: null, suyasCorrectas: null, suyosSegundos: null,
   totalPreguntas: 5, creadoEn: '', ...o });
 
@@ -16,8 +16,8 @@ describe('Retos', () => {
       companeros: vi.fn(() => of([{ id: 2, nombre: 'Beto Ruiz', fotoPerfilUrl: null }])),
       retar: vi.fn(() => of(duelo({ id: 3, soyRetador: true }))),
       preguntas: vi.fn(() => of([
-        { id: 10, enunciado: '2+2', opciones: [{ letra: 'A', texto: '4' }, { letra: 'B', texto: '5' }] },
-        { id: 11, enunciado: '3+3', opciones: [{ letra: 'A', texto: '6' }, { letra: 'B', texto: '7' }] }])),
+        { id: 10, enunciado: '2+2', puntos: 1, opciones: [{ letra: 'A', texto: '4' }, { letra: 'B', texto: '5' }] },
+        { id: 11, enunciado: '3+3', puntos: 3, opciones: [{ letra: 'A', texto: '6' }, { letra: 'B', texto: '7' }] }])),
       entregar: vi.fn(() => of(duelo({ id: 1, estado: 'TERMINADO', resultado: 'GANASTE', misCorrectas: 2, misSegundos: 30, suyasCorrectas: 1, suyosSegundos: 40 }))),
     };
     TestBed.configureTestingModule({ imports: [Retos], providers: [{ provide: DuelosService, useValue: s }] });
@@ -40,9 +40,11 @@ describe('Retos', () => {
     c.rivalId.set(2);
     c.tema.set('limites');
     f.detectChanges();
-    expect(f.nativeElement.textContent).toContain('¡Retar a Beto en Límites!');
+    c.modo.set('MUERTE_SUBITA');
+    f.detectChanges();
+    expect(f.nativeElement.textContent).toContain('¡Retar a Beto · A muerte de Límites!');
     c.retar();
-    expect(s.retar).toHaveBeenCalledWith(2, 'limites');
+    expect(s.retar).toHaveBeenCalledWith(2, 'limites', 'MUERTE_SUBITA');
     expect(c.porJugar().length).toBe(2);
   });
 
@@ -64,6 +66,22 @@ describe('Retos', () => {
     expect(c.sumiFinal()?.titulo).toBe('¡GANASTE!');
     expect(f.nativeElement.textContent).toContain('Revancha');
     c.revancha(c.resultado()!);
-    expect(s.retar).toHaveBeenCalledWith(2, 'algebra');
+    expect(s.retar).toHaveBeenCalledWith(2, 'algebra', 'CLASICO');
+  });
+
+  it('relámpago: cuenta hacia atrás y entrega solo al llegar a cero', () => {
+    const { f, s } = crear();
+    const c = f.componentInstance;
+    s.preguntas.mockReturnValue(of([{ id: 10, enunciado: 'x', puntos: 1, opciones: [{ letra: 'A', texto: '1' }] }]));
+    c.jugar(duelo({ id: 9, modo: 'RELAMPAGO', modoNombre: 'Relámpago', limiteSegundos: 60 }));
+    expect(c.restantes()).toBe(60);
+    c.segundos.set(50);
+    expect(c.sumiJuego().titulo).toContain('Se acaba');
+    c.segundos.set(59);
+    c.tic();
+    expect(s.entregar).toHaveBeenCalledWith(9, [{ preguntaId: 10, letra: null }], 60);
+    expect(c.unidad('PUNTOS')).toBe('pts');
+    expect(c.unidad('MUERTE_SUBITA')).toBe('racha');
+    c.cancelar();
   });
 });

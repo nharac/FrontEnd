@@ -17,7 +17,7 @@ describe('DuelosService', () => {
     s.companeros().subscribe();
     http.expectOne(`${API}/companeros`).flush([]);
     s.retar(2, 'algebra').subscribe();
-    expect(http.expectOne(API).request.body).toEqual({ rivalId: 2, tema: 'algebra' });
+    expect(http.expectOne(API).request.body).toEqual({ rivalId: 2, tema: 'algebra', modo: 'CLASICO' });
     s.preguntas(7).subscribe();
     http.expectOne(`${API}/7/preguntas`).flush([]);
     s.entregar(7, [{ preguntaId: 1, letra: 'A' }], 30).subscribe();

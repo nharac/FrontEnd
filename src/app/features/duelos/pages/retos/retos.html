@@ -5,7 +5,7 @@
     <div class="rt-hero__texto">
       <span class="rt-hero__chip"><mat-icon aria-hidden="true">sports_kabaddi</mat-icon> Arena de retos</span>
       <h1>Reta a tus compañeros</h1>
-      <p>Los dos responden las mismas 5 preguntas. Gana quien acierte más; si empatan, el más rápido.</p>
+      <p>Elige rival, tema y modo: clásico, a muerte, a puntos o relámpago. Los dos responden las mismas preguntas y, si empatan, gana el más rápido.</p>
       <div class="rt-marcador" aria-label="Tu récord">
         <div class="rt-marcador__g"><b>{{ ganados() }}</b><span>Ganados</span></div>
         <div><b>{{ empates() }}</b><span>Empates</span></div>
@@ -29,9 +29,13 @@
         </div>
         <div class="rt-juego__info">
           <h2 id="rt-juego-t">Reto contra {{ d.rival }}</h2>
-          <small><mat-icon aria-hidden="true">{{ iconoTema(d.tema) }}</mat-icon> {{ d.temaNombre }}</small>
+          <small><mat-icon aria-hidden="true">{{ iconoTema(d.tema) }}</mat-icon> {{ d.temaNombre }} · <mat-icon aria-hidden="true">{{ iconoModo(d.modo) }}</mat-icon> {{ d.modoNombre }}</small>
         </div>
-        <span class="rt-reloj" aria-live="off"><mat-icon aria-hidden="true">timer</mat-icon> {{ reloj$(segundos()) }}</span>
+        @if (restantes() !== null) {
+          <span class="rt-reloj rt-reloj--rayo" [class.rt-reloj--urgente]="restantes()! <= 10" aria-live="off"><mat-icon aria-hidden="true">bolt</mat-icon> {{ reloj$(restantes()!) }}</span>
+        } @else {
+          <span class="rt-reloj" aria-live="off"><mat-icon aria-hidden="true">timer</mat-icon> {{ reloj$(segundos()) }}</span>
+        }
       </div>
 
       <div class="rt-puntos" role="tablist" aria-label="Preguntas">
@@ -46,7 +50,10 @@
 
       @if (preguntaActual(); as p) {
         <div class="rt-pregunta">
-          <span class="rt-pregunta__n">Pregunta {{ actual() + 1 }} de {{ preguntas().length }}</span>
+          <div class="rt-pregunta__cabeza">
+            <span class="rt-pregunta__n">Pregunta {{ actual() + 1 }} de {{ preguntas().length }}</span>
+            @if (d.modo === 'PUNTOS') { <span class="rt-valor" [attr.data-v]="p.puntos">{{ p.puntos }} pt{{ p.puntos === 1 ? '' : 's' }}</span> }
+          </div>
           <p class="rt-enunciado" [appTextoRico]="p.enunciado"></p>
           <div class="rt-opciones" role="radiogroup" [attr.aria-label]="'Opciones de la pregunta ' + (actual() + 1)">
             @for (o of p.opciones; track o.letra) {
@@ -84,13 +91,15 @@
       <div class="rt-score">
         <div class="rt-score__lado">
           <span class="rt-avatar rt-avatar--grande rt-avatar--yo">Tú</span>
-          <b>{{ r.misCorrectas }}<small>/{{ r.totalPreguntas }}</small></b>
+          <b>{{ r.misCorrectas }}<small>/{{ r.puntajeMaximo }}</small></b>
+          <em>{{ unidad(r.modo) }}</em>
           <span>{{ reloj$(r.misSegundos ?? 0) }}</span>
         </div>
         <span class="rt-score__vs">VS</span>
         <div class="rt-score__lado">
           <span class="rt-avatar rt-avatar--grande">{{ iniciales(r.rival) }}</span>
-          <b>{{ r.suyasCorrectas ?? '?' }}<small>/{{ r.totalPreguntas }}</small></b>
+          <b>{{ r.suyasCorrectas ?? '?' }}<small>/{{ r.puntajeMaximo }}</small></b>
+          <em>{{ unidad(r.modo) }}</em>
           <span>{{ r.estado === 'TERMINADO' ? reloj$(r.suyosSegundos ?? 0) : 'Cuando ' + r.rival + ' juegue verás quién ganó' }}</span>
         </div>
       </div>
@@ -136,9 +145,19 @@
             }
           </div>
 
+          <p class="rt-paso"><b>3</b> Elige el modo</p>
+          <div class="rt-modos" role="radiogroup" aria-label="Modo de reto">
+            @for (m of modos; track m.id) {
+              <button type="button" role="radio" class="rt-modo" [attr.data-modo]="m.id" [class.activo]="modo() === m.id" [attr.aria-checked]="modo() === m.id" (click)="modo.set(m.id)">
+                <span class="rt-modo__icono"><mat-icon aria-hidden="true">{{ m.icono }}</mat-icon></span>
+                <span class="rt-modo__texto"><strong>{{ m.nombre }}</strong><small>{{ m.descripcion }}</small></span>
+              </button>
+            }
+          </div>
+
           <button type="button" class="rt-btn rt-btn--fuego rt-retar" (click)="retar()" [disabled]="!rivalId() || enviando()">
             <mat-icon aria-hidden="true">sports_kabaddi</mat-icon>
-            {{ rivalElegido() ? '¡Retar a ' + rivalElegido()!.nombre.split(' ')[0] + ' en ' + nombreTema() + '!' : 'Elige un rival para retar' }}
+            {{ rivalElegido() ? '¡Retar a ' + rivalElegido()!.nombre.split(' ')[0] + ' · ' + nombreModo() + ' de ' + nombreTema() + '!' : 'Elige un rival para retar' }}
           </button>
           @if (mensaje(); as m) { <p class="rt-exito" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon> {{ m }}</p> }
         }
@@ -157,7 +176,7 @@
                 </div>
                 <div class="rt-duelo__info">
                   <strong>{{ d.soyRetador ? 'Retaste a' : 'Te retó' }} {{ d.rival }}</strong>
-                  <small><mat-icon aria-hidden="true">{{ iconoTema(d.tema) }}</mat-icon> {{ d.temaNombre }} · {{ d.totalPreguntas }} preguntas</small>
+                  <small><mat-icon aria-hidden="true">{{ iconoModo(d.modo) }}</mat-icon> {{ d.modoNombre }} · {{ d.temaNombre }} · {{ d.totalPreguntas }} preguntas{{ d.limiteSegundos ? ' en ' + d.limiteSegundos + ' s' : '' }}</small>
                 </div>
                 <button type="button" class="rt-btn rt-btn--fuego" (click)="jugar(d)"><mat-icon aria-hidden="true">play_arrow</mat-icon> Jugar</button>
               </li>
@@ -174,7 +193,7 @@
                   <span class="rt-avatar">{{ iniciales(d.rival) }}</span>
                   <div class="rt-duelo__info">
                     <strong>{{ d.rival }}</strong>
-                    <small><mat-icon aria-hidden="true">{{ iconoTema(d.tema) }}</mat-icon> {{ d.temaNombre }}</small>
+                    <small><mat-icon aria-hidden="true">{{ iconoModo(d.modo) }}</mat-icon> {{ d.modoNombre }} · {{ d.temaNombre }}</small>
                   </div>
                   <div class="rt-duelo__marcador">
                     <b>{{ d.misCorrectas }} – {{ d.suyasCorrectas ?? '?' }}</b>
