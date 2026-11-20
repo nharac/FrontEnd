@@ -1,0 +1,29 @@
+@if (tareas().length) {
+  <section class="mt" aria-labelledby="mt-titulo">
+    <h3 id="mt-titulo" class="mt-titulo"><mat-icon aria-hidden="true">assignment</mat-icon> Tareas de tu docente
+      @if (pendientes()) { <span class="mt-contador">{{ pendientes() }} pendiente{{ pendientes() === 1 ? '' : 's' }}</span> }
+    </h3>
+    <ul class="mt-lista">
+      @for (t of tareas(); track t.id) {
+        <li class="mt-item" [class.mt-item--hecha]="t.completada" [class.mt-item--vencida]="t.vencida">
+          <div class="mt-cabeza">
+            <strong>{{ t.titulo }}</strong>
+            <span class="mt-plazo">{{ plazo(t) }}</span>
+          </div>
+          <p class="mt-detalle">{{ t.temaNombre }} · resuelve bien {{ t.metaPreguntas }} preguntas · {{ t.docente }}</p>
+          @if (t.instrucciones) { <p class="mt-instrucciones">{{ t.instrucciones }}</p> }
+          <div class="mt-barra" role="progressbar" [attr.aria-valuenow]="t.resueltas" aria-valuemin="0" [attr.aria-valuemax]="t.metaPreguntas"
+               [attr.aria-label]="'Avance de ' + t.titulo">
+            <span [style.width.%]="porcentaje(t)"></span>
+          </div>
+          <div class="mt-pie">
+            <small>{{ t.resueltas }} de {{ t.metaPreguntas }}</small>
+            @if (!t.completada) {
+              <a class="mt-btn" routerLink="/practica" [queryParams]="{ tema: t.tema }">Practicar</a>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+}

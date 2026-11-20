@@ -20,6 +20,8 @@
             <p class="ad-sugerencia">{{ a.sugerencia }}</p>
           </div>
           @if (a.estudianteId) {
+            <a class="ad-ver" routerLink="/docente/tareas" [queryParams]="{ estudiante: a.estudianteId, tema: a.tema }"
+               [attr.aria-label]="'Asignar tarea a ' + a.estudiante">Asignar tarea</a>
             <a class="ad-ver" [routerLink]="['/docente/estudiantes', a.estudianteId]" [attr.aria-label]="'Ver a ' + a.estudiante">Ver</a>
           } @else {
             <a class="ad-ver" routerLink="/docente/estadisticas">Ver</a>

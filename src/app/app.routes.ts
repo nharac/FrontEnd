@@ -147,6 +147,12 @@ export const routes: Routes = [
             .then(m => m.EstadisticasDocente)
       },
       {
+        path: 'tareas',
+        loadComponent: () =>
+          import('./features/tareas/pages/tareas-docente/tareas-docente')
+            .then(m => m.TareasDocente)
+      },
+      {
         path: 'estudiantes',
         loadComponent: () =>
           import('./features/docente/pages/estudiantes-docente/estudiantes-docente')

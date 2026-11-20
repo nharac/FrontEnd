@@ -1,3 +1,4 @@
+import { MisTareas } from '../../../tareas/components/mis-tareas/mis-tareas';
 import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
@@ -26,7 +27,7 @@ import { RetoDia } from '../../components/reto-dia/reto-dia';
 @Component({
   selector: 'app-dashboard-estudiante',
   standalone: true,
-  imports: [RetoDia, CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective, Medalla, SumiDice, PuntosSumi, Insignia],
+  imports: [MisTareas, RetoDia, CommonModule, RouterLink, MatIconModule, MatButtonModule, ContadorDirective, Medalla, SumiDice, PuntosSumi, Insignia],
   templateUrl: './dashboard-estudiante.html',
   styleUrl: './dashboard-estudiante.scss',
 })

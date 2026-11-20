@@ -1,0 +1,68 @@
+<div class="td">
+  <header>
+    <h1>Tareas</h1>
+    <p>Asigna práctica a un estudiante o a todo el grupo. La tarea se completa sola cuando el estudiante resuelve bien
+      las preguntas del tema; no tiene que entregar nada.</p>
+  </header>
+
+  <section class="td-caja" aria-labelledby="td-nueva">
+    <h2 id="td-nueva">Nueva tarea</h2>
+    <div class="td-grid">
+      <label class="td-campo td-campo--ancho"><span>Título</span>
+        <input type="text" maxlength="120" placeholder="Ej.: Repaso de factorización" [value]="form().titulo"
+               (input)="campo('titulo', $any($event.target).value)" />
+      </label>
+      <label class="td-campo"><span>Tema</span>
+        <select [value]="form().tema" (change)="campo('tema', $any($event.target).value)">
+          @for (t of temas; track t.id) { <option [value]="t.id" [selected]="t.id === form().tema">{{ t.nombre }}</option> }
+        </select>
+      </label>
+      <label class="td-campo"><span>Para</span>
+        <select (change)="campo('estudianteId', $any($event.target).value ? +$any($event.target).value : null)">
+          <option value="" [selected]="form().estudianteId === null">Todo el grupo</option>
+          @for (e of estudiantes(); track e.id) { <option [value]="e.id" [selected]="e.id === form().estudianteId">{{ e.nombre }}</option> }
+        </select>
+      </label>
+      <label class="td-campo"><span>Preguntas a resolver bien</span>
+        <input type="number" min="1" max="50" [value]="form().metaPreguntas" (input)="campo('metaPreguntas', +$any($event.target).value)" />
+      </label>
+      <label class="td-campo"><span>Fecha límite</span>
+        <input type="date" [min]="hoy" [value]="form().fechaLimite" (input)="campo('fechaLimite', $any($event.target).value)" />
+      </label>
+      <label class="td-campo td-campo--ancho"><span>Instrucciones (opcional)</span>
+        <textarea rows="2" maxlength="500" [value]="form().instrucciones ?? ''" (input)="campo('instrucciones', $any($event.target).value)"></textarea>
+      </label>
+    </div>
+    @if (error(); as e) { <p class="td-error" role="alert">{{ e }}</p> }
+    @if (exito(); as m) { <p class="td-exito" role="status">{{ m }}</p> }
+    <button type="button" class="td-btn" (click)="asignar()" [disabled]="!valido() || guardando()">
+      <mat-icon aria-hidden="true">assignment_add</mat-icon> {{ guardando() ? 'Asignando…' : 'Asignar tarea' }}
+    </button>
+  </section>
+
+  <section aria-labelledby="td-lista">
+    <h2 id="td-lista">Tareas asignadas</h2>
+    @if (cargando()) {
+      <p class="td-vacio">Cargando…</p>
+    } @else if (!tareas().length) {
+      <p class="td-vacio">Todavía no has asignado tareas.</p>
+    } @else {
+      <ul class="td-lista">
+        @for (t of tareas(); track t.id) {
+          <li class="td-item" [class.td-item--vencida]="t.vencida">
+            <div class="td-item__cabeza">
+              <strong>{{ t.titulo }}</strong>
+              <button type="button" class="td-borrar" (click)="eliminar(t)" [attr.aria-label]="'Eliminar ' + t.titulo">
+                <mat-icon aria-hidden="true">delete</mat-icon>
+              </button>
+            </div>
+            <p class="td-item__detalle">{{ t.temaNombre }} · {{ t.metaPreguntas }} preguntas · {{ t.asignadaA }} · hasta {{ t.fechaLimite }}{{ t.vencida ? ' (vencida)' : '' }}</p>
+            <div class="td-barra" role="progressbar" [attr.aria-valuenow]="t.completadas" aria-valuemin="0" [attr.aria-valuemax]="t.asignados"
+                 [attr.aria-label]="'Completada por ' + t.completadas + ' de ' + t.asignados"><span [style.width.%]="porcentaje(t)"></span></div>
+            <small>{{ t.completadas }} de {{ t.asignados }} la completaron</small>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

@@ -1,0 +1,17 @@
+:host { display: block; }
+.mt { background: #fff; border-radius: 20px; padding: 16px 18px; box-shadow: 0 6px 22px rgba(31, 50, 71, 0.07); margin-bottom: 20px; }
+.mt-titulo { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 18px; flex-wrap: wrap; }
+.mt-contador { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #e0e7ff; color: #3730a3; }
+.mt-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.mt-item { padding: 12px 14px; border-radius: 14px; background: #f8fafc; border-left: 4px solid #4f46e5;
+  &--hecha { border-left-color: #059669; background: #ecfdf5; }
+  &--vencida { border-left-color: #dc2626; .mt-plazo { color: #b91c1c; } } }
+.mt-cabeza { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.mt-plazo { font-size: 12px; font-weight: 700; color: #4f46e5; white-space: nowrap; }
+.mt-detalle { margin: 4px 0 0; font-size: 13px; color: #4b5563; }
+.mt-instrucciones { margin: 6px 0 0; font-size: 13.5px; color: #1f2f3f; }
+.mt-barra { height: 8px; border-radius: 999px; background: #e5e7eb; overflow: hidden; margin-top: 10px;
+  span { display: block; height: 100%; background: linear-gradient(90deg, #4f46e5, #7c3aed); border-radius: inherit; } }
+.mt-item--hecha .mt-barra span { background: #059669; }
+.mt-pie { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; small { color: #6b7280; } }
+.mt-btn { font-weight: 600; font-size: 14px; color: #4f46e5; text-decoration: none; padding: 4px 10px; border-radius: 8px; background: #eef2ff; }
