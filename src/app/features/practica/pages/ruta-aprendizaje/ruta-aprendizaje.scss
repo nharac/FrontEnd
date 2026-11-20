@@ -1,0 +1,54 @@
+$indigo: #4f46e5;
+$suave: #eef2ff;
+$verde: #059669;
+$gris: #6b7280;
+$sombra: 0 6px 22px rgba(31, 50, 71, 0.07);
+
+:host { display: block; color: #1f2f3f; }
+.ru { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.ru-hero {
+  h1 { margin: 0 0 6px; font-size: 28px; }
+  p { margin: 0 0 10px; color: $gris; line-height: 1.5; }
+}
+.ru-cuenta { display: inline-block; font-size: 13px; font-weight: 700; color: $indigo; background: $suave; padding: 5px 12px; border-radius: 999px; }
+.ru-aviso { color: $gris; }
+
+.ru-camino { list-style: none; margin: 0; padding: 0; position: relative; }
+.ru-camino::before { content: ''; position: absolute; left: 23px; top: 24px; bottom: 24px; width: 3px; background: #e5e7eb; border-radius: 3px; }
+
+.ru-parada { position: relative; display: flex; gap: 16px; padding-bottom: 18px; }
+.ru-punto {
+  position: relative; z-index: 1; flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+  background: #fff; border: 3px solid #e5e7eb; color: $gris;
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+}
+.ru-info {
+  flex: 1; background: #fff; border-radius: 16px; padding: 14px 16px; box-shadow: $sombra;
+  h2 { margin: 2px 0 4px; font-size: 19px; }
+  p { margin: 0 0 8px; color: $gris; font-size: 14px; }
+  small { display: block; margin-top: 4px; color: $gris; font-size: 12.5px; }
+}
+.ru-paso { font-size: 12px; font-weight: 700; color: $gris; text-transform: uppercase; letter-spacing: 0.4px; }
+.ru-barra { height: 8px; border-radius: 8px; background: #f1f5f9; overflow: hidden;
+  span { display: block; height: 100%; background: $indigo; border-radius: 8px; transition: width 0.4s; } }
+
+.ru-parada--completado {
+  .ru-punto { background: $verde; border-color: $verde; color: #fff; }
+  .ru-paso { color: $verde; }
+  .ru-barra span { background: $verde; }
+}
+.ru-parada--siguiente {
+  .ru-punto { border-color: $indigo; color: $indigo; box-shadow: 0 0 0 6px rgba(79, 70, 229, 0.15); }
+  .ru-info { outline: 2px solid $indigo; }
+  .ru-paso { color: $indigo; }
+}
+.ru-parada--en-curso .ru-punto { border-color: #a5b4fc; color: $indigo; }
+
+.ru-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 10px; }
+.ru-btn {
+  display: inline-flex; align-items: center; font-weight: 600; font-size: 14px; text-decoration: none; color: #fff;
+  padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  &--claro { color: $indigo; background: $suave; }
+  &:focus-visible { outline: 3px solid rgba(79, 70, 229, 0.4); outline-offset: 2px; }
+}
+.ru-link { font-size: 13.5px; color: $indigo; }

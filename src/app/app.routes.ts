@@ -74,6 +74,12 @@ export const routes: Routes = [
             .then(m => m.Ranking)
       },
       {
+        path: 'ruta',
+        loadComponent: () =>
+          import('./features/practica/pages/ruta-aprendizaje/ruta-aprendizaje')
+            .then(m => m.RutaAprendizaje)
+      },
+      {
         path: 'resueltos',
         loadComponent: () =>
           import('./features/resueltos/pages/ejercicios-resueltos/ejercicios-resueltos')

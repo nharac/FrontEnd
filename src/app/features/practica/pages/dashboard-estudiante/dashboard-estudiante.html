@@ -58,12 +58,13 @@
         } @else {
           <div class="hoy__cuerpo">
             <span class="hoy__icono"><mat-icon>functions</mat-icon></span>
-            <div><h2>Práctica de cálculo</h2><p>Límites, derivadas e integrales tipo ICFES, con pistas y tutor IA.</p></div>
+            <div><h2>Práctica de matemáticas</h2><p>Desde las bases hasta el cálculo, tipo ICFES, con pistas y tutor IA.</p></div>
           </div>
         }
         <div class="hoy__pie">
           <span><mat-icon>schedule</mat-icon> ~{{ minutosEstimados }} min · hasta 20 Puntos Sumi por pregunta</span>
           <div class="hoy__acciones">
+            <a class="hoy__quiz" routerLink="/ruta"><mat-icon>route</mat-icon> Mi ruta</a>
             <a class="hoy__quiz" routerLink="/quiz"><mat-icon>timer</mat-icon> Hacer un quiz</a>
             <button type="button" class="hoy__btn" (click)="irAPractica()">
               Empezar <mat-icon>arrow_forward</mat-icon>

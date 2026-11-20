@@ -1,0 +1,50 @@
+<div class="ru">
+  <header class="ru-hero">
+    <h1>Tu ruta de aprendizaje</h1>
+    <p>Las matemáticas se construyen por capas: primero las bases y después el cálculo.
+      Un tema queda superado con al menos {{ minimoPreguntas }} preguntas y {{ minimoPorcentaje }} % de aciertos.</p>
+    @if (!cargando() && !error()) {
+      <span class="ru-cuenta">{{ completadas() }} de {{ paradas().length }} temas superados</span>
+    }
+  </header>
+
+  @if (cargando()) {
+    <p class="ru-aviso">Cargando tu progreso…</p>
+  } @else if (error()) {
+    <p class="ru-aviso">No pudimos cargar tu progreso. Intenta de nuevo en un momento.</p>
+  } @else {
+    <ol class="ru-camino">
+      @for (p of paradas(); track p.tema; let i = $index) {
+        <li class="ru-parada" [class]="'ru-parada ru-parada--' + p.estado">
+          <span class="ru-punto" aria-hidden="true">
+            <mat-icon>{{ p.estado === 'completado' ? 'check' : p.icono }}</mat-icon>
+          </span>
+          <div class="ru-info">
+            <span class="ru-paso">Paso {{ i + 1 }}
+              @switch (p.estado) {
+                @case ('completado') { · Superado }
+                @case ('siguiente') { · Te toca aquí }
+                @case ('en-curso') { · En curso }
+              }
+            </span>
+            <h2>{{ p.nombre }}</h2>
+            <p>{{ p.descripcion }}</p>
+            @if (p.respondidas > 0) {
+              <div class="ru-barra" role="progressbar" [attr.aria-valuenow]="p.porcentaje" aria-valuemin="0" aria-valuemax="100"
+                   [attr.aria-label]="'Aciertos en ' + p.nombre">
+                <span [style.width.%]="p.porcentaje"></span>
+              </div>
+              <small>{{ p.respondidas }} preguntas · {{ p.porcentaje }} % de aciertos</small>
+            }
+            <div class="ru-acciones">
+              <a class="ru-btn" [class.ru-btn--claro]="p.estado !== 'siguiente'" routerLink="/practica" [queryParams]="{ tema: p.tema }">
+                {{ p.estado === 'completado' ? 'Repasar' : 'Practicar' }}
+              </a>
+              <a class="ru-link" routerLink="/resueltos">Ver ejercicios resueltos</a>
+            </div>
+          </div>
+        </li>
+      }
+    </ol>
+  }
+</div>
