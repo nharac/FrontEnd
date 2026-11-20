@@ -13,6 +13,7 @@ const preg = (id: number): Pregunta => ({
 
 describe('Repaso de errores', () => {
   function crear(servicio: object) {
+    servicio = { repasoResumen: vi.fn().mockReturnValue(of({ paraHoy: 2, manana: 3, estaSemana: 1, dominadas: 4, enRepaso: 6 })), ...servicio };
     TestBed.configureTestingModule({ imports: [RepasoErrores], providers: [provideRouter([]), { provide: PracticaService, useValue: servicio }] });
     const f = TestBed.createComponent(RepasoErrores);
     f.detectChanges();
@@ -43,7 +44,9 @@ describe('Repaso de errores', () => {
 
   it('sin errores pendientes lo felicita; si falla la carga avisa', () => {
     const f = crear({ repaso: vi.fn().mockReturnValue(of([])), responder: vi.fn() });
-    expect(f.nativeElement.textContent).toContain('No tienes errores pendientes');
+    expect(f.nativeElement.textContent).toContain('Nada que repasar hoy');
+    expect(f.nativeElement.textContent).toContain('Mañana te tocan 3');
+    expect(f.nativeElement.textContent).toContain('Dominadas');
     TestBed.resetTestingModule();
     const f2 = crear({ repaso: vi.fn().mockReturnValue(throwError(() => new Error('x'))), responder: vi.fn() });
     expect(f2.nativeElement.textContent).toContain('No pudimos cargar');

@@ -1,12 +1,21 @@
 <div class="re">
   <header class="re-hero">
-    <h1>Repaso de errores</h1>
-    <p>Aquí están las preguntas que fallaste la última vez. Equivocarse es parte de aprender: inténtalas de nuevo
-      y, cuando aciertes, saldrán de la lista.</p>
+    <h1>Repaso inteligente</h1>
+    <p>Lo que fallas vuelve <b>mañana</b>. Si lo aciertas, vuelve en <b>3 días</b>, luego en <b>7</b>, y después queda
+      <b>dominado</b>. Así tu memoria lo fija de verdad, sin repasar de más.</p>
     @if (corregidas() > 0) {
       <span class="re-logro"><mat-icon aria-hidden="true">celebration</mat-icon> ¡Corregiste {{ corregidas() }}!</span>
     }
   </header>
+
+  @if (resumen(); as r) {
+    <div class="re-cajas" aria-label="Tu repaso">
+      <div class="re-cajas__item re-cajas__item--hoy"><b>{{ r.paraHoy }}</b><span>Para hoy</span></div>
+      <div class="re-cajas__item"><b>{{ r.manana }}</b><span>Mañana</span></div>
+      <div class="re-cajas__item"><b>{{ r.estaSemana }}</b><span>Esta semana</span></div>
+      <div class="re-cajas__item re-cajas__item--ok"><b>{{ r.dominadas }}</b><span>Dominadas</span></div>
+    </div>
+  }
 
   @if (cargando()) {
     <p class="re-aviso">Buscando tus errores…</p>
@@ -15,8 +24,8 @@
   } @else if (pendientes() === 0) {
     <section class="re-caja re-vacio">
       <mat-icon aria-hidden="true">task_alt</mat-icon>
-      <h2>¡No tienes errores pendientes!</h2>
-      <p>Sigue practicando; si fallas alguna, aparecerá aquí para que la repases.</p>
+      <h2>¡Nada que repasar hoy!</h2>
+      <p>{{ resumen()?.manana ? 'Mañana te tocan ' + resumen()!.manana + '. ' : '' }}Sigue practicando; si fallas alguna, aparecerá aquí en el momento justo.</p>
       <a class="re-btn" routerLink="/practica">Ir a practicar</a>
     </section>
   } @else {

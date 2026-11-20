@@ -55,9 +55,14 @@ export class PracticaService {
     return this.http.get<Pregunta[]>(`${this.API}/preguntas/sesion`, { params });
   }
 
+  /** GET /api/practica/repaso/resumen: cajas del repaso espaciado. */
+  repasoResumen(): Observable<ResumenRepaso> {
+    return this.http.get<ResumenRepaso>(`${this.API}/repaso/resumen`);
+  }
+
   /**
    * GET /api/practica/preguntas/repaso
-   * Preguntas que el estudiante falló la última vez que las respondió.
+   * Repaso espaciado: las preguntas que tocan hoy (1 → 3 → 7 días).
    */
   repaso(size = 20): Observable<Pregunta[]> {
     return this.http.get<Pregunta[]>(`${this.API}/preguntas/repaso`, { params: { size } });
@@ -103,3 +108,5 @@ export class PracticaService {
     return this.http.get<Progreso>(`${this.API}/progreso`);
   }
 }
+
+export interface ResumenRepaso { paraHoy: number; manana: number; estaSemana: number; dominadas: number; enRepaso: number }

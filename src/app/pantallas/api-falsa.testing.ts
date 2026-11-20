@@ -128,6 +128,7 @@ const RUTAS: [string, RegExp, (cuerpo?: unknown) => unknown][] = [
   ['GET', /\/practica\/preguntas\/\d+\/pista$/, () => ({ preguntaId: 7, pista: 'Usa la regla de la potencia', mensaje: null })],
   ['POST', /\/practica\/preguntas\/\d+\/responder$/, () => ({ esCorrecta: false, opcionCorrectaId: 1, pista: 'Baja el exponente',
     mensaje: 'Casi', habilitarSiguiente: false, chatIaHabilitado: true, puntosGanados: 0, puntosEnJuego: 15, nuevosLogros: [] })],
+  ['GET', /\/practica\/repaso\/resumen$/, () => ({ paraHoy: 2, manana: 1, estaSemana: 3, dominadas: 4, enRepaso: 6 })],
   ['GET', /\/practica\/preguntas/, () => [pregunta(7), pregunta(8)]],
   ['GET', /\/practica\/progreso$/, () => progreso],
   ['GET', /\/practica\/actividad/, () => actividadEstudiante],

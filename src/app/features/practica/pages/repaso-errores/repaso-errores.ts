@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
-import { PracticaService } from '../../services/practica.service';
+import { PracticaService, ResumenRepaso } from '../../services/practica.service';
 import { Pregunta, TEMAS } from '../../models/practica.model';
 
 /**
@@ -25,11 +25,13 @@ export class RepasoErrores implements OnInit {
   elegida = signal<Record<number, number>>({});
   pistas = signal<Record<number, string>>({});
   corregidas = signal(0);
+  resumen = signal<ResumenRepaso | null>(null);
   enviando = signal<number | null>(null);
 
   pendientes = computed(() => this.preguntas().length);
 
   ngOnInit(): void {
+    this.practica.repasoResumen().subscribe({ next: r => this.resumen.set(r), error: () => this.resumen.set(null) });
     this.practica.repaso().subscribe({
       next: p => { this.preguntas.set(p); this.cargando.set(false); },
       error: () => { this.error.set(true); this.cargando.set(false); },
