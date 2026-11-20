@@ -7,6 +7,8 @@
     <a class="dp-btn" routerLink="/docente/preguntas/nueva"><mat-icon>add</mat-icon> Nueva pregunta</a>
   </header>
 
+  <app-generador-ia (guardada)="cargar()" />
+
   <app-sumi-dice class="dp-sumi" estado="feliz" accesorio="lapiz" [tamano]="78" compacto
                  titulo="Consejo para tus preguntas" [mensajes]="consejosBanco" />
 

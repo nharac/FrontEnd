@@ -1,3 +1,4 @@
+import { GeneradorIa } from '../../components/generador-ia/generador-ia';
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { BANCO_PREGUNTAS } from '../../../../shared/components/sumi-dice/dialogos';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
@@ -20,7 +21,7 @@ import { colorPorcentaje } from '../../utils/colores';
  */
 @Component({
   selector: 'app-banco-preguntas',
-  imports: [RouterLink, FormsModule, MatIconModule, SumiDice],
+  imports: [RouterLink, FormsModule, MatIconModule, SumiDice, GeneradorIa],
   templateUrl: './banco-preguntas.html',
   styleUrl: './banco-preguntas.scss',
 })

@@ -181,6 +181,11 @@ export class DocenteService {
     return this.http.get<PreguntaDocente>(`${this.API}/docente/preguntas/${id}`);
   }
 
+  /** POST /api/docente/preguntas/generar: borradores de preguntas con IA (no se guardan). */
+  generarPreguntas(pedido: { tema: string; dificultad: string; cantidad: number; enfoque: string | null }): Observable<PreguntaDocenteRequest[]> {
+    return this.http.post<PreguntaDocenteRequest[]>(`${this.API}/docente/preguntas/generar`, pedido);
+  }
+
   /** POST /api/docente/preguntas */
   crearPregunta(request: PreguntaDocenteRequest): Observable<PreguntaDocente> {
     return this.http.post<PreguntaDocente>(`${this.API}/docente/preguntas`, request);

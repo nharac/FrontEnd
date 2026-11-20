@@ -1,0 +1,78 @@
+<section class="gi" [class.gi--abierto]="abierto()">
+  <button type="button" class="gi-cabeza" (click)="abierto.set(!abierto())" [attr.aria-expanded]="abierto()">
+    <span class="gi-icono"><mat-icon aria-hidden="true">auto_awesome</mat-icon></span>
+    <span class="gi-titulo"><strong>Generar preguntas con IA</strong><small>La IA propone, tú revisas y publicas solo las que estén bien.</small></span>
+    <mat-icon aria-hidden="true">{{ abierto() ? 'expand_less' : 'expand_more' }}</mat-icon>
+  </button>
+
+  @if (abierto()) {
+    <div class="gi-cuerpo">
+      <div class="gi-form">
+        <label><span>Tema</span>
+          <select (change)="tema.set($any($event.target).value)">
+            @for (t of temas; track t.id) { <option [value]="t.id" [selected]="t.id === tema()">{{ t.nombre }}</option> }
+          </select>
+        </label>
+        <label><span>Dificultad</span>
+          <select (change)="dificultad.set($any($event.target).value)">
+            @for (d of dificultades; track d[0]) { <option [value]="d[0]" [selected]="d[0] === dificultad()">{{ d[1] }}</option> }
+          </select>
+        </label>
+        <label><span>Cuántas</span>
+          <select (change)="cantidad.set(+$any($event.target).value)">
+            @for (n of [1, 2, 3, 4, 5]; track n) { <option [value]="n" [selected]="n === cantidad()">{{ n }}</option> }
+          </select>
+        </label>
+        <label class="gi-ancho"><span>Enfoque (opcional)</span>
+          <input type="text" maxlength="200" placeholder="Ej.: regla de la cadena con funciones trigonométricas" [value]="enfoque()" (input)="enfoque.set($any($event.target).value)" />
+        </label>
+      </div>
+      <button type="button" class="dp-btn gi-generar" (click)="generar()" [disabled]="generando()">
+        <mat-icon aria-hidden="true">auto_awesome</mat-icon> {{ generando() ? 'La IA está escribiendo…' : 'Generar borradores' }}
+      </button>
+      @if (error(); as e) { <p class="gi-error" role="alert">{{ e }}</p> }
+
+      @if (borradores().length) {
+        <p class="gi-aviso"><mat-icon aria-hidden="true">fact_check</mat-icon> Revisa cada pregunta antes de publicarla: la IA puede equivocarse en los cálculos.</p>
+        <ol class="gi-lista">
+          @for (b of borradores(); track $index; let i = $index) {
+            @if (b.estado !== 'descartada') {
+              <li class="gi-borrador" [class.gi-borrador--ok]="b.estado === 'guardada'">
+                @if (b.editando) {
+                  <textarea rows="2" [value]="b.pregunta.enunciado" (input)="editarEnunciado(i, $any($event.target).value)" aria-label="Enunciado"></textarea>
+                } @else {
+                  <p class="gi-enunciado">{{ b.pregunta.enunciado }}</p>
+                }
+                <ul class="gi-opciones">
+                  @for (o of b.pregunta.opciones; track o.letra; let j = $index) {
+                    <li [class.gi-correcta]="o.esCorrecta">
+                      <b>{{ o.letra }}</b>
+                      @if (b.editando) {
+                        <input type="text" [value]="o.texto" (input)="editarOpcion(i, j, $any($event.target).value)" [attr.aria-label]="'Opción ' + o.letra" />
+                        <button type="button" class="gi-marcar" (click)="marcarCorrecta(i, j)" [attr.aria-pressed]="o.esCorrecta">{{ o.esCorrecta ? '✓ correcta' : 'marcar' }}</button>
+                      } @else {
+                        <span>{{ o.texto }}</span> @if (o.esCorrecta) { <mat-icon aria-hidden="true">check_circle</mat-icon> }
+                      }
+                    </li>
+                  }
+                </ul>
+                @if (b.pregunta.pista) { <p class="gi-pista"><mat-icon aria-hidden="true">lightbulb</mat-icon> {{ b.pregunta.pista }}</p> }
+                <div class="gi-acciones">
+                  @if (b.estado === 'guardada') {
+                    <span class="gi-guardada"><mat-icon aria-hidden="true">check_circle</mat-icon> Publicada en el banco</span>
+                  } @else {
+                    <button type="button" class="dp-btn dp-btn--claro" (click)="descartar(i)">Descartar</button>
+                    <button type="button" class="dp-btn dp-btn--claro" (click)="alternarEdicion(i)">{{ b.editando ? 'Listo' : 'Editar' }}</button>
+                    <button type="button" class="dp-btn" (click)="guardar(i)" [disabled]="b.estado === 'guardando'">
+                      <mat-icon aria-hidden="true">publish</mat-icon> {{ b.estado === 'guardando' ? 'Guardando…' : 'Publicar' }}
+                    </button>
+                  }
+                </div>
+              </li>
+            }
+          }
+        </ol>
+      }
+    </div>
+  }
+</section>
