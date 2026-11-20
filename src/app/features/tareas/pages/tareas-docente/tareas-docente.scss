@@ -1,6 +1,6 @@
 :host { display: block; }
 .td { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;
-  h1 { margin: 0 0 6px; } h2 { margin: 0 0 12px; font-size: 20px; } header p { margin: 0; color: #6b7280; line-height: 1.5; } }
+  h1 { margin: 0 0 6px; line-height: 1.15; } h2 { margin: 0 0 12px; font-size: 20px; } header p { margin: 0; color: #6b7280; line-height: 1.5; } }
 .td-caja { background: #fff; border-radius: 20px; padding: 18px 20px; box-shadow: 0 6px 22px rgba(31, 50, 71, 0.07); display: flex; flex-direction: column; gap: 12px; }
 .td-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .td-campo { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 600;

@@ -13,6 +13,16 @@ export class TemaService {
 
   constructor() {
     this.aplicar(this.leer());
+    // Mientras la persona no elija, sigue los cambios del sistema (por ejemplo, el modo noche del celular)
+    if (typeof matchMedia === 'function') {
+      matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', e => {
+        if (!this.elegido()) this.aplicar(e.matches);
+      });
+    }
+  }
+
+  private elegido(): boolean {
+    try { return !!localStorage.getItem(CLAVE); } catch { return false; }
   }
 
   alternar(): void {

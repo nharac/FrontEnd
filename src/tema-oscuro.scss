@@ -5,8 +5,9 @@
 // ============================================
 html.tema-oscuro {
   background: #0b1020;
+  --saesu-filtro-tema: invert(0.9) hue-rotate(180deg);
   color-scheme: dark;
-  filter: invert(0.9) hue-rotate(180deg);
+  filter: var(--saesu-filtro-tema);
 
   // Lo que debe conservar sus colores originales
   img, video, picture, canvas, iframe,
@@ -33,4 +34,51 @@ html { transition: filter 0.35s ease, background-color 0.35s ease; }
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
+}
+
+// ============================================
+// Accesibilidad (AccesibilidadService pone las clases en <html>)
+// ============================================
+
+// Saltar al contenido: invisible hasta que se navega con el teclado
+.saltar-contenido {
+  position: fixed; top: -60px; left: 12px; z-index: 2000; padding: 10px 16px; border-radius: 10px;
+  background: #4f46e5; color: #fff; font-weight: 600; text-decoration: none; transition: top 0.15s;
+  &:focus { top: 12px; }
+}
+main:focus { outline: none; }
+
+// Texto más grande: se agranda todo un 12,5 % (los tamaños están en px, por eso zoom)
+html.texto-grande body { zoom: 1.125; }
+
+// Alto contraste: más contraste, enlaces subrayados y bordes visibles
+html.alto-contraste { filter: contrast(1.3); }
+html.tema-oscuro.alto-contraste { filter: var(--saesu-filtro-tema) contrast(1.3); }
+html.alto-contraste {
+  main a:not([class*="btn"]):not([role]) { text-decoration: underline; }
+  :where(input, select, textarea) { border-color: #374151 !important; }
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible { outline-width: 3px; outline-color: #1d4ed8; }
+}
+
+// Sin animaciones
+html.sin-animaciones *, html.sin-animaciones *::before, html.sin-animaciones *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+}
+
+// ============================================
+// Celular: la barra de abajo muestra las secciones principales y "Más" abre el resto
+// ============================================
+.navbar__links .nav-mas { display: none; }
+.navbar__links .nav-mas button {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px;
+  font: inherit; font-size: 10.5px; color: inherit; background: none; border: 0; border-radius: 12px; cursor: pointer;
+  mat-icon { font-size: 23px; width: 23px; height: 23px; }
+}
+@media (max-width: 700px) {
+  .navbar__links .nav-extra { display: none !important; }
+  .navbar__links .nav-mas { display: block; flex: 1; min-width: 0; }
+  // Tablas y bloques anchos nunca empujan la página hacia los lados
+  .main-content { overflow-x: clip; }
+  .main-content :where(table) { display: block; max-width: 100%; overflow-x: auto; }
 }

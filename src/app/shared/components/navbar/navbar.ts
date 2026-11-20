@@ -1,3 +1,5 @@
+import { AccesibilidadService } from '../../../core/services/accesibilidad.service';
+import { MatDividerModule } from '@angular/material/divider';
 import { Logo } from '../logo/logo';
 import { BotonTema } from '../boton-tema/boton-tema';
 import { Component, OnInit, computed, inject } from '@angular/core';
@@ -18,7 +20,7 @@ import { esEstudiante } from '../../utils/rol';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [Logo, BotonTema, 
+  imports: [MatDividerModule, Logo, BotonTema, 
     CommonModule,
     RouterLink,
     RouterLinkActive,
@@ -31,6 +33,7 @@ import { esEstudiante } from '../../utils/rol';
   styleUrl: './navbar.scss',
 })
 export class Navbar implements OnInit {
+  readonly a11y = inject(AccesibilidadService);
 
   private authService = inject(AuthService);
   private tokenService = inject(TokenService);

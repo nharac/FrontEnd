@@ -38,23 +38,29 @@
         <span>Tareas</span>
       </a>
     </li>
-    <li>
+    <li class="nav-extra">
       <a routerLink="/docente/estadisticas" routerLinkActive="active">
         <mat-icon>insights</mat-icon>
         <span>Estadísticas</span>
       </a>
     </li>
-    <li>
+    <li class="nav-extra">
       <a routerLink="/docente/preguntas" routerLinkActive="active">
         <mat-icon>quiz</mat-icon>
         <span>Preguntas</span>
       </a>
     </li>
-    <li>
+    <li class="nav-extra">
       <a routerLink="/docente/foro" routerLinkActive="active">
         <mat-icon>forum</mat-icon>
         <span>Foro</span>
       </a>
+    </li>
+    <li class="nav-mas">
+      <button type="button" [matMenuTriggerFor]="mas" aria-label="Más secciones">
+        <mat-icon>more_horiz</mat-icon>
+        <span>Más</span>
+      </button>
     </li>
   </ul>
 
@@ -68,6 +74,21 @@
     <mat-icon>expand_more</mat-icon>
   </button>
 
+  <mat-menu #mas="matMenu" yPosition="above">
+    <button mat-menu-item routerLink="/docente/estadisticas">
+      <mat-icon>insights</mat-icon>
+      <span>Estadísticas</span>
+    </button>
+    <button mat-menu-item routerLink="/docente/preguntas">
+      <mat-icon>quiz</mat-icon>
+      <span>Preguntas</span>
+    </button>
+    <button mat-menu-item routerLink="/docente/foro">
+      <mat-icon>forum</mat-icon>
+      <span>Foro</span>
+    </button>
+  </mat-menu>
+
   <mat-menu #menu="matMenu" xPosition="before">
     <button mat-menu-item routerLink="/docente/perfil">
       <mat-icon>person</mat-icon>
@@ -77,6 +98,20 @@
       <mat-icon>shield</mat-icon>
       <span>Moderación del foro</span>
     </button>
+    <mat-divider />
+    <button mat-menu-item (click)="$event.stopPropagation(); a11y.alternar('textoGrande')" role="menuitemcheckbox" [attr.aria-checked]="a11y.textoGrande()">
+      <mat-icon>{{ a11y.textoGrande() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+      <span>Texto más grande</span>
+    </button>
+    <button mat-menu-item (click)="$event.stopPropagation(); a11y.alternar('altoContraste')" role="menuitemcheckbox" [attr.aria-checked]="a11y.altoContraste()">
+      <mat-icon>{{ a11y.altoContraste() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+      <span>Alto contraste</span>
+    </button>
+    <button mat-menu-item (click)="$event.stopPropagation(); a11y.alternar('sinAnimaciones')" role="menuitemcheckbox" [attr.aria-checked]="a11y.sinAnimaciones()">
+      <mat-icon>{{ a11y.sinAnimaciones() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+      <span>Sin animaciones</span>
+    </button>
+    <mat-divider />
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>
       <span>Cerrar sesión</span>

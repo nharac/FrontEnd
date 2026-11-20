@@ -1,3 +1,5 @@
+import { AccesibilidadService } from '../../../core/services/accesibilidad.service';
+import { MatDividerModule } from '@angular/material/divider';
 import { Logo } from '../logo/logo';
 import { BotonTema } from '../boton-tema/boton-tema';
 import { Component, DestroyRef, OnInit, computed, inject } from '@angular/core';
@@ -18,7 +20,7 @@ import { Verificado } from '../verificado/verificado';
 @Component({
   selector: 'app-navbar-docente',
   standalone: true,
-  imports: [Verificado, Logo, BotonTema, 
+  imports: [MatDividerModule, Verificado, Logo, BotonTema, 
     CommonModule,
     RouterLink,
     RouterLinkActive,
@@ -30,6 +32,7 @@ import { Verificado } from '../verificado/verificado';
   styleUrl: './navbar-docente.scss',
 })
 export class NavbarDocente implements OnInit {
+  readonly a11y = inject(AccesibilidadService);
 
   private authService = inject(AuthService);
   private despedida = inject(DespedidaService);
