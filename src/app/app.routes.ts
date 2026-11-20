@@ -92,6 +92,12 @@ export const routes: Routes = [
             .then(m => m.RutaAprendizaje)
       },
       {
+        path: 'retos',
+        loadComponent: () =>
+          import('./features/duelos/pages/retos/retos')
+            .then(m => m.Retos)
+      },
+      {
         path: 'resueltos',
         loadComponent: () =>
           import('./features/resueltos/pages/ejercicios-resueltos/ejercicios-resueltos')

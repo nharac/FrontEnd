@@ -159,6 +159,8 @@ const RUTAS: [string, RegExp, (cuerpo?: unknown) => unknown][] = [
   ['GET', /\/docente\/notificaciones$/, () => [publicacionResumen(1), publicacionResumen(2)]],
   ['GET', /\/docente\/estadisticas$/, () => estadisticas],
   ['GET', /\/tareas$/, () => []],
+  ['GET', /\/duelos\/companeros$/, () => []],
+  ['GET', /\/duelos$/, () => []],
   ['GET', /\/docente\/alertas$/, () => [{ tipo: 'INACTIVO', gravedad: 'alta', estudianteId: 2, estudiante: 'Ana', tema: null,
     mensaje: 'Ana lleva 9 días sin practicar.', sugerencia: 'Asígnale una tarea corta para que retome.' }]],
   ['GET', /\/docente\/estudiantes\/\d+\/quices\/\d+$/, () => resultadoQuiz],

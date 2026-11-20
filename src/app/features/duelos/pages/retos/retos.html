@@ -1,0 +1,102 @@
+<div class="rt">
+  <header class="rt-hero">
+    <h1>Retos entre compañeros</h1>
+    <p>Reta a un compañero: los dos responden las mismas 5 preguntas. Gana quien acierte más y, si empatan, quien termine más rápido.</p>
+    @if (ganados()) { <p class="rt-ganados"><mat-icon aria-hidden="true">emoji_events</mat-icon> Has ganado {{ ganados() }} reto{{ ganados() === 1 ? '' : 's' }}</p> }
+  </header>
+
+  @if (error(); as e) { <p class="rt-error" role="alert">{{ e }}</p> }
+
+  @if (jugando(); as d) {
+    <section class="rt-caja" aria-labelledby="rt-juego">
+      <div class="rt-juego__cabeza">
+        <h2 id="rt-juego">Reto contra {{ d.rival }} · {{ d.temaNombre }}</h2>
+        <span class="rt-reloj" aria-live="off"><mat-icon aria-hidden="true">timer</mat-icon> {{ segundos() }} s</span>
+      </div>
+      <ol class="rt-preguntas">
+        @for (p of preguntas(); track p.id; let i = $index) {
+          <li class="rt-pregunta">
+            <p class="rt-enunciado" [appTextoRico]="p.enunciado"></p>
+            <div class="rt-opciones" role="radiogroup" [attr.aria-label]="'Pregunta ' + (i + 1)">
+              @for (o of p.opciones; track o.letra) {
+                <button type="button" role="radio" class="rt-opcion" [class.rt-opcion--elegida]="respuestas()[p.id] === o.letra"
+                        [attr.aria-checked]="respuestas()[p.id] === o.letra" (click)="elegir(p.id, o.letra)">
+                  <b>{{ o.letra }})</b> <span [appTextoRico]="o.texto"></span>
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+      <div class="rt-acciones">
+        <button type="button" class="rt-btn rt-btn--claro" (click)="cancelar()">Salir</button>
+        <button type="button" class="rt-btn" (click)="entregar()" [disabled]="enviando()">
+          Entregar ({{ contestadas() }}/{{ preguntas().length }})
+        </button>
+      </div>
+    </section>
+  } @else {
+    @if (resultado(); as r) {
+      <section class="rt-caja rt-resultado" role="status">
+        <h2>{{ r.estado === 'TERMINADO' ? textoResultado(r) : '¡Listo!' }}</h2>
+        <p>Acertaste {{ r.misCorrectas }} de {{ r.totalPreguntas }} en {{ r.misSegundos }} s.
+          @if (r.estado === 'TERMINADO') { {{ r.rival }} acertó {{ r.suyasCorrectas }} en {{ r.suyosSegundos }} s. }
+          @else { Cuando {{ r.rival }} juegue verás quién ganó. }
+        </p>
+      </section>
+    }
+
+    <section class="rt-caja" aria-labelledby="rt-nuevo">
+      <h2 id="rt-nuevo">Nuevo reto</h2>
+      @if (!companeros().length) {
+        <p class="rt-vacio">Aún no hay compañeros registrados para retar.</p>
+      } @else {
+        <div class="rt-form">
+          <label><span>Compañero</span>
+            <select (change)="rivalId.set($any($event.target).value ? +$any($event.target).value : null)">
+              <option value="">Elige…</option>
+              @for (c of companeros(); track c.id) { <option [value]="c.id">{{ c.nombre }}</option> }
+            </select>
+          </label>
+          <label><span>Tema</span>
+            <select (change)="tema.set($any($event.target).value)">
+              @for (t of temas; track t.id) { <option [value]="t.id" [selected]="t.id === tema()">{{ t.nombre }}</option> }
+            </select>
+          </label>
+          <button type="button" class="rt-btn" (click)="retar()" [disabled]="!rivalId() || enviando()">
+            <mat-icon aria-hidden="true">sports_kabaddi</mat-icon> Retar
+          </button>
+        </div>
+        @if (mensaje(); as m) { <p class="rt-exito" role="status">{{ m }}</p> }
+      }
+    </section>
+
+    <section aria-labelledby="rt-pendientes">
+      <h2 id="rt-pendientes">Por jugar</h2>
+      @if (!porJugar().length) { <p class="rt-vacio">No tienes retos pendientes.</p> }
+      <ul class="rt-lista">
+        @for (d of porJugar(); track d.id) {
+          <li class="rt-item rt-item--pendiente">
+            <div><strong>{{ d.soyRetador ? 'Retaste a' : 'Te retó' }} {{ d.rival }}</strong><small>{{ d.temaNombre }} · {{ d.totalPreguntas }} preguntas</small></div>
+            <button type="button" class="rt-btn" (click)="jugar(d)">Jugar</button>
+          </li>
+        }
+      </ul>
+    </section>
+
+    @if (otros().length) {
+      <section aria-labelledby="rt-historial">
+        <h2 id="rt-historial">Historial</h2>
+        <ul class="rt-lista">
+          @for (d of otros(); track d.id) {
+            <li class="rt-item" [class.rt-item--gane]="d.resultado === 'GANASTE'" [class.rt-item--perdi]="d.resultado === 'PERDISTE'">
+              <div><strong>{{ d.rival }} · {{ d.temaNombre }}</strong>
+                <small>Tú: {{ d.misCorrectas }}/{{ d.totalPreguntas }}@if (d.suyasCorrectas !== null) { · {{ d.rival }}: {{ d.suyasCorrectas }}/{{ d.totalPreguntas }} }</small></div>
+              <span class="rt-estado">{{ textoResultado(d) }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</div>
