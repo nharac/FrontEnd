@@ -193,3 +193,8 @@ app-ejercicios-resueltos {
 }
 
 @keyframes rs-entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+app-ejercicios-resueltos {
+  .rs-sumi { display: block; }
+  .rs-sumi--paso { margin: -2px 0 2px; }
+}

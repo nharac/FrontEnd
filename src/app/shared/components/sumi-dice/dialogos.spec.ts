@@ -83,3 +83,26 @@ describe('Diálogos de Sumi', () => {
     });
   });
 });
+
+import { sumiJugando, sumiListaResueltos, sumiPasoResuelto, sumiResultadoReto, sumiRetos } from './dialogos';
+
+describe('Sumi en resueltos y retos', () => {
+  it('resueltos: saluda, cuenta y celebra', () => {
+    expect(sumiListaResueltos('algebra', 'Álgebra', 0, 10).estado).toBe('saludo');
+    expect(sumiListaResueltos('algebra', 'Álgebra', 4, 10).titulo).toBe('Llevas 4 de 10');
+    expect(sumiListaResueltos('algebra', 'Álgebra', 10, 10).estado).toBe('celebra');
+    expect(sumiPasoResuelto(0, 4, 'Avanzado').titulo).toContain('difíciles');
+    expect(sumiPasoResuelto(3, 4, 'Básico').titulo).toBe('¡Último paso!');
+    expect(sumiPasoResuelto(4, 4, 'Básico').tono).toBe('exito');
+  });
+
+  it('retos: portada, juego y resultado', () => {
+    expect(sumiRetos(0, 0, 0, false).titulo).toContain('rivales');
+    expect(sumiRetos(2, 0, 0, true).titulo).toContain('2 retos');
+    expect(sumiRetos(0, 3, 4, true).titulo).toContain('75 %');
+    expect(sumiJugando(5, 5, 10).estado).toBe('celebra');
+    expect(sumiJugando(2, 5, 200).estado).toBe('nervioso');
+    expect(sumiResultadoReto('GANASTE', 'TERMINADO', 'Beto').titulo).toBe('¡GANASTE!');
+    expect(sumiResultadoReto(null, 'ESPERANDO', 'Beto').mensajes[0]).toContain('Beto');
+  });
+});

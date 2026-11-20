@@ -1,17 +1,26 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { DuelosService } from '../../services/duelos.service';
 import { Companero, Duelo, PreguntaDuelo } from '../../models/duelo.model';
 import { TEMAS } from '../../../practica/models/practica.model';
 import { TextoRicoDirective } from '../../../../shared/directives/texto-rico.directive';
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { Confeti } from '../../../../shared/components/confeti/confeti';
+import { sumiJugando, sumiResultadoReto, sumiRetos } from '../../../../shared/components/sumi-dice/dialogos';
 
-/** Retos entre compañeros: retar, jugar y ver resultados. */
+/** Iniciales para el avatar (máximo dos letras). */
+export function iniciales(nombre: string): string {
+  return nombre.trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() ?? '').join('') || '?';
+}
+
+/** Retos entre compañeros: retar, jugar una pregunta a la vez y ver el marcador. */
 @Component({
   selector: 'app-retos',
   standalone: true,
-  imports: [MatIconModule, TextoRicoDirective],
+  imports: [NgClass, MatIconModule, TextoRicoDirective, SumiDice, Confeti],
   templateUrl: './retos.html',
   styleUrl: './retos.scss',
 })
@@ -19,9 +28,12 @@ export class Retos implements OnInit, OnDestroy {
   private readonly servicio = inject(DuelosService);
 
   readonly temas = TEMAS;
+  readonly iniciales = iniciales;
+  readonly letras = ['A', 'B', 'C', 'D', 'E'];
 
   duelos = signal<Duelo[]>([]);
   companeros = signal<Companero[]>([]);
+  filtroRival = signal('');
   rivalId = signal<number | null>(null);
   tema = signal<string>('fundamentos');
   mensaje = signal<string | null>(null);
@@ -31,15 +43,37 @@ export class Retos implements OnInit, OnDestroy {
   // Juego en curso
   jugando = signal<Duelo | null>(null);
   preguntas = signal<PreguntaDuelo[]>([]);
+  actual = signal(0);
   respuestas = signal<Record<number, string>>({});
   segundos = signal(0);
   resultado = signal<Duelo | null>(null);
   private reloj?: ReturnType<typeof setInterval>;
 
   porJugar = computed(() => this.duelos().filter(d => d.estado === 'POR_JUGAR'));
+  esperando = computed(() => this.duelos().filter(d => d.estado === 'ESPERANDO'));
+  terminados = computed(() => this.duelos().filter(d => d.estado === 'TERMINADO'));
   otros = computed(() => this.duelos().filter(d => d.estado !== 'POR_JUGAR'));
-  ganados = computed(() => this.duelos().filter(d => d.resultado === 'GANASTE').length);
+  ganados = computed(() => this.terminados().filter(d => d.resultado === 'GANASTE').length);
+  perdidos = computed(() => this.terminados().filter(d => d.resultado === 'PERDISTE').length);
+  empates = computed(() => this.terminados().filter(d => d.resultado === 'EMPATE').length);
   contestadas = computed(() => Object.keys(this.respuestas()).length);
+  preguntaActual = computed(() => this.preguntas()[this.actual()] ?? null);
+  rivalElegido = computed(() => this.companeros().find(c => c.id === this.rivalId()) ?? null);
+  companerosFiltrados = computed(() => {
+    const q = this.filtroRival().trim().toLowerCase();
+    return q ? this.companeros().filter(c => c.nombre.toLowerCase().includes(q)) : this.companeros();
+  });
+  nombreTema = computed(() => this.temas.find(t => t.id === this.tema())?.nombre ?? '');
+
+  // Lo que dice Sumi en cada momento
+  sumiPortada = computed(() => sumiRetos(this.porJugar().length, this.ganados(), this.terminados().length, this.companeros().length > 0));
+  /** Solo cambia una vez (a los 2 minutos), así Sumi no se reinicia con cada segundo del reloj. */
+  private lento = computed(() => this.segundos() > 120);
+  sumiJuego = computed(() => sumiJugando(this.contestadas(), this.preguntas().length, this.lento() ? 121 : 0));
+  sumiFinal = computed(() => {
+    const r = this.resultado();
+    return r ? sumiResultadoReto(r.resultado, r.estado, r.rival) : null;
+  });
 
   ngOnInit(): void {
     this.cargar();
@@ -68,10 +102,21 @@ export class Retos implements OnInit, OnDestroy {
       next: d => {
         this.duelos.update(l => [d, ...l]);
         this.mensaje.set(`¡Retaste a ${d.rival}! Juega tu parte cuando quieras.`);
+        this.rivalId.set(null);
         this.enviando.set(false);
       },
       error: e => this.falla(e, 'No se pudo crear el reto.'),
     });
+  }
+
+  /** Revancha: mismo rival y mismo tema. */
+  revancha(d: Duelo): void {
+    const c = this.companeros().find(x => x.nombre === d.rival);
+    if (!c) return;
+    this.resultado.set(null);
+    this.rivalId.set(c.id);
+    this.tema.set(d.tema);
+    this.retar();
   }
 
   jugar(d: Duelo): void {
@@ -81,6 +126,7 @@ export class Retos implements OnInit, OnDestroy {
       next: p => {
         this.preguntas.set(p);
         this.respuestas.set({});
+        this.actual.set(0);
         this.segundos.set(0);
         this.jugando.set(d);
         this.pararReloj();
@@ -92,6 +138,10 @@ export class Retos implements OnInit, OnDestroy {
 
   elegir(preguntaId: number, letra: string): void {
     this.respuestas.update(r => ({ ...r, [preguntaId]: letra }));
+  }
+
+  irA(i: number): void {
+    if (i >= 0 && i < this.preguntas().length) this.actual.set(i);
   }
 
   entregar(): void {
@@ -117,9 +167,17 @@ export class Retos implements OnInit, OnDestroy {
     this.jugando.set(null);
   }
 
+  cerrarResultado(): void {
+    this.resultado.set(null);
+  }
+
   private pararReloj(): void {
     if (this.reloj) clearInterval(this.reloj);
     this.reloj = undefined;
+  }
+
+  reloj$(s: number): string {
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
   }
 
   textoResultado(d: Duelo): string {
@@ -127,5 +185,9 @@ export class Retos implements OnInit, OnDestroy {
     if (d.resultado === 'GANASTE') return '¡Ganaste!';
     if (d.resultado === 'PERDISTE') return 'Perdiste';
     return 'Empate';
+  }
+
+  iconoTema(id: string): string {
+    return this.temas.find(t => t.id === id)?.icono ?? 'functions';
   }
 }

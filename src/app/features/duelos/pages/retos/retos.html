@@ -1,102 +1,191 @@
 <div class="rt">
+  <!-- ===== Portada ===== -->
+  @if (!jugando() && !resultado()) {
   <header class="rt-hero">
-    <h1>Retos entre compañeros</h1>
-    <p>Reta a un compañero: los dos responden las mismas 5 preguntas. Gana quien acierte más y, si empatan, quien termine más rápido.</p>
-    @if (ganados()) { <p class="rt-ganados"><mat-icon aria-hidden="true">emoji_events</mat-icon> Has ganado {{ ganados() }} reto{{ ganados() === 1 ? '' : 's' }}</p> }
+    <div class="rt-hero__texto">
+      <span class="rt-hero__chip"><mat-icon aria-hidden="true">sports_kabaddi</mat-icon> Arena de retos</span>
+      <h1>Reta a tus compañeros</h1>
+      <p>Los dos responden las mismas 5 preguntas. Gana quien acierte más; si empatan, el más rápido.</p>
+      <div class="rt-marcador" aria-label="Tu récord">
+        <div class="rt-marcador__g"><b>{{ ganados() }}</b><span>Ganados</span></div>
+        <div><b>{{ empates() }}</b><span>Empates</span></div>
+        <div><b>{{ perdidos() }}</b><span>Perdidos</span></div>
+        <div class="rt-marcador__p"><b>{{ porJugar().length }}</b><span>Por jugar</span></div>
+      </div>
+    </div>
   </header>
+  }
 
-  @if (error(); as e) { <p class="rt-error" role="alert">{{ e }}</p> }
+  @if (error(); as e) { <p class="rt-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon> {{ e }}</p> }
 
   @if (jugando(); as d) {
-    <section class="rt-caja" aria-labelledby="rt-juego">
+    <!-- ===== Jugando ===== -->
+    <section class="rt-juego" aria-labelledby="rt-juego-t">
       <div class="rt-juego__cabeza">
-        <h2 id="rt-juego">Reto contra {{ d.rival }} · {{ d.temaNombre }}</h2>
-        <span class="rt-reloj" aria-live="off"><mat-icon aria-hidden="true">timer</mat-icon> {{ segundos() }} s</span>
+        <div class="rt-vs rt-vs--mini">
+          <span class="rt-avatar rt-avatar--yo">Tú</span>
+          <b>VS</b>
+          <span class="rt-avatar">{{ iniciales(d.rival) }}</span>
+        </div>
+        <div class="rt-juego__info">
+          <h2 id="rt-juego-t">Reto contra {{ d.rival }}</h2>
+          <small><mat-icon aria-hidden="true">{{ iconoTema(d.tema) }}</mat-icon> {{ d.temaNombre }}</small>
+        </div>
+        <span class="rt-reloj" aria-live="off"><mat-icon aria-hidden="true">timer</mat-icon> {{ reloj$(segundos()) }}</span>
       </div>
-      <ol class="rt-preguntas">
+
+      <div class="rt-puntos" role="tablist" aria-label="Preguntas">
         @for (p of preguntas(); track p.id; let i = $index) {
-          <li class="rt-pregunta">
-            <p class="rt-enunciado" [appTextoRico]="p.enunciado"></p>
-            <div class="rt-opciones" role="radiogroup" [attr.aria-label]="'Pregunta ' + (i + 1)">
-              @for (o of p.opciones; track o.letra) {
-                <button type="button" role="radio" class="rt-opcion" [class.rt-opcion--elegida]="respuestas()[p.id] === o.letra"
-                        [attr.aria-checked]="respuestas()[p.id] === o.letra" (click)="elegir(p.id, o.letra)">
-                  <b>{{ o.letra }})</b> <span [appTextoRico]="o.texto"></span>
-                </button>
-              }
-            </div>
-          </li>
+          <button type="button" role="tab" class="rt-punto" [class.rt-punto--actual]="i === actual()" [class.rt-punto--hecha]="respuestas()[p.id]"
+                  [attr.aria-selected]="i === actual()" [attr.aria-label]="'Pregunta ' + (i + 1) + (respuestas()[p.id] ? ', respondida' : '')" (click)="irA(i)">{{ i + 1 }}</button>
         }
-      </ol>
-      <div class="rt-acciones">
-        <button type="button" class="rt-btn rt-btn--claro" (click)="cancelar()">Salir</button>
-        <button type="button" class="rt-btn" (click)="entregar()" [disabled]="enviando()">
-          Entregar ({{ contestadas() }}/{{ preguntas().length }})
-        </button>
+      </div>
+
+      @let sj = sumiJuego();
+      <app-sumi-dice class="rt-sumi" [estado]="sj.estado" accesorio="cronometro" [tamano]="60" compacto [titulo]="sj.titulo" [mensajes]="sj.mensajes" [tono]="sj.tono" [aleatorio]="false" />
+
+      @if (preguntaActual(); as p) {
+        <div class="rt-pregunta">
+          <span class="rt-pregunta__n">Pregunta {{ actual() + 1 }} de {{ preguntas().length }}</span>
+          <p class="rt-enunciado" [appTextoRico]="p.enunciado"></p>
+          <div class="rt-opciones" role="radiogroup" [attr.aria-label]="'Opciones de la pregunta ' + (actual() + 1)">
+            @for (o of p.opciones; track o.letra) {
+              <button type="button" role="radio" class="rt-opcion" [class.rt-opcion--elegida]="respuestas()[p.id] === o.letra"
+                      [attr.aria-checked]="respuestas()[p.id] === o.letra" (click)="elegir(p.id, o.letra)">
+                <span class="rt-opcion__letra">{{ o.letra }}</span> <span [appTextoRico]="o.texto"></span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="rt-juego__pie">
+        <button type="button" class="rt-btn rt-btn--claro" (click)="cancelar()"><mat-icon aria-hidden="true">close</mat-icon> Salir</button>
+        <div class="rt-juego__nav">
+          <button type="button" class="rt-btn rt-btn--claro" (click)="irA(actual() - 1)" [disabled]="actual() === 0" aria-label="Pregunta anterior">
+            <mat-icon aria-hidden="true">chevron_left</mat-icon>
+          </button>
+          @if (actual() < preguntas().length - 1) {
+            <button type="button" class="rt-btn" (click)="irA(actual() + 1)">Siguiente <mat-icon aria-hidden="true">chevron_right</mat-icon></button>
+          } @else {
+            <button type="button" class="rt-btn rt-btn--fuego" (click)="entregar()" [disabled]="enviando()">
+              <mat-icon aria-hidden="true">flag</mat-icon> Entregar ({{ contestadas() }}/{{ preguntas().length }})
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+  } @else if (resultado(); as r) {
+    <!-- ===== Resultado ===== -->
+    <section class="rt-resultado" [ngClass]="'rt-resultado--' + (r.resultado ?? 'espera').toLowerCase()" role="status">
+      @if (r.resultado === 'GANASTE') { <app-confeti [cantidad]="40" [alcance]="220" /> }
+      @let sf = sumiFinal()!;
+      <app-sumi-dice [estado]="sf.estado" accesorio="trofeo" [tamano]="90" [titulo]="sf.titulo" [mensajes]="sf.mensajes" [tono]="sf.tono" [aleatorio]="false" />
+      <div class="rt-score">
+        <div class="rt-score__lado">
+          <span class="rt-avatar rt-avatar--grande rt-avatar--yo">Tú</span>
+          <b>{{ r.misCorrectas }}<small>/{{ r.totalPreguntas }}</small></b>
+          <span>{{ reloj$(r.misSegundos ?? 0) }}</span>
+        </div>
+        <span class="rt-score__vs">VS</span>
+        <div class="rt-score__lado">
+          <span class="rt-avatar rt-avatar--grande">{{ iniciales(r.rival) }}</span>
+          <b>{{ r.suyasCorrectas ?? '?' }}<small>/{{ r.totalPreguntas }}</small></b>
+          <span>{{ r.estado === 'TERMINADO' ? reloj$(r.suyosSegundos ?? 0) : 'Cuando ' + r.rival + ' juegue verás quién ganó' }}</span>
+        </div>
+      </div>
+      <div class="rt-resultado__acciones">
+        <button type="button" class="rt-btn rt-btn--claro" (click)="cerrarResultado()">Volver a la arena</button>
+        @if (r.estado === 'TERMINADO') {
+          <button type="button" class="rt-btn rt-btn--fuego" (click)="revancha(r)"><mat-icon aria-hidden="true">replay</mat-icon> Revancha</button>
+        }
       </div>
     </section>
   } @else {
-    @if (resultado(); as r) {
-      <section class="rt-caja rt-resultado" role="status">
-        <h2>{{ r.estado === 'TERMINADO' ? textoResultado(r) : '¡Listo!' }}</h2>
-        <p>Acertaste {{ r.misCorrectas }} de {{ r.totalPreguntas }} en {{ r.misSegundos }} s.
-          @if (r.estado === 'TERMINADO') { {{ r.rival }} acertó {{ r.suyasCorrectas }} en {{ r.suyosSegundos }} s. }
-          @else { Cuando {{ r.rival }} juegue verás quién ganó. }
-        </p>
-      </section>
-    }
+    <!-- ===== Arena ===== -->
+    <div class="rt-columnas">
+      <section class="rt-caja rt-nuevo" aria-labelledby="rt-nuevo">
+        @let sr = sumiPortada();
+        <app-sumi-dice [estado]="sr.estado" accesorio="trofeo" [tamano]="72" compacto [titulo]="sr.titulo" [mensajes]="sr.mensajes" [tono]="sr.tono" />
 
-    <section class="rt-caja" aria-labelledby="rt-nuevo">
-      <h2 id="rt-nuevo">Nuevo reto</h2>
-      @if (!companeros().length) {
-        <p class="rt-vacio">Aún no hay compañeros registrados para retar.</p>
-      } @else {
-        <div class="rt-form">
-          <label><span>Compañero</span>
-            <select (change)="rivalId.set($any($event.target).value ? +$any($event.target).value : null)">
-              <option value="">Elige…</option>
-              @for (c of companeros(); track c.id) { <option [value]="c.id">{{ c.nombre }}</option> }
-            </select>
-          </label>
-          <label><span>Tema</span>
-            <select (change)="tema.set($any($event.target).value)">
-              @for (t of temas; track t.id) { <option [value]="t.id" [selected]="t.id === tema()">{{ t.nombre }}</option> }
-            </select>
-          </label>
-          <button type="button" class="rt-btn" (click)="retar()" [disabled]="!rivalId() || enviando()">
-            <mat-icon aria-hidden="true">sports_kabaddi</mat-icon> Retar
-          </button>
-        </div>
-        @if (mensaje(); as m) { <p class="rt-exito" role="status">{{ m }}</p> }
-      }
-    </section>
-
-    <section aria-labelledby="rt-pendientes">
-      <h2 id="rt-pendientes">Por jugar</h2>
-      @if (!porJugar().length) { <p class="rt-vacio">No tienes retos pendientes.</p> }
-      <ul class="rt-lista">
-        @for (d of porJugar(); track d.id) {
-          <li class="rt-item rt-item--pendiente">
-            <div><strong>{{ d.soyRetador ? 'Retaste a' : 'Te retó' }} {{ d.rival }}</strong><small>{{ d.temaNombre }} · {{ d.totalPreguntas }} preguntas</small></div>
-            <button type="button" class="rt-btn" (click)="jugar(d)">Jugar</button>
-          </li>
-        }
-      </ul>
-    </section>
-
-    @if (otros().length) {
-      <section aria-labelledby="rt-historial">
-        <h2 id="rt-historial">Historial</h2>
-        <ul class="rt-lista">
-          @for (d of otros(); track d.id) {
-            <li class="rt-item" [class.rt-item--gane]="d.resultado === 'GANASTE'" [class.rt-item--perdi]="d.resultado === 'PERDISTE'">
-              <div><strong>{{ d.rival }} · {{ d.temaNombre }}</strong>
-                <small>Tú: {{ d.misCorrectas }}/{{ d.totalPreguntas }}@if (d.suyasCorrectas !== null) { · {{ d.rival }}: {{ d.suyasCorrectas }}/{{ d.totalPreguntas }} }</small></div>
-              <span class="rt-estado">{{ textoResultado(d) }}</span>
-            </li>
+        <h2 id="rt-nuevo"><mat-icon aria-hidden="true">bolt</mat-icon> Nuevo reto</h2>
+        @if (!companeros().length) {
+          <p class="rt-vacio">Aún no hay compañeros registrados para retar.</p>
+        } @else {
+          <p class="rt-paso"><b>1</b> Elige a tu rival</p>
+          @if (companeros().length > 6) {
+            <label class="rt-buscar"><mat-icon aria-hidden="true">search</mat-icon>
+              <input type="search" placeholder="Buscar compañero" aria-label="Buscar compañero" [value]="filtroRival()" (input)="filtroRival.set($any($event.target).value)" />
+            </label>
           }
-        </ul>
+          <div class="rt-rivales" role="radiogroup" aria-label="Rival">
+            @for (c of companerosFiltrados(); track c.id) {
+              <button type="button" role="radio" class="rt-rival" [class.activo]="rivalId() === c.id" [attr.aria-checked]="rivalId() === c.id" (click)="rivalId.set(c.id)">
+                @if (c.fotoPerfilUrl) { <img class="rt-avatar" [src]="c.fotoPerfilUrl" alt=""> } @else { <span class="rt-avatar">{{ iniciales(c.nombre) }}</span> }
+                <span class="rt-rival__nombre">{{ c.nombre }}</span>
+              </button>
+            }
+          </div>
+
+          <p class="rt-paso"><b>2</b> Elige el tema</p>
+          <div class="rt-temas" role="radiogroup" aria-label="Tema">
+            @for (t of temas; track t.id) {
+              <button type="button" role="radio" class="rt-tema" [class.activo]="tema() === t.id" [attr.aria-checked]="tema() === t.id" (click)="tema.set(t.id)">
+                <mat-icon aria-hidden="true">{{ t.icono }}</mat-icon> {{ t.nombre }}
+              </button>
+            }
+          </div>
+
+          <button type="button" class="rt-btn rt-btn--fuego rt-retar" (click)="retar()" [disabled]="!rivalId() || enviando()">
+            <mat-icon aria-hidden="true">sports_kabaddi</mat-icon>
+            {{ rivalElegido() ? '¡Retar a ' + rivalElegido()!.nombre.split(' ')[0] + ' en ' + nombreTema() + '!' : 'Elige un rival para retar' }}
+          </button>
+          @if (mensaje(); as m) { <p class="rt-exito" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon> {{ m }}</p> }
+        }
       </section>
-    }
+
+      <div class="rt-listas">
+        <section aria-labelledby="rt-pendientes">
+          <h2 id="rt-pendientes"><mat-icon aria-hidden="true">notifications_active</mat-icon> Por jugar
+            @if (porJugar().length) { <span class="rt-badge">{{ porJugar().length }}</span> }</h2>
+          @if (!porJugar().length) { <p class="rt-vacio">No tienes retos pendientes.</p> }
+          <ul class="rt-lista">
+            @for (d of porJugar(); track d.id) {
+              <li class="rt-duelo rt-duelo--pendiente">
+                <div class="rt-vs">
+                  <span class="rt-avatar rt-avatar--yo">Tú</span><b>VS</b><span class="rt-avatar">{{ iniciales(d.rival) }}</span>
+                </div>
+                <div class="rt-duelo__info">
+                  <strong>{{ d.soyRetador ? 'Retaste a' : 'Te retó' }} {{ d.rival }}</strong>
+                  <small><mat-icon aria-hidden="true">{{ iconoTema(d.tema) }}</mat-icon> {{ d.temaNombre }} · {{ d.totalPreguntas }} preguntas</small>
+                </div>
+                <button type="button" class="rt-btn rt-btn--fuego" (click)="jugar(d)"><mat-icon aria-hidden="true">play_arrow</mat-icon> Jugar</button>
+              </li>
+            }
+          </ul>
+        </section>
+
+        @if (otros().length) {
+          <section aria-labelledby="rt-historial">
+            <h2 id="rt-historial"><mat-icon aria-hidden="true">history</mat-icon> Historial</h2>
+            <ul class="rt-lista">
+              @for (d of otros(); track d.id) {
+                <li class="rt-duelo" [ngClass]="'rt-duelo--' + (d.resultado ?? 'espera').toLowerCase()">
+                  <span class="rt-avatar">{{ iniciales(d.rival) }}</span>
+                  <div class="rt-duelo__info">
+                    <strong>{{ d.rival }}</strong>
+                    <small><mat-icon aria-hidden="true">{{ iconoTema(d.tema) }}</mat-icon> {{ d.temaNombre }}</small>
+                  </div>
+                  <div class="rt-duelo__marcador">
+                    <b>{{ d.misCorrectas }} – {{ d.suyasCorrectas ?? '?' }}</b>
+                    <span class="rt-estado">{{ textoResultado(d) }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+    </div>
   }
 </div>

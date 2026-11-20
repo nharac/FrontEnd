@@ -11,6 +11,8 @@ import {
 } from '../../models/ejercicios-resueltos';
 import { FORMULAS } from '../../models/formulas';
 import { Graficas } from '../../components/graficas/graficas';
+import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
+import { sumiListaResueltos, sumiPasoResuelto } from '../../../../shared/components/sumi-dice/dialogos';
 import { TextoMatriz } from '../../components/texto-matriz/texto-matriz';
 import { CalculadoraPasos } from '../../components/calculadora-pasos/calculadora-pasos';
 
@@ -32,7 +34,7 @@ type Vista = 'ejercicios' | 'formulas' | 'graficas' | 'calculadora';
 @Component({
   selector: 'app-ejercicios-resueltos',
   standalone: true,
-  imports: [NgClass, RouterLink, MatIconModule, Graficas, CalculadoraPasos, TextoMatriz],
+  imports: [NgClass, RouterLink, MatIconModule, Graficas, CalculadoraPasos, TextoMatriz, SumiDice],
   templateUrl: './ejercicios-resueltos.html',
   styleUrl: './ejercicios-resueltos.scss',
 })
@@ -99,6 +101,13 @@ export class EjerciciosResueltos {
   siguiente = computed(() => {
     const i = this.indiceActual();
     return i >= 0 && i < this.ejercicios().length - 1 ? this.ejercicios()[i + 1] : null;
+  });
+
+  /** Lo que dice Sumi en la lista y dentro de cada ejercicio. */
+  sumiLista = computed(() => sumiListaResueltos(this.tema(), this.nombreTema(), this.vistosDelTema(), this.totalTema()));
+  sumiPaso = computed(() => {
+    const e = this.seleccionado();
+    return sumiPasoResuelto(this.visibles(), e?.pasos.length ?? 0, e?.nivel ?? 'Básico');
   });
 
   visto(e: EjercicioResuelto): boolean {

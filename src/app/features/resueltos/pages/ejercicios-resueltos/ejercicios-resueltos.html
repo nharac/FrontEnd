@@ -78,6 +78,10 @@
           <small>{{ visibles() }} de {{ e.pasos.length }} pasos</small>
         </div>
 
+        @let sp = sumiPaso();
+        <app-sumi-dice class="rs-sumi rs-sumi--paso" [estado]="sp.estado" accesorio="lapiz" [tamano]="64" compacto lado="derecha"
+                       [titulo]="sp.titulo" [mensajes]="sp.mensajes" [tono]="sp.tono" [aleatorio]="false" />
+
         <ol class="rs-pasos" aria-live="polite">
           @for (p of pasosVisibles(); track $index) {
             <li class="rs-paso">
@@ -139,6 +143,9 @@
       </section>
     } @else {
       <div class="rs-panel">
+        @let sl = sumiLista();
+        <app-sumi-dice class="rs-sumi" [estado]="sl.estado" accesorio="libro" [tamano]="76" compacto
+                       [titulo]="sl.titulo" [mensajes]="sl.mensajes" [tono]="sl.tono" />
         <div class="rs-panel__avance">
           <div>
             <strong>{{ nombreTema() }}</strong>
