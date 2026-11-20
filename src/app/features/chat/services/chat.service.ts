@@ -28,6 +28,14 @@ export class ChatService {
   }
 
   /**
+   * POST /api/chat/explicar
+   * El tutor resuelve el ejercicio completo, paso a paso y explicando el porqué.
+   */
+  explicar(ejercicio: string): Observable<{ explicacion: string; mensajesRestantes: number }> {
+    return this.http.post<{ explicacion: string; mensajesRestantes: number }>(`${this.API}/explicar`, { ejercicio });
+  }
+
+  /**
    * Historial del chat libre (en orden cronológico).
    * GET /api/chat/historial
    */

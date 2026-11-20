@@ -17,10 +17,16 @@
             [attr.aria-selected]="vista() === 'graficas'" (click)="cambiarVista('graficas')">
       <mat-icon aria-hidden="true">show_chart</mat-icon> Gráficas
     </button>
+    <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'calculadora'"
+            [attr.aria-selected]="vista() === 'calculadora'" (click)="cambiarVista('calculadora')">
+      <mat-icon aria-hidden="true">auto_awesome</mat-icon> Tu ejercicio con IA
+    </button>
   </div>
 
   @if (vista() === 'graficas') {
     <app-graficas />
+  } @else if (vista() === 'calculadora') {
+    <app-calculadora-pasos />
   } @else {
   <div class="rs-temas" role="tablist" aria-label="Tema">
     @for (t of temas; track t.id) {
@@ -34,7 +40,7 @@
 
   }
 
-  @if (vista() === 'graficas') {
+  @if (vista() === 'graficas' || vista() === 'calculadora') {
   } @else if (vista() === 'formulas') {
     <ul class="rs-formulas">
       @for (f of formulas(); track f.nombre) {

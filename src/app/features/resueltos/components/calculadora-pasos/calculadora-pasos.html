@@ -1,0 +1,29 @@
+<section class="cp">
+  <p class="cp-intro">Escribe <strong>tu</strong> ejercicio y Sumi te lo resuelve paso a paso, explicando por qué se hace cada paso.
+    Úsalo para entender el procedimiento, no solo para copiar el resultado.</p>
+
+  <label class="cp-campo">
+    <span>Tu ejercicio</span>
+    <textarea rows="3" maxlength="500" placeholder="Ejemplo: resuelve x² − 5x + 6 = 0"
+              [value]="ejercicio()" (input)="ejercicio.set($any($event.target).value)"></textarea>
+  </label>
+
+  <div class="cp-ejemplos" aria-label="Ejemplos">
+    @for (e of ejemplos; track e) {
+      <button type="button" class="cp-ejemplo" (click)="usarEjemplo(e)">{{ e }}</button>
+    }
+  </div>
+
+  <div class="cp-acciones">
+    @if (restantes() !== null) { <small>Te quedan {{ restantes() }} mensajes hoy</small> }
+    <button type="button" class="cp-btn" (click)="resolver()" [disabled]="!ejercicio().trim() || cargando()">
+      <mat-icon aria-hidden="true">auto_awesome</mat-icon> {{ cargando() ? 'Resolviendo…' : 'Resolver paso a paso' }}
+    </button>
+  </div>
+
+  @if (error(); as e) { <p class="cp-error" role="alert">{{ e }}</p> }
+
+  @if (explicacion(); as texto) {
+    <article class="cp-resultado" aria-live="polite" [appTextoRico]="texto"></article>
+  }
+</section>

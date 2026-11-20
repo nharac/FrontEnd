@@ -10,6 +10,9 @@ import {
 } from '../../models/ejercicios-resueltos';
 import { FORMULAS } from '../../models/formulas';
 import { Graficas } from '../../components/graficas/graficas';
+import { CalculadoraPasos } from '../../components/calculadora-pasos/calculadora-pasos';
+
+type Vista = 'ejercicios' | 'formulas' | 'graficas' | 'calculadora';
 
 /**
  * Biblioteca de ejercicios resueltos paso a paso.
@@ -19,7 +22,7 @@ import { Graficas } from '../../components/graficas/graficas';
 @Component({
   selector: 'app-ejercicios-resueltos',
   standalone: true,
-  imports: [RouterLink, MatIconModule, Graficas],
+  imports: [RouterLink, MatIconModule, Graficas, CalculadoraPasos],
   templateUrl: './ejercicios-resueltos.html',
   styleUrl: './ejercicios-resueltos.scss',
 })
@@ -27,7 +30,7 @@ export class EjerciciosResueltos {
   readonly temas = TEMAS_RESUELTOS;
 
   /** Pestaña activa: ejercicios resueltos o fórmulas de consulta. */
-  vista = signal<'ejercicios' | 'formulas' | 'graficas'>('ejercicios');
+  vista = signal<Vista>('ejercicios');
   tema = signal<TemaResuelto>('fundamentos');
   seleccionado = signal<EjercicioResuelto | null>(null);
   /** Cuántos pasos se están mostrando del ejercicio seleccionado. */
@@ -46,7 +49,7 @@ export class EjerciciosResueltos {
     this.seleccionado.set(null);
   }
 
-  cambiarVista(v: 'ejercicios' | 'formulas' | 'graficas'): void {
+  cambiarVista(v: Vista): void {
     this.vista.set(v);
     this.seleccionado.set(null);
   }
