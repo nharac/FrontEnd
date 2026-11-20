@@ -1,0 +1,75 @@
+<div class="rs">
+  <header class="rs-hero">
+    <h1>Ejercicios resueltos</h1>
+    <p>Mira cómo se resuelve cada ejercicio paso a paso, con el <strong>porqué</strong> de cada paso. Intenta adivinar el siguiente antes de verlo.</p>
+  </header>
+
+  <div class="rs-temas" role="tablist" aria-label="Tema">
+    @for (t of temas; track t.id) {
+      <button type="button" role="tab" class="rs-tema" [class.activo]="tema() === t.id"
+              [attr.aria-selected]="tema() === t.id" (click)="elegirTema(t.id)">
+        <mat-icon aria-hidden="true">{{ t.icono }}</mat-icon>
+        <span>{{ t.nombre }}</span>
+      </button>
+    }
+  </div>
+
+  @if (seleccionado(); as e) {
+    <section class="rs-caja" aria-labelledby="rs-titulo">
+      <button type="button" class="rs-link" (click)="volver()">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon> Volver a la lista
+      </button>
+
+      <span class="rs-nivel">{{ e.nivel }}</span>
+      <h2 id="rs-titulo">{{ e.titulo }}</h2>
+      <p class="rs-enunciado">{{ e.enunciado }}</p>
+
+      <ol class="rs-pasos" aria-live="polite">
+        @for (p of pasosVisibles(); track $index) {
+          <li class="rs-paso">
+            <span class="rs-paso__num">Paso {{ $index + 1 }}</span>
+            <code class="rs-paso__mate">{{ p.paso }}</code>
+            <p class="rs-paso__porque"><strong>¿Por qué?</strong> {{ p.porque }}</p>
+          </li>
+        }
+      </ol>
+
+      @if (terminado()) {
+        <div class="rs-final">
+          <p><strong>Respuesta:</strong> <code>{{ e.respuesta }}</code></p>
+          <p class="rs-clave"><mat-icon aria-hidden="true">lightbulb</mat-icon> {{ e.clave }}</p>
+        </div>
+      }
+
+      <div class="rs-acciones">
+        @if (!terminado()) {
+          <button type="button" class="rs-btn" (click)="siguientePaso()">
+            <mat-icon aria-hidden="true">navigate_next</mat-icon>
+            {{ visibles() === 0 ? 'Ver el primer paso' : 'Siguiente paso' }}
+          </button>
+          <button type="button" class="rs-btn rs-btn--claro" (click)="verTodo()">Ver todos los pasos</button>
+        } @else {
+          <button type="button" class="rs-btn rs-btn--claro" (click)="reiniciar()">
+            <mat-icon aria-hidden="true">replay</mat-icon> Repasar desde el inicio
+          </button>
+          <a class="rs-btn" routerLink="/chat">
+            <mat-icon aria-hidden="true">smart_toy</mat-icon> ¿Dudas? Pregúntale al tutor
+          </a>
+        }
+      </div>
+    </section>
+  } @else {
+    <ul class="rs-lista">
+      @for (e of ejercicios(); track e.id) {
+        <li>
+          <button type="button" class="rs-item" (click)="abrir(e)">
+            <span class="rs-nivel">{{ e.nivel }}</span>
+            <strong>{{ e.titulo }}</strong>
+            <span class="rs-item__enunciado">{{ e.enunciado }}</span>
+            <span class="rs-item__pasos">{{ e.pasos.length }} pasos</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>
