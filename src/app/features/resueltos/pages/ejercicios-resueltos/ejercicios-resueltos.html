@@ -1,9 +1,27 @@
 <div class="rs">
   <header class="rs-hero">
-    <h1>Ejercicios resueltos</h1>
+    <h1>Ejercicios resueltos, fórmulas y gráficas</h1>
     <p>Mira cómo se resuelve cada ejercicio paso a paso, con el <strong>porqué</strong> de cada paso. Intenta adivinar el siguiente antes de verlo.</p>
   </header>
 
+  <div class="rs-vistas" role="tablist" aria-label="Sección">
+    <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'ejercicios'"
+            [attr.aria-selected]="vista() === 'ejercicios'" (click)="cambiarVista('ejercicios')">
+      <mat-icon aria-hidden="true">menu_book</mat-icon> Ejercicios paso a paso
+    </button>
+    <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'formulas'"
+            [attr.aria-selected]="vista() === 'formulas'" (click)="cambiarVista('formulas')">
+      <mat-icon aria-hidden="true">functions</mat-icon> Fórmulas
+    </button>
+    <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'graficas'"
+            [attr.aria-selected]="vista() === 'graficas'" (click)="cambiarVista('graficas')">
+      <mat-icon aria-hidden="true">show_chart</mat-icon> Gráficas
+    </button>
+  </div>
+
+  @if (vista() === 'graficas') {
+    <app-graficas />
+  } @else {
   <div class="rs-temas" role="tablist" aria-label="Tema">
     @for (t of temas; track t.id) {
       <button type="button" role="tab" class="rs-tema" [class.activo]="tema() === t.id"
@@ -14,7 +32,20 @@
     }
   </div>
 
-  @if (seleccionado(); as e) {
+  }
+
+  @if (vista() === 'graficas') {
+  } @else if (vista() === 'formulas') {
+    <ul class="rs-formulas">
+      @for (f of formulas(); track f.nombre) {
+        <li class="rs-formula">
+          <strong>{{ f.nombre }}</strong>
+          <code>{{ f.formula }}</code>
+          <span>{{ f.nota }}</span>
+        </li>
+      }
+    </ul>
+  } @else if (seleccionado(); as e) {
     <section class="rs-caja" aria-labelledby="rs-titulo">
       <button type="button" class="rs-link" (click)="volver()">
         <mat-icon aria-hidden="true">arrow_back</mat-icon> Volver a la lista

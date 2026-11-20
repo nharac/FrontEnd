@@ -13,6 +13,20 @@ $sombra: 0 6px 22px rgba(31, 50, 71, 0.07);
   p { margin: 0; color: $gris; line-height: 1.5; }
 }
 
+.rs-vistas { display: flex; gap: 6px; padding: 4px; background: #fff; border-radius: 14px; box-shadow: $sombra; align-self: flex-start; flex-wrap: wrap; }
+.rs-vista {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-weight: 600; font-size: 14px; border: 0; cursor: pointer;
+  padding: 8px 14px; border-radius: 10px; background: transparent; color: $gris;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &.activo { background: $suave; color: $indigo; }
+}
+.rs-formulas { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.rs-formula {
+  display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 16px; background: #fff; box-shadow: $sombra;
+  code { font-family: inherit; font-size: 16px; font-weight: 700; color: $indigo; white-space: pre-wrap; }
+  span { font-size: 13.5px; color: $gris; }
+}
+
 .rs-temas { display: flex; flex-wrap: wrap; gap: 8px; }
 .rs-tema {
   display: inline-flex; align-items: center; gap: 6px; font: inherit; font-weight: 600; font-size: 14px;

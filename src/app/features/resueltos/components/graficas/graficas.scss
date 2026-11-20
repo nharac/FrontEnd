@@ -1,0 +1,22 @@
+:host { display: block; }
+.gr { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(260px, 360px); gap: 18px; align-items: start;
+  background: #fff; border-radius: 20px; padding: 18px; box-shadow: 0 6px 22px rgba(31, 50, 71, 0.07);
+  @media (max-width: 720px) { grid-template-columns: 1fr; } }
+.gr-controles { display: flex; flex-direction: column; gap: 12px; }
+.gr-campo { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 600;
+  select { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid #e5e7eb; }
+  input[type='range'] { accent-color: #4f46e5; } }
+.gr-check { display: flex; gap: 8px; align-items: center; font-size: 14px; input { accent-color: #4f46e5; } }
+.gr-dato { margin: 0; font-size: 14px; background: #f8fafc; border-radius: 10px; padding: 8px 10px; small { color: #6b7280; } }
+.gr-lienzo { width: 100%; height: auto; background: #fcfcff; border-radius: 14px; border: 1px solid #eef2ff; grid-row: span 2; }
+.gr-rejilla { stroke: #eef2f7; stroke-width: 1; }
+.gr-eje { stroke: #94a3b8; stroke-width: 1.5; }
+.gr-num { font-size: 9px; fill: #94a3b8; text-anchor: middle; }
+.gr-curva { fill: none; stroke: #4f46e5; stroke-width: 2.5; }
+.gr-derivada { fill: none; stroke: #059669; stroke-width: 2; stroke-dasharray: 6 4; }
+.gr-tangente { fill: none; stroke: #f59e0b; stroke-width: 2; }
+.gr-area { fill: rgba(79, 70, 229, 0.18); stroke: none; }
+.gr-punto { fill: #f59e0b; stroke: #fff; stroke-width: 2; }
+.gr-leyenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #374151; }
+.gr-color { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px;
+  &--curva { background: #4f46e5; } &--tangente { background: #f59e0b; } &--derivada { background: #059669; } }

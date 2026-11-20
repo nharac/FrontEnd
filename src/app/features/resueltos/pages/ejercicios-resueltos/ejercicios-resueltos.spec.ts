@@ -24,6 +24,16 @@ describe('EjerciciosResueltos', () => {
     }
   });
 
+  it('muestra las fórmulas del tema elegido', () => {
+    const f = crear();
+    const c = f.componentInstance;
+    c.cambiarVista('formulas');
+    c.elegirTema('trigonometria');
+    f.detectChanges();
+    expect(c.formulas().length).toBeGreaterThan(3);
+    expect(f.nativeElement.textContent).toContain('Ley del coseno');
+  });
+
   it('filtra por tema y muestra los pasos uno a uno hasta la respuesta', () => {
     const f = crear();
     const c = f.componentInstance;

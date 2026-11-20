@@ -8,6 +8,8 @@ import {
   TEMAS_RESUELTOS,
   TemaResuelto
 } from '../../models/ejercicios-resueltos';
+import { FORMULAS } from '../../models/formulas';
+import { Graficas } from '../../components/graficas/graficas';
 
 /**
  * Biblioteca de ejercicios resueltos paso a paso.
@@ -17,18 +19,21 @@ import {
 @Component({
   selector: 'app-ejercicios-resueltos',
   standalone: true,
-  imports: [RouterLink, MatIconModule],
+  imports: [RouterLink, MatIconModule, Graficas],
   templateUrl: './ejercicios-resueltos.html',
   styleUrl: './ejercicios-resueltos.scss',
 })
 export class EjerciciosResueltos {
   readonly temas = TEMAS_RESUELTOS;
 
+  /** Pestaña activa: ejercicios resueltos o fórmulas de consulta. */
+  vista = signal<'ejercicios' | 'formulas' | 'graficas'>('ejercicios');
   tema = signal<TemaResuelto>('fundamentos');
   seleccionado = signal<EjercicioResuelto | null>(null);
   /** Cuántos pasos se están mostrando del ejercicio seleccionado. */
   visibles = signal(0);
 
+  formulas = computed(() => FORMULAS[this.tema()]);
   ejercicios = computed(() => EJERCICIOS_RESUELTOS.filter(e => e.tema === this.tema()));
   pasosVisibles = computed(() => this.seleccionado()?.pasos.slice(0, this.visibles()) ?? []);
   terminado = computed(() => {
@@ -38,6 +43,11 @@ export class EjerciciosResueltos {
 
   elegirTema(t: TemaResuelto): void {
     this.tema.set(t);
+    this.seleccionado.set(null);
+  }
+
+  cambiarVista(v: 'ejercicios' | 'formulas' | 'graficas'): void {
+    this.vista.set(v);
     this.seleccionado.set(null);
   }
 

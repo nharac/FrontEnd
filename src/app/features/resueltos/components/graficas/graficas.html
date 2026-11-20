@@ -1,0 +1,56 @@
+<div class="gr">
+  <div class="gr-controles">
+    <label class="gr-campo">
+      <span>Función</span>
+      <select [value]="funcionId()" (change)="funcionId.set($any($event.target).value)">
+        @for (f of funciones; track f.id) { <option [value]="f.id">{{ f.nombre }}</option> }
+      </select>
+    </label>
+
+    <label class="gr-campo">
+      <span>Punto de tangencia: x = {{ x0() | number: '1.1-1' }}</span>
+      <input type="range" min="-4" max="4" step="0.1" [value]="x0()" (input)="x0.set(numero($event))" />
+    </label>
+    <p class="gr-dato">Pendiente de la tangente = f'({{ x0() | number: '1.1-1' }}) = <strong>{{ pendiente() | number: '1.2-2' }}</strong></p>
+
+    <label class="gr-check"><input type="checkbox" [checked]="verDerivada()" (change)="verDerivada.set(!verDerivada())" />
+      Mostrar la derivada ({{ funcion().derivadaTexto }})</label>
+
+    <label class="gr-check"><input type="checkbox" [checked]="verArea()" (change)="verArea.set(!verArea())" />
+      Mostrar el área bajo la curva (integral)</label>
+
+    @if (verArea()) {
+      <label class="gr-campo"><span>Desde a = {{ a() | number: '1.1-1' }}</span>
+        <input type="range" min="-4" max="4" step="0.1" [value]="a()" (input)="a.set(numero($event))" /></label>
+      <label class="gr-campo"><span>Hasta b = {{ b() | number: '1.1-1' }}</span>
+        <input type="range" min="-4" max="4" step="0.1" [value]="b()" (input)="b.set(numero($event))" /></label>
+      <p class="gr-dato">∫ de {{ desde() | number: '1.1-1' }} a {{ hasta() | number: '1.1-1' }} = <strong>{{ integral() | number: '1.2-2' }}</strong>
+        <br /><small>Lo que queda bajo el eje x cuenta como negativo.</small></p>
+    }
+  </div>
+
+  <svg class="gr-lienzo" [attr.viewBox]="'0 0 ' + lado + ' ' + lado" role="img"
+       [attr.aria-label]="'Gráfica de ' + funcion().nombre + ' con su recta tangente en x = ' + x0()">
+    @for (m of marcas; track m) {
+      <line class="gr-rejilla" [attr.x1]="px(m)" [attr.x2]="px(m)" y1="0" [attr.y2]="lado" />
+      <line class="gr-rejilla" x1="0" [attr.x2]="lado" [attr.y1]="py(m)" [attr.y2]="py(m)" />
+      <text class="gr-num" [attr.x]="px(m)" [attr.y]="py(0) + 12">{{ m }}</text>
+    }
+    <line class="gr-eje" x1="0" [attr.x2]="lado" [attr.y1]="py(0)" [attr.y2]="py(0)" />
+    <line class="gr-eje" [attr.x1]="px(0)" [attr.x2]="px(0)" y1="0" [attr.y2]="lado" />
+
+    @if (verArea()) { <path class="gr-area" [attr.d]="region()" /> }
+    @if (verDerivada()) { <path class="gr-derivada" [attr.d]="curvaDerivada()" /> }
+    <path class="gr-curva" [attr.d]="curva()" />
+    <path class="gr-tangente" [attr.d]="tangente()" />
+    @if (y0() > -rango && y0() < rango) {
+      <circle class="gr-punto" [attr.cx]="px(x0())" [attr.cy]="py(y0())" r="5" />
+    }
+  </svg>
+
+  <ul class="gr-leyenda">
+    <li><span class="gr-color gr-color--curva"></span> {{ funcion().nombre }}</li>
+    <li><span class="gr-color gr-color--tangente"></span> Recta tangente (su inclinación es la derivada)</li>
+    @if (verDerivada()) { <li><span class="gr-color gr-color--derivada"></span> {{ funcion().derivadaTexto }}</li> }
+  </ul>
+</div>
