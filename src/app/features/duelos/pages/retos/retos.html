@@ -159,6 +159,11 @@
             <mat-icon aria-hidden="true">sports_kabaddi</mat-icon>
             {{ rivalElegido() ? '¡Retar a ' + rivalElegido()!.nombre.split(' ')[0] + ' · ' + nombreModo() + ' de ' + nombreTema() + '!' : 'Elige un rival para retar' }}
           </button>
+          <div class="rt-vivo">
+            <div><strong><mat-icon aria-hidden="true">bolt</mat-icon> ¿Prefieres en vivo?</strong>
+              <small>Los dos al mismo tiempo, 20 s por pregunta y bono por rapidez. {{ rivalElegido() ? 'Le avisamos a ' + rivalElegido()!.nombre.split(' ')[0] + '.' : 'Sin rival elegido, comparte el código.' }}</small></div>
+            <button type="button" class="rt-btn rt-btn--vivo" (click)="crearEnVivo()" [disabled]="enviando()"><mat-icon aria-hidden="true">sensors</mat-icon> Reto en vivo</button>
+          </div>
           @if (mensaje(); as m) { <p class="rt-exito" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon> {{ m }}</p> }
         }
       </section>
@@ -202,6 +207,13 @@
             <small class="rt-torneo__reglas">3 puntos por reto ganado y 1 por empate.</small>
           </section>
         }
+
+        <form class="rt-codigo" (submit)="$event.preventDefault(); unirseConCodigo()">
+          <mat-icon aria-hidden="true">sensors</mat-icon>
+          <input type="text" maxlength="6" placeholder="¿Tienes un código en vivo?" aria-label="Código de sala en vivo"
+                 [value]="codigoUnirse()" (input)="codigoUnirse.set($any($event.target).value.toUpperCase())" />
+          <button type="submit" class="rt-btn" [disabled]="codigoUnirse().trim().length !== 6">Entrar</button>
+        </form>
 
         <section aria-labelledby="rt-pendientes">
           <h2 id="rt-pendientes"><mat-icon aria-hidden="true">notifications_active</mat-icon> Por jugar

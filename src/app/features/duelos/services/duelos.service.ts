@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { Companero, Duelo, PreguntaDuelo, Torneo } from '../models/duelo.model';
+import { Companero, Duelo, EstadoSala, PreguntaDuelo, RespuestaVivo, Torneo } from '../models/duelo.model';
 
 @Injectable({ providedIn: 'root' })
 export class DuelosService {
@@ -32,5 +32,32 @@ export class DuelosService {
 
   entregar(id: number, respuestas: { preguntaId: number; letra: string | null }[], segundos: number): Observable<Duelo> {
     return this.http.post<Duelo>(`${this.API}/${id}/entregar`, { respuestas, segundos });
+  }
+}
+
+/** Retos en vivo: el cliente consulta el estado cada segundo. */
+@Injectable({ providedIn: 'root' })
+export class VivoService {
+  private readonly API = `${environment.apiUrl}/vivo/salas`;
+  private http = inject(HttpClient);
+
+  crear(tema: string, invitadoId: number | null): Observable<EstadoSala> {
+    return this.http.post<EstadoSala>(this.API, { tema, invitadoId });
+  }
+
+  ver(codigo: string): Observable<EstadoSala> {
+    return this.http.get<EstadoSala>(`${this.API}/${codigo}`);
+  }
+
+  unirse(codigo: string): Observable<EstadoSala> {
+    return this.http.post<EstadoSala>(`${this.API}/${codigo}/unirse`, {});
+  }
+
+  responder(codigo: string, orden: number, letra: string): Observable<RespuestaVivo> {
+    return this.http.post<RespuestaVivo>(`${this.API}/${codigo}/responder`, { orden, letra });
+  }
+
+  cancelar(codigo: string): Observable<EstadoSala> {
+    return this.http.post<EstadoSala>(`${this.API}/${codigo}/cancelar`, {});
   }
 }

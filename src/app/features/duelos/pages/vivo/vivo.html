@@ -1,0 +1,99 @@
+<div class="vv">
+  <header class="vv-cabeza">
+    <a class="vv-volver" routerLink="/retos"><mat-icon aria-hidden="true">arrow_back</mat-icon> Arena</a>
+    <span class="vv-envivo"><i></i> EN VIVO</span>
+    <button type="button" class="vv-codigo" (click)="copiar()" [attr.aria-label]="'Copiar código ' + codigo">
+      {{ codigo }} <mat-icon aria-hidden="true">{{ copiado() ? 'check' : 'content_copy' }}</mat-icon>
+    </button>
+  </header>
+
+  @if (error(); as e) { <p class="vv-error" role="alert">{{ e }}</p> }
+
+  @if (sala(); as s) {
+    <!-- Marcador en vivo -->
+    <section class="vv-marcador" aria-label="Marcador">
+      @if (yo(); as y) {
+        <div class="vv-jugador vv-jugador--yo">
+          <span class="vv-avatar vv-avatar--yo">Tú</span>
+          <b>{{ y.puntos }}</b>
+          <small>{{ y.aciertos }} aciertos</small>
+          @if (s.estado === 'JUGANDO' && !s.cuentaRegresiva) { <em [class.ok]="y.respondioActual">{{ y.respondioActual ? '✓ respondió' : 'pensando…' }}</em> }
+        </div>
+      }
+      <div class="vv-centro">
+        <span class="vv-vs">VS</span>
+        <small>{{ s.temaNombre }}</small>
+      </div>
+      @if (otro(); as o) {
+        <div class="vv-jugador">
+          <span class="vv-avatar">{{ iniciales(o.nombre) }}</span>
+          <b>{{ o.puntos }}</b>
+          <small>{{ o.nombre.split(' ')[0] }}</small>
+          @if (s.estado === 'JUGANDO' && !s.cuentaRegresiva) { <em [class.ok]="o.respondioActual">{{ o.respondioActual ? '✓ respondió' : 'pensando…' }}</em> }
+        </div>
+      } @else {
+        <div class="vv-jugador vv-jugador--vacio">
+          <span class="vv-avatar">?</span>
+          <small>{{ s.rival ?? 'Esperando…' }}</small>
+        </div>
+      }
+    </section>
+
+    @let su = sumi();
+    <app-sumi-dice [estado]="su.estado" accesorio="cronometro" [tamano]="64" compacto [titulo]="su.titulo" [mensajes]="su.texto" [aleatorio]="false"
+                   [tono]="s.estado === 'TERMINADA' && s.resultado === 'GANASTE' ? 'exito' : 'normal'" />
+
+    @switch (s.estado) {
+      @case ('ESPERANDO') {
+        <section class="vv-caja vv-espera">
+          <div class="vv-pulso" aria-hidden="true"><mat-icon>bolt</mat-icon></div>
+          @if (s.soyAnfitrion) {
+            <h2>Sala lista</h2>
+            <p>Comparte este código con tu rival:</p>
+            <button type="button" class="vv-codigo vv-codigo--grande" (click)="copiar()">{{ codigo }}</button>
+            <p class="vv-nota">{{ s.total }} preguntas de {{ s.temaNombre }} · {{ s.segundosPorPregunta }} s cada una</p>
+            <button type="button" class="vv-btn vv-btn--claro" (click)="cancelar()">Cancelar sala</button>
+          } @else {
+            <h2>¡Te retaron en vivo!</h2>
+            <p>{{ s.total }} preguntas de {{ s.temaNombre }}, {{ s.segundosPorPregunta }} segundos cada una. Acertar rápido da más puntos.</p>
+            <button type="button" class="vv-btn vv-btn--grande" (click)="unirme()" [disabled]="enviando()"><mat-icon aria-hidden="true">bolt</mat-icon> Entrar al reto</button>
+          }
+        </section>
+      }
+      @case ('CANCELADA') {
+        <section class="vv-caja"><h2>La sala se canceló</h2><button type="button" class="vv-btn" (click)="volver()">Volver a la arena</button></section>
+      }
+      @case ('JUGANDO') {
+        @if (s.cuentaRegresiva) {
+          <section class="vv-caja vv-cuenta" aria-live="assertive"><span>{{ s.cuentaRegresiva }}</span><p>¡Prepárate!</p></section>
+        } @else if (s.pregunta; as p) {
+          <section class="vv-caja vv-pregunta">
+            <div class="vv-pregunta__top">
+              <span>Pregunta {{ s.indice + 1 }} / {{ s.total }}</span>
+              <span class="vv-tiempo" [class.vv-tiempo--poco]="(s.segundosRestantes ?? 0) <= 5">{{ s.segundosRestantes }} s</span>
+            </div>
+            <div class="vv-barra"><span [style.width.%]="progresoTiempo()"></span></div>
+            <p class="vv-enunciado" [appTextoRico]="p.enunciado"></p>
+            <div class="vv-opciones">
+              @for (o of p.opciones; track o.letra; let i = $index) {
+                <button type="button" class="vv-opcion" [attr.data-i]="i" [ngClass]="claseOpcion(o.letra)" [disabled]="!!mia() || enviando()" (click)="responder(o.letra)">
+                  <b>{{ o.letra }}</b><span [appTextoRico]="o.texto"></span>
+                </button>
+              }
+            </div>
+          </section>
+        }
+      }
+      @case ('TERMINADA') {
+        <section class="vv-caja vv-final" [ngClass]="'vv-final--' + (s.resultado ?? 'empate').toLowerCase()">
+          @if (s.resultado === 'GANASTE') { <app-confeti [cantidad]="48" [alcance]="240" /> }
+          <h2>{{ s.resultado === 'GANASTE' ? '¡Ganaste!' : s.resultado === 'PERDISTE' ? 'Perdiste' : 'Empate' }}</h2>
+          <p>{{ yo()?.puntos }} contra {{ otro()?.puntos }} puntos</p>
+          <button type="button" class="vv-btn" (click)="volver()">Volver a la arena</button>
+        </section>
+      }
+    }
+  } @else if (!error()) {
+    <p class="vv-cargando">Conectando con la sala…</p>
+  }
+</div>

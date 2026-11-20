@@ -3,7 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
-import { DuelosService } from '../../services/duelos.service';
+import { DuelosService, VivoService } from '../../services/duelos.service';
+import { Router } from '@angular/router';
 import { Companero, Duelo, MODOS, ModoDuelo, PreguntaDuelo, Torneo } from '../../models/duelo.model';
 import { TEMAS } from '../../../practica/models/practica.model';
 import { TextoRicoDirective } from '../../../../shared/directives/texto-rico.directive';
@@ -26,6 +27,9 @@ export function iniciales(nombre: string): string {
 })
 export class Retos implements OnInit, OnDestroy {
   private readonly servicio = inject(DuelosService);
+  private readonly vivo = inject(VivoService);
+  private readonly router = inject(Router);
+  codigoUnirse = signal('');
 
   readonly temas = TEMAS;
   readonly modos = MODOS;
@@ -122,6 +126,22 @@ export class Retos implements OnInit, OnDestroy {
       },
       error: e => this.falla(e, 'No se pudo crear el reto.'),
     });
+  }
+
+  /** Crea una sala en vivo (con el rival elegido o abierta con código) y entra a ella. */
+  crearEnVivo(): void {
+    if (this.enviando()) return;
+    this.enviando.set(true);
+    this.error.set(null);
+    this.vivo.crear(this.tema(), this.rivalId()).subscribe({
+      next: s => { this.enviando.set(false); this.router.navigate(['/retos/vivo', s.codigo]); },
+      error: e => this.falla(e, 'No se pudo crear la sala en vivo.'),
+    });
+  }
+
+  unirseConCodigo(): void {
+    const c = this.codigoUnirse().trim().toUpperCase();
+    if (c.length === 6) this.router.navigate(['/retos/vivo', c]);
   }
 
   /** Revancha: mismo rival y mismo tema. */

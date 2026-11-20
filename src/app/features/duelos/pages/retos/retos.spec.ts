@@ -2,7 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 import { Retos, iniciales } from './retos';
-import { DuelosService } from '../../services/duelos.service';
+import { DuelosService, VivoService } from '../../services/duelos.service';
+import { provideRouter } from '@angular/router';
 import { Duelo } from '../../models/duelo.model';
 
 const duelo = (o: Partial<Duelo>): Duelo => ({ id: 1, tema: 'algebra', temaNombre: 'Álgebra', rival: 'Beto Ruiz', soyRetador: false, modo: 'CLASICO', modoNombre: 'Clásico', puntajeMaximo: 5, limiteSegundos: null,
@@ -23,7 +24,7 @@ describe('Retos', () => {
         { id: 11, enunciado: '3+3', puntos: 3, opciones: [{ letra: 'A', texto: '6' }, { letra: 'B', texto: '7' }] }])),
       entregar: vi.fn(() => of(duelo({ id: 1, estado: 'TERMINADO', resultado: 'GANASTE', misCorrectas: 2, misSegundos: 30, suyasCorrectas: 1, suyosSegundos: 40 }))),
     };
-    TestBed.configureTestingModule({ imports: [Retos], providers: [{ provide: DuelosService, useValue: s }] });
+    TestBed.configureTestingModule({ imports: [Retos], providers: [provideRouter([]), { provide: DuelosService, useValue: s }, { provide: VivoService, useValue: { crear: vi.fn() } }] });
     const f = TestBed.createComponent(Retos);
     f.detectChanges();
     return { f, s };

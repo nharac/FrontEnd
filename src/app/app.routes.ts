@@ -92,6 +92,12 @@ export const routes: Routes = [
             .then(m => m.RutaAprendizaje)
       },
       {
+        path: 'retos/vivo/:codigo',
+        loadComponent: () =>
+          import('./features/duelos/pages/vivo/vivo')
+            .then(m => m.Vivo)
+      },
+      {
         path: 'retos',
         loadComponent: () =>
           import('./features/duelos/pages/retos/retos')

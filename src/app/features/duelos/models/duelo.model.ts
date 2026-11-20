@@ -63,3 +63,26 @@ export interface Torneo {
   tabla: FilaTorneo[];
   campeonAnterior: FilaTorneo | null;
 }
+
+// ---------- Retos en vivo ----------
+export interface JugadorVivo { nombre: string; soyYo: boolean; puntos: number; aciertos: number; respondioActual: boolean }
+export interface PreguntaVivo { orden: number; id: number; enunciado: string; opciones: { letra: string; texto: string }[] }
+export interface RespuestaVivo { letra: string; correcta: boolean; letraCorrecta: string; puntos: number }
+export interface EstadoSala {
+  codigo: string;
+  tema: string;
+  temaNombre: string;
+  estado: 'ESPERANDO' | 'JUGANDO' | 'TERMINADA' | 'CANCELADA';
+  soyAnfitrion: boolean;
+  abierta: boolean;
+  rival: string | null;
+  cuentaRegresiva: number | null;
+  indice: number;
+  total: number;
+  segundosPorPregunta: number;
+  segundosRestantes: number | null;
+  pregunta: PreguntaVivo | null;
+  miRespuesta: RespuestaVivo | null;
+  jugadores: JugadorVivo[];
+  resultado: 'GANASTE' | 'PERDISTE' | 'EMPATE' | null;
+}
