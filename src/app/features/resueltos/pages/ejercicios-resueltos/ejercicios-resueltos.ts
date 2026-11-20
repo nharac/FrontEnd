@@ -10,7 +10,11 @@ import {
 } from '../../models/ejercicios-resueltos';
 import { FORMULAS } from '../../models/formulas';
 import { Graficas } from '../../components/graficas/graficas';
+import { TextoMatriz } from '../../components/texto-matriz/texto-matriz';
 import { CalculadoraPasos } from '../../components/calculadora-pasos/calculadora-pasos';
+
+type Nivel = 'todos' | 'Básico' | 'Intermedio' | 'Avanzado';
+const POR_PAGINA = 12;
 
 type Vista = 'ejercicios' | 'formulas' | 'graficas' | 'calculadora';
 
@@ -22,7 +26,7 @@ type Vista = 'ejercicios' | 'formulas' | 'graficas' | 'calculadora';
 @Component({
   selector: 'app-ejercicios-resueltos',
   standalone: true,
-  imports: [RouterLink, MatIconModule, Graficas, CalculadoraPasos],
+  imports: [RouterLink, MatIconModule, Graficas, CalculadoraPasos, TextoMatriz],
   templateUrl: './ejercicios-resueltos.html',
   styleUrl: './ejercicios-resueltos.scss',
 })
@@ -37,7 +41,34 @@ export class EjerciciosResueltos {
   visibles = signal(0);
 
   formulas = computed(() => FORMULAS[this.tema()]);
-  ejercicios = computed(() => EJERCICIOS_RESUELTOS.filter(e => e.tema === this.tema()));
+  readonly niveles: Nivel[] = ['todos', 'Básico', 'Intermedio', 'Avanzado'];
+  nivel = signal<Nivel>('todos');
+  busqueda = signal('');
+  mostrar = signal(POR_PAGINA);
+
+  /** Ejercicios del tema con el filtro de nivel y la búsqueda por título o enunciado. */
+  ejercicios = computed(() => {
+    const q = this.busqueda().trim().toLowerCase();
+    return EJERCICIOS_RESUELTOS.filter(e => e.tema === this.tema()
+      && (this.nivel() === 'todos' || e.nivel === this.nivel())
+      && (!q || e.titulo.toLowerCase().includes(q) || e.enunciado.toLowerCase().includes(q)));
+  });
+  visiblesLista = computed(() => this.ejercicios().slice(0, this.mostrar()));
+  totalTema = computed(() => EJERCICIOS_RESUELTOS.filter(e => e.tema === this.tema()).length);
+
+  elegirNivel(n: Nivel): void {
+    this.nivel.set(n);
+    this.mostrar.set(POR_PAGINA);
+  }
+
+  buscar(texto: string): void {
+    this.busqueda.set(texto);
+    this.mostrar.set(POR_PAGINA);
+  }
+
+  verMas(): void {
+    this.mostrar.update(m => m + POR_PAGINA);
+  }
   pasosVisibles = computed(() => this.seleccionado()?.pasos.slice(0, this.visibles()) ?? []);
   terminado = computed(() => {
     const e = this.seleccionado();
@@ -47,6 +78,7 @@ export class EjerciciosResueltos {
   elegirTema(t: TemaResuelto): void {
     this.tema.set(t);
     this.seleccionado.set(null);
+    this.mostrar.set(POR_PAGINA);
   }
 
   cambiarVista(v: Vista): void {

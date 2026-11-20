@@ -59,13 +59,13 @@
 
       <span class="rs-nivel">{{ e.nivel }}</span>
       <h2 id="rs-titulo">{{ e.titulo }}</h2>
-      <p class="rs-enunciado">{{ e.enunciado }}</p>
+      <p class="rs-enunciado"><app-texto-matriz [texto]="e.enunciado" /></p>
 
       <ol class="rs-pasos" aria-live="polite">
         @for (p of pasosVisibles(); track $index) {
           <li class="rs-paso">
             <span class="rs-paso__num">Paso {{ $index + 1 }}</span>
-            <code class="rs-paso__mate">{{ p.paso }}</code>
+            <code class="rs-paso__mate"><app-texto-matriz [texto]="p.paso" /></code>
             <p class="rs-paso__porque"><strong>¿Por qué?</strong> {{ p.porque }}</p>
           </li>
         }
@@ -73,7 +73,7 @@
 
       @if (terminado()) {
         <div class="rs-final">
-          <p><strong>Respuesta:</strong> <code>{{ e.respuesta }}</code></p>
+          <p><strong>Respuesta:</strong> <code><app-texto-matriz [texto]="e.respuesta" /></code></p>
           <p class="rs-clave"><mat-icon aria-hidden="true">lightbulb</mat-icon> {{ e.clave }}</p>
         </div>
       }
@@ -96,8 +96,20 @@
       </div>
     </section>
   } @else {
+    <div class="rs-filtros">
+      <input type="search" class="rs-buscar" placeholder="Buscar ejercicio (ej.: determinante, cadena, fracciones)"
+             aria-label="Buscar ejercicio" [value]="busqueda()" (input)="buscar($any($event.target).value)" />
+      <div class="rs-niveles" role="group" aria-label="Nivel">
+        @for (n of niveles; track n) {
+          <button type="button" class="rs-chip" [class.activo]="nivel() === n" [attr.aria-pressed]="nivel() === n" (click)="elegirNivel(n)">
+            {{ n === 'todos' ? 'Todos' : n }}
+          </button>
+        }
+      </div>
+    </div>
+    <p class="rs-conteo">{{ ejercicios().length }} de {{ totalTema() }} ejercicios</p>
     <ul class="rs-lista">
-      @for (e of ejercicios(); track e.id) {
+      @for (e of visiblesLista(); track e.id) {
         <li>
           <button type="button" class="rs-item" (click)="abrir(e)">
             <span class="rs-nivel">{{ e.nivel }}</span>
@@ -106,7 +118,14 @@
             <span class="rs-item__pasos">{{ e.pasos.length }} pasos</span>
           </button>
         </li>
+      } @empty {
+        <li class="rs-vacio">No hay ejercicios con ese filtro.</li>
       }
     </ul>
+    @if (visiblesLista().length < ejercicios().length) {
+      <button type="button" class="rs-btn rs-btn--claro rs-mas" (click)="verMas()">
+        Ver más ({{ ejercicios().length - visiblesLista().length }} restantes)
+      </button>
+    }
   }
 </div>

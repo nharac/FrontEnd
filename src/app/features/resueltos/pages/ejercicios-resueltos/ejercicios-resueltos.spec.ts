@@ -65,3 +65,33 @@ describe('EjerciciosResueltos', () => {
     expect(c.seleccionado()).toBeNull();
   });
 });
+
+describe('EjerciciosResueltos (biblioteca grande)', () => {
+  it('tiene más de 400 ejercicios, incluido álgebra lineal con Gauss-Jordan', () => {
+    expect(EJERCICIOS_RESUELTOS.length).toBeGreaterThan(400);
+    const lineal = EJERCICIOS_RESUELTOS.filter(e => e.tema === 'algebra_lineal');
+    expect(lineal.length).toBeGreaterThan(50);
+    expect(lineal.some(e => e.titulo.includes('Gauss-Jordan'))).toBe(true);
+    expect(lineal.some(e => e.titulo.includes('Determinante'))).toBe(true);
+  });
+
+  it('filtra por nivel y búsqueda, y pagina de a 12', () => {
+    TestBed.configureTestingModule({ imports: [EjerciciosResueltos], providers: [provideRouter([])] });
+    const f = TestBed.createComponent(EjerciciosResueltos);
+    f.detectChanges();
+    const c = f.componentInstance;
+    c.elegirTema('algebra_lineal');
+    f.detectChanges();
+    expect(c.visiblesLista().length).toBe(12);
+    c.verMas();
+    expect(c.visiblesLista().length).toBe(24);
+    c.elegirNivel('Avanzado');
+    expect(c.ejercicios().every(e => e.nivel === 'Avanzado')).toBe(true);
+    c.buscar('gauss');
+    expect(c.ejercicios().length).toBeGreaterThan(0);
+    expect(c.ejercicios().every(e => /gauss/i.test(e.titulo + e.enunciado))).toBe(true);
+    c.buscar('zzzz');
+    f.detectChanges();
+    expect(f.nativeElement.textContent).toContain('No hay ejercicios');
+  });
+});

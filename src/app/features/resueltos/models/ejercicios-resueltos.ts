@@ -4,7 +4,9 @@
  * Es contenido fijo y revisado (no lo genera la IA), así siempre es correcto.
  */
 
-export type TemaResuelto = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales';
+import { EJERCICIOS_GENERADOS } from './ejercicios-generados';
+
+export type TemaResuelto = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | 'algebra_lineal';
 
 export interface PasoResuelto {
   /** Lo que se escribe en este paso. */
@@ -32,9 +34,11 @@ export const TEMAS_RESUELTOS: { id: TemaResuelto; nombre: string; icono: string 
   { id: 'limites', nombre: 'Límites', icono: 'trending_flat' },
   { id: 'derivadas', nombre: 'Derivadas', icono: 'show_chart' },
   { id: 'integrales', nombre: 'Integrales', icono: 'functions' },
+  { id: 'algebra_lineal', nombre: 'Álgebra lineal', icono: 'grid_on' },
 ];
 
-export const EJERCICIOS_RESUELTOS: EjercicioResuelto[] = [
+/** Ejercicios escritos a mano (los primeros de cada tema). */
+const EJERCICIOS_BASE: EjercicioResuelto[] = [
   // ================= FUNDAMENTOS =================
   {
     id: 'fun-1', tema: 'fundamentos', nivel: 'Básico', titulo: 'Jerarquía de operaciones',
@@ -331,3 +335,6 @@ export const EJERCICIOS_RESUELTOS: EjercicioResuelto[] = [
     clave: 'Por partes: ∫ u dv = uv − ∫ v du. Escoge u para que al derivarla se simplifique.',
   },
 ];
+
+/** Todos: primero los escritos a mano y luego los generados (unos 400 más). */
+export const EJERCICIOS_RESUELTOS: EjercicioResuelto[] = [...EJERCICIOS_BASE, ...EJERCICIOS_GENERADOS];

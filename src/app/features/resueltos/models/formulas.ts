@@ -70,4 +70,15 @@ export const FORMULAS: Record<TemaResuelto, Formula[]> = {
     { nombre: 'Por partes', formula: '∫ u dv = u·v − ∫ v du', nota: 'Escoge u para que al derivarla se simplifique (regla ILATE).' },
     { nombre: 'Teorema fundamental', formula: '∫ₐᵇ f(x) dx = F(b) − F(a)', nota: 'F es una primitiva de f; en la definida no va la C.' },
   ],
+  algebra_lineal: [
+    { nombre: 'Suma de matrices', formula: '(A + B)ᵢⱼ = aᵢⱼ + bᵢⱼ', nota: 'Solo entre matrices del mismo tamaño.' },
+    { nombre: 'Producto de matrices', formula: '(AB)ᵢⱼ = fila i de A · columna j de B', nota: 'Columnas de A deben ser iguales a filas de B. AB ≠ BA en general.' },
+    { nombre: 'Transpuesta', formula: '(Aᵀ)ᵢⱼ = aⱼᵢ', nota: 'Las filas pasan a ser columnas.' },
+    { nombre: 'Determinante 2×2', formula: 'det [a b; c d] = ad − bc', nota: 'Si es 0 la matriz no tiene inversa.' },
+    { nombre: 'Determinante 3×3', formula: 'det A = a₁₁M₁₁ − a₁₂M₁₂ + a₁₃M₁₃', nota: 'Cofactores por la primera fila con signos + − +.' },
+    { nombre: 'Inversa 2×2', formula: '[a b; c d]⁻¹ = (1/(ad − bc)) · [d −b; −c a]', nota: 'Cambia a ↔ d, niega b y c y divide entre el determinante.' },
+    { nombre: 'Operaciones de fila', formula: 'Fᵢ ↔ Fⱼ     Fᵢ → k·Fᵢ     Fᵢ → Fᵢ + k·Fⱼ', nota: 'No cambian las soluciones del sistema.' },
+    { nombre: 'Gauss-Jordan', formula: '[A | b] → [I | x]', nota: 'Pivote en 1 y ceros arriba y abajo, columna por columna.' },
+    { nombre: 'Inversa por Gauss-Jordan', formula: '[A | I] → [I | A⁻¹]', nota: 'Lo que se le hace a A se le hace a I.' },
+  ],
 };
