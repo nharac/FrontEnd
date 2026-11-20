@@ -1,0 +1,195 @@
+// ============================================
+// Ejercicios resueltos: encabezado, temas, tarjetas y detalle paso a paso.
+// Va global (acotado a app-ejercicios-resueltos) para no pasar el límite de 8 kB por componente.
+// ============================================
+$indigo: #4f46e5;
+$violeta: #7c3aed;
+$suave: #eef2ff;
+$texto: #1f2f3f;
+$gris: #6b7280;
+$borde: #e5e7eb;
+$sombra: 0 6px 22px rgba(31, 50, 71, 0.07);
+
+app-ejercicios-resueltos {
+  display: block; color: $texto;
+
+.rs { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+// ---------- Encabezado ----------
+.rs-hero {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap;
+  padding: 24px 26px; border-radius: 24px; color: #fff;
+  background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.18), transparent 40%), linear-gradient(135deg, $indigo, $violeta);
+  box-shadow: 0 14px 34px rgba(79, 70, 229, 0.28);
+  h1 { margin: 8px 0 6px; font-size: 30px; line-height: 1.15; }
+  p { margin: 0; max-width: 520px; line-height: 1.5; opacity: 0.92; }
+}
+.rs-hero__chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.18);
+  mat-icon { font-size: 16px; width: 16px; height: 16px; } }
+.rs-hero__cifras { display: flex; gap: 10px;
+  div { display: flex; flex-direction: column; align-items: center; min-width: 78px; padding: 10px 12px; border-radius: 16px; background: rgba(255, 255, 255, 0.15); }
+  b { font-size: 24px; line-height: 1; } span { font-size: 12px; opacity: 0.9; margin-top: 4px; } }
+
+// ---------- Pestañas ----------
+.rs-vistas { display: flex; gap: 4px; padding: 5px; background: #fff; border-radius: 16px; box-shadow: $sombra; overflow-x: auto; scrollbar-width: none; }
+.rs-vista {
+  flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: inherit; font-weight: 600; font-size: 14px;
+  border: 0; cursor: pointer; padding: 10px 14px; border-radius: 12px; background: transparent; color: $gris; white-space: nowrap; transition: background 0.15s, color 0.15s;
+  mat-icon { font-size: 19px; width: 19px; height: 19px; }
+  &:hover { color: $indigo; }
+  &.activo { background: linear-gradient(135deg, $indigo, $violeta); color: #fff; box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3); }
+}
+
+// ---------- Temas ----------
+.rs-temas { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
+.rs-tema {
+  --c: #{$indigo}; --f: #{$suave};
+  display: flex; align-items: center; gap: 10px; font: inherit; text-align: left; cursor: pointer;
+  padding: 10px 12px; border-radius: 16px; border: 2px solid transparent; background: #fff; color: $texto; box-shadow: $sombra;
+  transition: transform 0.15s, border-color 0.15s;
+  &:hover { transform: translateY(-2px); }
+  &.activo { border-color: var(--c); background: var(--f); }
+  &[data-tema='fundamentos'] { --c: #0891b2; --f: #ecfeff; }
+  &[data-tema='algebra'] { --c: #4f46e5; --f: #eef2ff; }
+  &[data-tema='trigonometria'] { --c: #db2777; --f: #fdf2f8; }
+  &[data-tema='limites'] { --c: #ea580c; --f: #fff7ed; }
+  &[data-tema='derivadas'] { --c: #16a34a; --f: #f0fdf4; }
+  &[data-tema='integrales'] { --c: #7c3aed; --f: #f5f3ff; }
+  &[data-tema='algebra_lineal'] { --c: #0f766e; --f: #f0fdfa; }
+}
+.rs-tema__icono { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--f); color: var(--c);
+  mat-icon { font-size: 20px; width: 20px; height: 20px; } }
+.rs-tema.activo .rs-tema__icono { background: var(--c); color: #fff; }
+.rs-tema__nombre { flex: 1; min-width: 0; font-weight: 600; font-size: 14px; line-height: 1.2; overflow-wrap: anywhere; }
+.rs-tema__n { flex: none; font-size: 12px; font-weight: 700; color: var(--c); }
+
+// ---------- Panel de filtros ----------
+.rs-panel { display: flex; flex-direction: column; gap: 14px; padding: 16px 18px; border-radius: 20px; background: #fff; box-shadow: $sombra; }
+.rs-panel__avance { display: flex; flex-direction: column; gap: 8px;
+  div:first-child { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  strong { font-size: 18px; } small { color: $gris; } }
+.rs-progreso__pista { height: 8px; border-radius: 999px; background: #eef0f4; overflow: hidden;
+  span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, $indigo, $violeta); transition: width 0.35s ease; } }
+.rs-filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.rs-buscar { flex: 1 1 260px; min-width: 0; max-width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 12px; border: 2px solid $borde; background: #fafbff;
+  mat-icon { color: $gris; font-size: 20px; width: 20px; height: 20px; }
+  input { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 0; border: 0; background: transparent; color: inherit; outline: none; }
+  &:focus-within { border-color: $indigo; background: #fff; } }
+.rs-niveles { display: flex; flex-wrap: wrap; gap: 6px; }
+.rs-chip { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 999px;
+  border: 1px solid $borde; background: #fff; color: $gris; cursor: pointer;
+  &.activo { background: $texto; border-color: $texto; color: #fff; } }
+.rs-punto { width: 8px; height: 8px; border-radius: 50%;
+  &--basico { background: #10b981; } &--intermedio { background: #f59e0b; } &--avanzado { background: #ef4444; } }
+.rs-conteo { margin: -4px 0 0; font-size: 13px; color: $gris; }
+
+// ---------- Tarjetas ----------
+.rs-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.rs-item {
+  --n: #10b981;
+  position: relative; width: 100%; height: 100%; text-align: left; font: inherit; color: inherit; border: 0; cursor: pointer; overflow: hidden;
+  display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 14px; border-radius: 18px; background: #fff; box-shadow: $sombra;
+  transition: transform 0.18s, box-shadow 0.18s;
+  &::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--n); }
+  &--intermedio { --n: #f59e0b; } &--avanzado { --n: #ef4444; }
+  &:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(31, 50, 71, 0.13); .rs-item__ver { gap: 8px; } }
+  &--visto { background: linear-gradient(180deg, #fff 70%, #f0fdf4); }
+}
+.rs-item__arriba { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rs-item__titulo { font-size: 16px; }
+.rs-item__enunciado { color: #374151; font-size: 14px; line-height: 1.45; padding: 8px 10px; border-radius: 10px; background: #f8fafc;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.rs-item__pie { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: $gris;
+  > span { display: inline-flex; align-items: center; gap: 4px; } mat-icon { font-size: 16px; width: 16px; height: 16px; } }
+.rs-item__ver { font-weight: 700; color: $indigo; transition: gap 0.15s; }
+.rs-visto { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; color: #059669;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; } }
+.rs-nivel { font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+  color: #047857; background: #d1fae5;
+  &--intermedio { color: #b45309; background: #fef3c7; } &--avanzado { color: #b91c1c; background: #fee2e2; } }
+.rs-vacio { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; justify-content: center; padding: 30px; color: $gris; background: #fff; border-radius: 18px; }
+.rs-mas { align-self: center; }
+
+// ---------- Fórmulas ----------
+.rs-formulas { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.rs-formula { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; border-radius: 18px; background: #fff; box-shadow: $sombra; border-top: 4px solid $indigo;
+  code { font-family: inherit; font-size: 16px; font-weight: 700; color: $indigo; white-space: pre-wrap; padding: 8px 10px; border-radius: 10px; background: $suave; }
+  span { font-size: 13.5px; color: $gris; } }
+
+// ---------- Detalle ----------
+.rs-detalle { background: #fff; border-radius: 24px; padding: 22px 24px; box-shadow: $sombra; display: flex; flex-direction: column; gap: 14px;
+  h2 { margin: 0; font-size: 24px; line-height: 1.2; } }
+.rs-detalle__barra { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.rs-enunciado { display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: $suave; border: 1px solid #e0e7ff;
+  mat-icon { color: $indigo; flex: none; } p { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.5; } }
+.rs-progreso { display: flex; align-items: center; gap: 12px; .rs-progreso__pista { flex: 1; } small { color: $gris; white-space: nowrap; } }
+
+.rs-pasos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.rs-paso { position: relative; display: flex; gap: 14px; padding-bottom: 14px; animation: rs-entra 0.3s ease-out;
+  &::before { content: ''; position: absolute; left: 15px; top: 34px; bottom: 0; width: 2px; background: #e0e7ff; }
+  &:last-child::before { display: none; } }
+.rs-paso__num { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font-weight: 700; font-size: 14px;
+  color: #fff; background: linear-gradient(135deg, $indigo, $violeta); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+.rs-paso__cuerpo { flex: 1; min-width: 0; padding: 12px 14px; border-radius: 14px; background: #f8fafc; border: 1px solid #eef0f4; }
+.rs-paso__etiqueta { font-size: 12px; font-weight: 700; color: $indigo; text-transform: uppercase; letter-spacing: 0.3px; }
+.rs-paso__mate { display: block; margin: 6px 0 8px; font-size: 17px; font-family: inherit; font-weight: 600; white-space: pre-wrap; overflow-x: auto; }
+.rs-paso__porque { display: flex; gap: 6px; margin: 0; color: #374151; line-height: 1.5; font-size: 14.5px;
+  mat-icon { flex: none; color: #d97706; font-size: 19px; width: 19px; height: 19px; margin-top: 1px; } }
+.rs-paso--fantasma { animation: none;
+  .rs-paso__num { background: #fff; color: #a5b4fc; border: 2px dashed #c7d2fe; box-shadow: none; }
+  .rs-paso__cuerpo { background: transparent; border: 2px dashed #e0e7ff; }
+  .rs-paso__etiqueta { color: #a5b4fc; text-transform: none; font-size: 14px; } }
+
+.rs-final { display: flex; flex-direction: column; gap: 10px; animation: rs-entra 0.35s ease-out; }
+.rs-final__respuesta { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 16px; background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #a7f3d0;
+  > mat-icon { color: #059669; font-size: 30px; width: 30px; height: 30px; flex: none; }
+  span { display: block; font-size: 12px; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.4px; }
+  code { font-family: inherit; font-size: 18px; font-weight: 700; color: #065f46; } }
+.rs-clave { display: flex; gap: 8px; align-items: flex-start; margin: 0; padding: 12px 14px; border-radius: 14px; background: #fffbeb; color: #78350f; line-height: 1.45;
+  mat-icon { color: #d97706; flex: none; } }
+
+.rs-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.rs-navegar { display: flex; justify-content: space-between; gap: 10px; padding-top: 14px; border-top: 1px solid #eef0f4; }
+.rs-navegar__btn { display: inline-flex; align-items: center; gap: 6px; max-width: 48%; font: inherit; text-align: left; cursor: pointer; padding: 8px 10px;
+  border-radius: 12px; border: 1px solid $borde; background: #fff; color: $texto;
+  span { display: flex; flex-direction: column; min-width: 0; font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  small { font-weight: 500; color: $gris; font-size: 12px; }
+  mat-icon { color: $indigo; flex: none; }
+  &:hover { border-color: $indigo; }
+  &--sig { margin-left: auto; text-align: right; span { align-items: flex-end; } } }
+
+.rs-link { display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 14px; font-weight: 600; background: none; border: 0; color: $indigo; cursor: pointer; padding: 0;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+
+.rs-btn {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-weight: 600; font-size: 14.5px; text-decoration: none;
+  color: #fff; border: 0; border-radius: 12px; padding: 10px 18px; cursor: pointer; background: linear-gradient(135deg, $indigo, $violeta);
+  box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  &--claro { color: $indigo; background: $suave; box-shadow: none; }
+  &:focus-visible { outline: 3px solid rgba(79, 70, 229, 0.4); outline-offset: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .rs-paso, .rs-final { animation: none; } }
+
+// ---------- Celular ----------
+@media (max-width: 640px) {
+  .rs-hero { padding: 18px; border-radius: 20px; h1 { font-size: 24px; } }
+  .rs-hero__cifras { width: 100%; div { flex: 1; min-width: 0; } b { font-size: 20px; } }
+  .rs-vista span { display: none; }
+  .rs-vista.activo span { display: inline; }
+  .rs-temas { display: flex; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px 6px; }
+  .rs-tema { flex: none; }
+  .rs-buscar { flex-basis: 100%; }
+  .rs-niveles { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .rs-chip { flex: none; }
+  .rs-detalle { padding: 16px; border-radius: 20px; h2 { font-size: 20px; } }
+  .rs-paso { gap: 10px; }
+  .rs-paso__cuerpo { padding: 10px 12px; }
+  .rs-paso__mate { font-size: 16px; }
+  .rs-navegar__btn { max-width: 100%; }
+  .rs-navegar { flex-direction: column; .rs-navegar__btn--sig { margin-left: 0; } }
+}
+}
+
+@keyframes rs-entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }

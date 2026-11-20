@@ -1,131 +1,194 @@
 <div class="rs">
   <header class="rs-hero">
-    <h1>Ejercicios resueltos, fórmulas y gráficas</h1>
-    <p>Mira cómo se resuelve cada ejercicio paso a paso, con el <strong>porqué</strong> de cada paso. Intenta adivinar el siguiente antes de verlo.</p>
+    <div class="rs-hero__texto">
+      <span class="rs-hero__chip"><mat-icon aria-hidden="true">school</mat-icon> Aprende paso a paso</span>
+      <h1>Ejercicios resueltos</h1>
+      <p>Cada ejercicio explica <strong>qué</strong> se hace y <strong>por qué</strong>. Intenta adivinar el siguiente paso antes de verlo.</p>
+    </div>
+    <div class="rs-hero__cifras">
+      <div><b>{{ totalGeneral }}</b><span>ejercicios</span></div>
+      <div><b>{{ temas.length }}</b><span>temas</span></div>
+      <div><b>{{ vistos().size }}</b><span>vistos por ti</span></div>
+    </div>
   </header>
 
-  <div class="rs-vistas" role="tablist" aria-label="Sección">
+  <nav class="rs-vistas" role="tablist" aria-label="Sección">
     <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'ejercicios'"
             [attr.aria-selected]="vista() === 'ejercicios'" (click)="cambiarVista('ejercicios')">
-      <mat-icon aria-hidden="true">menu_book</mat-icon> Ejercicios paso a paso
+      <mat-icon aria-hidden="true">menu_book</mat-icon> <span>Ejercicios</span>
     </button>
     <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'formulas'"
             [attr.aria-selected]="vista() === 'formulas'" (click)="cambiarVista('formulas')">
-      <mat-icon aria-hidden="true">functions</mat-icon> Fórmulas
+      <mat-icon aria-hidden="true">functions</mat-icon> <span>Fórmulas</span>
     </button>
     <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'graficas'"
             [attr.aria-selected]="vista() === 'graficas'" (click)="cambiarVista('graficas')">
-      <mat-icon aria-hidden="true">show_chart</mat-icon> Gráficas
+      <mat-icon aria-hidden="true">show_chart</mat-icon> <span>Gráficas</span>
     </button>
     <button type="button" role="tab" class="rs-vista" [class.activo]="vista() === 'calculadora'"
             [attr.aria-selected]="vista() === 'calculadora'" (click)="cambiarVista('calculadora')">
-      <mat-icon aria-hidden="true">auto_awesome</mat-icon> Tu ejercicio con IA
+      <mat-icon aria-hidden="true">auto_awesome</mat-icon> <span>Tu ejercicio con IA</span>
     </button>
-  </div>
+  </nav>
 
   @if (vista() === 'graficas') {
     <app-graficas />
   } @else if (vista() === 'calculadora') {
     <app-calculadora-pasos />
   } @else {
-  <div class="rs-temas" role="tablist" aria-label="Tema">
-    @for (t of temas; track t.id) {
-      <button type="button" role="tab" class="rs-tema" [class.activo]="tema() === t.id"
-              [attr.aria-selected]="tema() === t.id" (click)="elegirTema(t.id)">
-        <mat-icon aria-hidden="true">{{ t.icono }}</mat-icon>
-        <span>{{ t.nombre }}</span>
-      </button>
-    }
-  </div>
-
-  }
-
-  @if (vista() === 'graficas' || vista() === 'calculadora') {
-  } @else if (vista() === 'formulas') {
-    <ul class="rs-formulas">
-      @for (f of formulas(); track f.nombre) {
-        <li class="rs-formula">
-          <strong>{{ f.nombre }}</strong>
-          <code>{{ f.formula }}</code>
-          <span>{{ f.nota }}</span>
-        </li>
+    <div class="rs-temas" role="tablist" aria-label="Tema">
+      @for (t of temas; track t.id) {
+        <button type="button" role="tab" class="rs-tema" [attr.data-tema]="t.id" [class.activo]="tema() === t.id"
+                [attr.aria-selected]="tema() === t.id" (click)="elegirTema(t.id)">
+          <span class="rs-tema__icono"><mat-icon aria-hidden="true">{{ t.icono }}</mat-icon></span>
+          <span class="rs-tema__nombre">{{ t.nombre }}</span>
+          @if (vista() === 'ejercicios') { <span class="rs-tema__n">{{ conteoPorTema()[t.id] }}</span> }
+        </button>
       }
-    </ul>
-  } @else if (seleccionado(); as e) {
-    <section class="rs-caja" aria-labelledby="rs-titulo">
-      <button type="button" class="rs-link" (click)="volver()">
-        <mat-icon aria-hidden="true">arrow_back</mat-icon> Volver a la lista
-      </button>
+    </div>
 
-      <span class="rs-nivel">{{ e.nivel }}</span>
-      <h2 id="rs-titulo">{{ e.titulo }}</h2>
-      <p class="rs-enunciado"><app-texto-matriz [texto]="e.enunciado" /></p>
-
-      <ol class="rs-pasos" aria-live="polite">
-        @for (p of pasosVisibles(); track $index) {
-          <li class="rs-paso">
-            <span class="rs-paso__num">Paso {{ $index + 1 }}</span>
-            <code class="rs-paso__mate"><app-texto-matriz [texto]="p.paso" /></code>
-            <p class="rs-paso__porque"><strong>¿Por qué?</strong> {{ p.porque }}</p>
+    @if (vista() === 'formulas') {
+      <ul class="rs-formulas">
+        @for (f of formulas(); track f.nombre) {
+          <li class="rs-formula">
+            <strong>{{ f.nombre }}</strong>
+            <code>{{ f.formula }}</code>
+            <span>{{ f.nota }}</span>
           </li>
         }
-      </ol>
-
-      @if (terminado()) {
-        <div class="rs-final">
-          <p><strong>Respuesta:</strong> <code><app-texto-matriz [texto]="e.respuesta" /></code></p>
-          <p class="rs-clave"><mat-icon aria-hidden="true">lightbulb</mat-icon> {{ e.clave }}</p>
+      </ul>
+    } @else if (seleccionado(); as e) {
+      <section class="rs-detalle" aria-labelledby="rs-titulo">
+        <div class="rs-detalle__barra">
+          <button type="button" class="rs-link" (click)="volver()">
+            <mat-icon aria-hidden="true">arrow_back</mat-icon> {{ nombreTema() }}
+          </button>
+          <span class="rs-nivel" [ngClass]="'rs-nivel--' + claseNivel(e.nivel)">{{ e.nivel }}</span>
         </div>
-      }
 
-      <div class="rs-acciones">
-        @if (!terminado()) {
-          <button type="button" class="rs-btn" (click)="siguientePaso()">
-            <mat-icon aria-hidden="true">navigate_next</mat-icon>
-            {{ visibles() === 0 ? 'Ver el primer paso' : 'Siguiente paso' }}
-          </button>
-          <button type="button" class="rs-btn rs-btn--claro" (click)="verTodo()">Ver todos los pasos</button>
-        } @else {
-          <button type="button" class="rs-btn rs-btn--claro" (click)="reiniciar()">
-            <mat-icon aria-hidden="true">replay</mat-icon> Repasar desde el inicio
-          </button>
-          <a class="rs-btn" routerLink="/chat">
-            <mat-icon aria-hidden="true">smart_toy</mat-icon> ¿Dudas? Pregúntale al tutor
-          </a>
+        <h2 id="rs-titulo">{{ e.titulo }}</h2>
+        <div class="rs-enunciado">
+          <mat-icon aria-hidden="true">edit_note</mat-icon>
+          <p><app-texto-matriz [texto]="e.enunciado" /></p>
+        </div>
+
+        <div class="rs-progreso" role="progressbar" [attr.aria-valuenow]="visibles()" aria-valuemin="0" [attr.aria-valuemax]="e.pasos.length"
+             [attr.aria-label]="'Pasos vistos: ' + visibles() + ' de ' + e.pasos.length">
+          <div class="rs-progreso__pista"><span [style.width.%]="avancePasos()"></span></div>
+          <small>{{ visibles() }} de {{ e.pasos.length }} pasos</small>
+        </div>
+
+        <ol class="rs-pasos" aria-live="polite">
+          @for (p of pasosVisibles(); track $index) {
+            <li class="rs-paso">
+              <span class="rs-paso__num" aria-hidden="true">{{ $index + 1 }}</span>
+              <div class="rs-paso__cuerpo">
+                <span class="rs-paso__etiqueta">Paso {{ $index + 1 }}</span>
+                <code class="rs-paso__mate"><app-texto-matriz [texto]="p.paso" /></code>
+                <p class="rs-paso__porque"><mat-icon aria-hidden="true">help_outline</mat-icon><span><strong>¿Por qué?</strong> {{ p.porque }}</span></p>
+              </div>
+            </li>
+          }
+          @if (!terminado()) {
+            <li class="rs-paso rs-paso--fantasma" aria-hidden="true">
+              <span class="rs-paso__num">{{ visibles() + 1 }}</span>
+              <div class="rs-paso__cuerpo"><span class="rs-paso__etiqueta">¿Cuál crees que es el siguiente paso?</span></div>
+            </li>
+          }
+        </ol>
+
+        @if (terminado()) {
+          <div class="rs-final">
+            <div class="rs-final__respuesta">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              <div><span>Respuesta</span><code><app-texto-matriz [texto]="e.respuesta" /></code></div>
+            </div>
+            <p class="rs-clave"><mat-icon aria-hidden="true">lightbulb</mat-icon> <span><strong>Para recordar:</strong> {{ e.clave }}</span></p>
+          </div>
         }
+
+        <div class="rs-acciones">
+          @if (!terminado()) {
+            <button type="button" class="rs-btn" (click)="siguientePaso()">
+              <mat-icon aria-hidden="true">navigate_next</mat-icon>
+              {{ visibles() === 0 ? 'Ver el primer paso' : 'Siguiente paso' }}
+            </button>
+            <button type="button" class="rs-btn rs-btn--claro" (click)="verTodo()">Ver todos los pasos</button>
+          } @else {
+            <button type="button" class="rs-btn rs-btn--claro" (click)="reiniciar()">
+              <mat-icon aria-hidden="true">replay</mat-icon> Repasar
+            </button>
+            <a class="rs-btn rs-btn--claro" routerLink="/chat">
+              <mat-icon aria-hidden="true">smart_toy</mat-icon> Preguntar al tutor
+            </a>
+          }
+        </div>
+
+        <div class="rs-navegar">
+          @if (anterior(); as a) {
+            <button type="button" class="rs-navegar__btn" (click)="abrir(a)">
+              <mat-icon aria-hidden="true">chevron_left</mat-icon><span><small>Anterior</small>{{ a.titulo }}</span>
+            </button>
+          } @else { <span></span> }
+          @if (siguiente(); as s) {
+            <button type="button" class="rs-navegar__btn rs-navegar__btn--sig" (click)="abrir(s)">
+              <span><small>Siguiente</small>{{ s.titulo }}</span><mat-icon aria-hidden="true">chevron_right</mat-icon>
+            </button>
+          }
+        </div>
+      </section>
+    } @else {
+      <div class="rs-panel">
+        <div class="rs-panel__avance">
+          <div>
+            <strong>{{ nombreTema() }}</strong>
+            <small>Has visto {{ vistosDelTema() }} de {{ totalTema() }} ejercicios</small>
+          </div>
+          <div class="rs-progreso__pista"><span [style.width.%]="avanceTema()"></span></div>
+        </div>
+        <div class="rs-filtros">
+          <label class="rs-buscar">
+            <mat-icon aria-hidden="true">search</mat-icon>
+            <input type="search" placeholder="Buscar: determinante, cadena, fracciones…"
+                   aria-label="Buscar ejercicio" [value]="busqueda()" (input)="buscar($any($event.target).value)" />
+          </label>
+          <div class="rs-niveles" role="group" aria-label="Nivel">
+            @for (n of niveles; track n) {
+              <button type="button" class="rs-chip" [class.activo]="nivel() === n" [attr.aria-pressed]="nivel() === n" (click)="elegirNivel(n)">
+                @if (n !== 'todos') { <i [ngClass]="'rs-punto rs-punto--' + claseNivel(n)"></i> }
+                {{ n === 'todos' ? 'Todos' : n }}
+              </button>
+            }
+          </div>
+        </div>
       </div>
-    </section>
-  } @else {
-    <div class="rs-filtros">
-      <input type="search" class="rs-buscar" placeholder="Buscar ejercicio (ej.: determinante, cadena, fracciones)"
-             aria-label="Buscar ejercicio" [value]="busqueda()" (input)="buscar($any($event.target).value)" />
-      <div class="rs-niveles" role="group" aria-label="Nivel">
-        @for (n of niveles; track n) {
-          <button type="button" class="rs-chip" [class.activo]="nivel() === n" [attr.aria-pressed]="nivel() === n" (click)="elegirNivel(n)">
-            {{ n === 'todos' ? 'Todos' : n }}
-          </button>
+
+      <p class="rs-conteo">{{ ejercicios().length }} de {{ totalTema() }} ejercicios</p>
+      <ul class="rs-lista">
+        @for (e of visiblesLista(); track e.id) {
+          <li>
+            <button type="button" class="rs-item" [ngClass]="'rs-item--' + claseNivel(e.nivel)" [class.rs-item--visto]="visto(e)" (click)="abrir(e)">
+              <span class="rs-item__arriba">
+                <span class="rs-nivel" [ngClass]="'rs-nivel--' + claseNivel(e.nivel)">{{ e.nivel }}</span>
+                @if (visto(e)) { <span class="rs-visto"><mat-icon aria-hidden="true">check_circle</mat-icon> Visto</span> }
+              </span>
+              <strong class="rs-item__titulo">{{ e.titulo }}</strong>
+              <span class="rs-item__enunciado"><app-texto-matriz [texto]="e.enunciado" /></span>
+              <span class="rs-item__pie">
+                <span><mat-icon aria-hidden="true">format_list_numbered</mat-icon> {{ e.pasos.length }} pasos</span>
+                <span class="rs-item__ver">Ver solución <mat-icon aria-hidden="true">arrow_forward</mat-icon></span>
+              </span>
+            </button>
+          </li>
+        } @empty {
+          <li class="rs-vacio"><mat-icon aria-hidden="true">search_off</mat-icon> No hay ejercicios con ese filtro.</li>
         }
-      </div>
-    </div>
-    <p class="rs-conteo">{{ ejercicios().length }} de {{ totalTema() }} ejercicios</p>
-    <ul class="rs-lista">
-      @for (e of visiblesLista(); track e.id) {
-        <li>
-          <button type="button" class="rs-item" (click)="abrir(e)">
-            <span class="rs-nivel">{{ e.nivel }}</span>
-            <strong>{{ e.titulo }}</strong>
-            <span class="rs-item__enunciado">{{ e.enunciado }}</span>
-            <span class="rs-item__pasos">{{ e.pasos.length }} pasos</span>
-          </button>
-        </li>
-      } @empty {
-        <li class="rs-vacio">No hay ejercicios con ese filtro.</li>
+      </ul>
+      @if (visiblesLista().length < ejercicios().length) {
+        <button type="button" class="rs-btn rs-btn--claro rs-mas" (click)="verMas()">
+          <mat-icon aria-hidden="true">expand_more</mat-icon> Ver más ({{ ejercicios().length - visiblesLista().length }} restantes)
+        </button>
       }
-    </ul>
-    @if (visiblesLista().length < ejercicios().length) {
-      <button type="button" class="rs-btn rs-btn--claro rs-mas" (click)="verMas()">
-        Ver más ({{ ejercicios().length - visiblesLista().length }} restantes)
-      </button>
     }
   }
 </div>

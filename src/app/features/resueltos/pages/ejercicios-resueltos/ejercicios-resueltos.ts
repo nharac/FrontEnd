@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +16,11 @@ import { CalculadoraPasos } from '../../components/calculadora-pasos/calculadora
 
 type Nivel = 'todos' | 'Básico' | 'Intermedio' | 'Avanzado';
 const POR_PAGINA = 12;
+const CLAVE_VISTOS = 'saesu_resueltos_vistos';
+
+function leerVistos(): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(CLAVE_VISTOS) ?? '[]')); } catch { return new Set(); }
+}
 
 type Vista = 'ejercicios' | 'formulas' | 'graficas' | 'calculadora';
 
@@ -26,7 +32,7 @@ type Vista = 'ejercicios' | 'formulas' | 'graficas' | 'calculadora';
 @Component({
   selector: 'app-ejercicios-resueltos',
   standalone: true,
-  imports: [RouterLink, MatIconModule, Graficas, CalculadoraPasos, TextoMatriz],
+  imports: [NgClass, RouterLink, MatIconModule, Graficas, CalculadoraPasos, TextoMatriz],
   templateUrl: './ejercicios-resueltos.html',
   styleUrl: './ejercicios-resueltos.scss',
 })
@@ -69,6 +75,47 @@ export class EjerciciosResueltos {
   verMas(): void {
     this.mostrar.update(m => m + POR_PAGINA);
   }
+
+  /** Ejercicios que el estudiante ya terminó de ver (se guardan en este navegador). */
+  vistos = signal<Set<string>>(leerVistos());
+  readonly totalGeneral = EJERCICIOS_RESUELTOS.length;
+  conteoPorTema = computed(() => {
+    const m: Record<string, number> = {};
+    for (const e of EJERCICIOS_RESUELTOS) m[e.tema] = (m[e.tema] ?? 0) + 1;
+    return m;
+  });
+  vistosDelTema = computed(() => EJERCICIOS_RESUELTOS.filter(e => e.tema === this.tema() && this.vistos().has(e.id)).length);
+  avanceTema = computed(() => Math.round((this.vistosDelTema() / Math.max(1, this.totalTema())) * 100));
+  nombreTema = computed(() => this.temas.find(t => t.id === this.tema())?.nombre ?? '');
+  avancePasos = computed(() => {
+    const e = this.seleccionado();
+    return e ? Math.round((this.visibles() / e.pasos.length) * 100) : 0;
+  });
+  private indiceActual = computed(() => {
+    const e = this.seleccionado();
+    return e ? this.ejercicios().findIndex(x => x.id === e.id) : -1;
+  });
+  anterior = computed(() => (this.indiceActual() > 0 ? this.ejercicios()[this.indiceActual() - 1] : null));
+  siguiente = computed(() => {
+    const i = this.indiceActual();
+    return i >= 0 && i < this.ejercicios().length - 1 ? this.ejercicios()[i + 1] : null;
+  });
+
+  visto(e: EjercicioResuelto): boolean {
+    return this.vistos().has(e.id);
+  }
+
+  private marcarVisto(): void {
+    const e = this.seleccionado();
+    if (!e || !this.terminado() || this.vistos().has(e.id)) return;
+    const nuevo = new Set(this.vistos()).add(e.id);
+    this.vistos.set(nuevo);
+    try { localStorage.setItem(CLAVE_VISTOS, JSON.stringify([...nuevo])); } catch { /* modo privado */ }
+  }
+
+  claseNivel(n: string): string {
+    return n === 'Básico' ? 'basico' : n === 'Intermedio' ? 'intermedio' : 'avanzado';
+  }
   pasosVisibles = computed(() => this.seleccionado()?.pasos.slice(0, this.visibles()) ?? []);
   terminado = computed(() => {
     const e = this.seleccionado();
@@ -98,11 +145,13 @@ export class EjerciciosResueltos {
   siguientePaso(): void {
     const e = this.seleccionado();
     if (e && this.visibles() < e.pasos.length) this.visibles.update(v => v + 1);
+    this.marcarVisto();
   }
 
   verTodo(): void {
     const e = this.seleccionado();
     if (e) this.visibles.set(e.pasos.length);
+    this.marcarVisto();
   }
 
   reiniciar(): void {
