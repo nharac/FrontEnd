@@ -10,13 +10,13 @@ import { Progreso } from '../../models/practica.model';
 const t = (respondidas: number, porcentaje: number) => ({ respondidas, correctas: 0, porcentaje });
 const progreso = (cambios: Partial<Progreso> = {}): Progreso => ({
   fundamentos: t(0, 0), algebra: t(0, 0), trigonometria: t(0, 0),
-  limites: t(0, 0), derivadas: t(0, 0), integrales: t(0, 0), ...cambios,
+  limites: t(0, 0), derivadas: t(0, 0), integrales: t(0, 0), algebra_lineal: t(0, 0), ...cambios,
 });
 
 describe('Ruta de aprendizaje', () => {
   it('sin progreso empieza por fundamentos', () => {
     const r = armarRuta(progreso());
-    expect(r.map(p => p.tema)).toEqual(['fundamentos', 'algebra', 'trigonometria', 'limites', 'derivadas', 'integrales']);
+    expect(r.map(p => p.tema)).toEqual(['fundamentos', 'algebra', 'trigonometria', 'limites', 'derivadas', 'integrales', 'algebra_lineal']);
     expect(r[0].estado).toBe('siguiente');
     expect(r.slice(1).every(p => p.estado === 'pendiente')).toBe(true);
   });

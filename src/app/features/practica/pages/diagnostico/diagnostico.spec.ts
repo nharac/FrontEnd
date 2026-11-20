@@ -33,7 +33,7 @@ describe('Diagnóstico inicial', () => {
     const f = TestBed.createComponent(Diagnostico);
     const c = f.componentInstance;
     c.empezar();
-    expect(c.preguntas().length).toBe(12);
+    expect(c.preguntas().length).toBe(14);
 
     while (c.etapa() === 'preguntas') {
       const p = c.pregunta()!;

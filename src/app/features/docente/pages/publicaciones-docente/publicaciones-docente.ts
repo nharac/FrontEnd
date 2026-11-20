@@ -53,6 +53,7 @@ export class PublicacionesDocente implements OnInit {
     { id: 'limites', nombre: 'Límites' },
     { id: 'derivadas', nombre: 'Derivadas' },
     { id: 'integrales', nombre: 'Integrales' },
+    { id: 'algebra_lineal', nombre: 'Álgebra lineal' },
   ];
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;

@@ -4,7 +4,7 @@
  */
 
 /** null = mixto (los tres temas). */
-export type TemaQuiz = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | null;
+export type TemaQuiz = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | 'algebra_lineal' | null;
 
 /** Cuerpo de POST /api/quiz/iniciar. */
 export interface IniciarQuizRequest {
@@ -98,6 +98,7 @@ export const OPCIONES_TEMA: { id: TemaQuiz; nombre: string; simbolo: string; des
   { id: 'limites', nombre: 'Límites', simbolo: 'lim', descripcion: 'Indeterminaciones y al infinito' },
   { id: 'derivadas', nombre: 'Derivadas', simbolo: 'f′', descripcion: 'Reglas, cadena y aplicaciones' },
   { id: 'integrales', nombre: 'Integrales', simbolo: '∫', descripcion: 'Inmediatas, sustitución y partes' },
+  { id: 'algebra_lineal', nombre: 'Álgebra lineal', simbolo: '[ ]', descripcion: 'Matrices, determinantes y Gauss-Jordan' },
 ];
 
 export const CANTIDADES = [5, 10, 15, 20];

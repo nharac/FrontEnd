@@ -96,7 +96,7 @@ export interface EstudianteResumen {
 /** Quiz entregado por un estudiante (detalle del docente). */
 export interface QuizRealizado {
   id: number;
-  tema: 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | null;
+  tema: 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | 'algebra_lineal' | null;
   correctas: number;
   total: number;
   porcentaje: number;

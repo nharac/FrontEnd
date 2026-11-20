@@ -4,7 +4,7 @@
  * Los usan el módulo docente y el módulo foro.
  */
 
-export type TemaForo = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales';
+export type TemaForo = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | 'algebra_lineal';
 
 /** Autor de una publicación o respuesta (AutorResponse). */
 export interface Autor {
@@ -73,6 +73,7 @@ export const NOMBRES_TEMA: Record<string, string> = {
   limites: 'Límites',
   derivadas: 'Derivadas',
   integrales: 'Integrales',
+  algebra_lineal: 'Álgebra lineal',
 };
 
 /** Cuerpo de POST /api/foro/publicaciones (CrearPublicacionRequest). */

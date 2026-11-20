@@ -42,6 +42,7 @@ export class NuevaPublicacion implements OnDestroy {
     { id: 'limites', nombre: 'Límites', icono: 'trending_flat' },
     { id: 'derivadas', nombre: 'Derivadas', icono: 'show_chart' },
     { id: 'integrales', nombre: 'Integrales', icono: 'functions' },
+    { id: 'algebra_lineal', nombre: 'Álgebra lineal', icono: 'grid_on' },
   ];
 
   enviando = signal(false);

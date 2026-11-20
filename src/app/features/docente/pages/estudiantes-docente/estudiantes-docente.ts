@@ -46,7 +46,7 @@ export class EstudiantesDocente implements OnInit {
   orden = signal<Orden>('nombre');
   descendente = signal(false);
 
-  readonly temas = ['fundamentos', 'algebra', 'trigonometria', 'limites', 'derivadas', 'integrales'] as const;
+  readonly temas = ['fundamentos', 'algebra', 'trigonometria', 'limites', 'derivadas', 'integrales', 'algebra_lineal'] as const;
   readonly nombresTema = NOMBRES_TEMA;
   readonly haceCuanto = haceCuanto;
   readonly iniciales = iniciales;

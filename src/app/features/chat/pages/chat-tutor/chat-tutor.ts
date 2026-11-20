@@ -32,6 +32,8 @@ export class ChatTutor {
       preguntas: ['¿Cuándo uso la regla del producto?', '¿Qué significa la derivada en una gráfica?'] },
     { id: 'integrales', nombre: 'Integrales', icono: 'functions',
       preguntas: ['¿Cómo elijo la sustitución u?', '¿Por qué se suma + C?'] },
+    { id: 'algebra_lineal', nombre: 'Álgebra lineal', icono: 'grid_on',
+      preguntas: ['¿Cómo funciona Gauss-Jordan?', '¿Cuándo una matriz no tiene inversa?'] },
   ];
 
   /** Envía una pregunta rápida al chat y lo lleva a la vista en pantallas pequeñas. */

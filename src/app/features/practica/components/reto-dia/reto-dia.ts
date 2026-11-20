@@ -8,7 +8,7 @@ import { Mascota } from '../../../../shared/components/mascota/mascota';
 import { Confeti } from '../../../../shared/components/confeti/confeti';
 import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
 
-const TEMAS: Record<string, string> = { fundamentos: 'Fundamentos', algebra: 'Álgebra', trigonometria: 'Trigonometría', limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales' };
+const TEMAS: Record<string, string> = { fundamentos: 'Fundamentos', algebra: 'Álgebra', trigonometria: 'Trigonometría', limites: 'Límites', derivadas: 'Derivadas', integrales: 'Integrales', algebra_lineal: 'Álgebra lineal' };
 const NIVELES: Record<string, string> = { basico: 'Básico', intermedio: 'Intermedio', avanzado: 'Avanzado' };
 
 /**

@@ -84,7 +84,7 @@ const miPosicion = { periodo: 'semana', posicion: 2, puntos: 400, participantes:
 
 const progreso = { fundamentos: { respondidas: 0, correctas: 0, porcentaje: 0 }, algebra: { respondidas: 0, correctas: 0, porcentaje: 0 },
   trigonometria: { respondidas: 0, correctas: 0, porcentaje: 0 }, limites: { respondidas: 10, correctas: 8, porcentaje: 80 }, derivadas: { respondidas: 4, correctas: 1, porcentaje: 25 },
-  integrales: { respondidas: 0, correctas: 0, porcentaje: 0 } };
+  integrales: { respondidas: 0, correctas: 0, porcentaje: 0 }, algebra_lineal: { respondidas: 0, correctas: 0, porcentaje: 0 } };
 
 // Lunes 2 a domingo 8 de noviembre de 2026 (el 2 es lunes)
 const actividadEstudiante = { dias: [0, 3, 0, 12, 25, 1, 6].map((r, i) => ({ fecha: `2026-11-0${i + 2}`, respondidas: r, aciertos: Math.floor(r * 0.7) })),

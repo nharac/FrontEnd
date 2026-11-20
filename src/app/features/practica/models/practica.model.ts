@@ -5,7 +5,7 @@ import { Logro } from '../../gamificacion/models/logro.model';
  * Reflejan los DTOs del backend (paquete practica.application.dto).
  */
 
-export type Tema = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales';
+export type Tema = 'fundamentos' | 'algebra' | 'trigonometria' | 'limites' | 'derivadas' | 'integrales' | 'algebra_lineal';
 export type Dificultad = 'basico' | 'intermedio' | 'avanzado';
 
 /** Opción de respuesta (OpcionResponse). No incluye cuál es la correcta. */
@@ -84,6 +84,7 @@ export interface Progreso {
   limites: ProgresoTema;
   derivadas: ProgresoTema;
   integrales: ProgresoTema;
+  algebra_lineal: ProgresoTema;
 }
 
 /** Datos de presentación de cada tema. */
@@ -101,6 +102,7 @@ export const TEMAS: InfoTema[] = [
   { id: 'limites', nombre: 'Límites', descripcion: 'Sustitución, indeterminaciones y límites al infinito', icono: 'trending_flat' },
   { id: 'derivadas', nombre: 'Derivadas', descripcion: 'Reglas de derivación, cadena y aplicaciones', icono: 'show_chart' },
   { id: 'integrales', nombre: 'Integrales', descripcion: 'Integrales inmediatas, sustitución y por partes', icono: 'functions' },
+  { id: 'algebra_lineal', nombre: 'Álgebra lineal', descripcion: 'Matrices, determinantes, inversa y Gauss-Jordan', icono: 'grid_on' },
 ];
 
 export const DIFICULTADES: { id: Dificultad | null; nombre: string }[] = [
