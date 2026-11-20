@@ -7,6 +7,7 @@ import { environment } from '../../../../environments/environment';
 import { TokenService } from '../../../core/services/token.service';
 import { Usuario } from '../../usuario/models/usuario.model';
 import {
+  AlertaDocente,
   ContenidoOculto,
   EstadisticasGrupo,
   EstadoFiltro,
@@ -133,6 +134,11 @@ export class DocenteService {
   /** GET /api/docente/estadisticas */
   estadisticas(): Observable<EstadisticasGrupo> {
     return this.http.get<EstadisticasGrupo>(`${this.API}/docente/estadisticas`);
+  }
+
+  /** GET /api/docente/alertas: alertas automáticas sobre estudiantes y temas. */
+  alertas(): Observable<AlertaDocente[]> {
+    return this.http.get<AlertaDocente[]>(`${this.API}/docente/alertas`);
   }
 
   /** GET /api/docente/estudiantes */

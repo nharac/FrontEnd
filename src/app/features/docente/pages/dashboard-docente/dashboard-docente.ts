@@ -1,5 +1,6 @@
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
 import { saludoDocente } from '../../../../shared/components/sumi-dice/dialogos';
+import { AlertasDocente } from '../../components/alertas-docente/alertas-docente';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -30,7 +31,7 @@ export function fechaLarga(d: Date): string {
 @Component({
   selector: 'app-dashboard-docente',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, SumiDice],
+  imports: [CommonModule, RouterLink, MatIconModule, SumiDice, AlertasDocente],
   templateUrl: './dashboard-docente.html',
   styleUrl: './dashboard-docente.scss',
 })

@@ -1,0 +1,16 @@
+:host { display: block; }
+.ad { background: var(--saesu-superficie, #fff); border-radius: 20px; padding: 16px 18px; box-shadow: 0 6px 22px rgba(31, 50, 71, 0.07); }
+.ad-titulo { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 18px; }
+.ad-contador { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #fef3c7; color: #92400e;
+  &--alta { background: #fee2e2; color: #b91c1c; } }
+.ad-vacio { display: flex; align-items: center; gap: 6px; margin: 0; color: #6b7280; mat-icon { color: #059669; } }
+.ad-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ad-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; background: #fffbeb; border-left: 4px solid #f59e0b;
+  &--alta { background: #fef2f2; border-left-color: #dc2626; .ad-icono { color: #dc2626; } } }
+.ad-icono { color: #d97706; flex: none; }
+.ad-texto { flex: 1; min-width: 0; }
+.ad-mensaje { margin: 0; font-weight: 600; color: #1f2f3f; }
+.ad-sugerencia { margin: 2px 0 0; font-size: 13.5px; color: #4b5563; }
+.ad-ver { flex: none; align-self: center; font-weight: 600; font-size: 14px; color: #4f46e5; text-decoration: none; padding: 4px 10px; border-radius: 8px;
+  &:hover, &:focus-visible { background: #eef2ff; } }
+.ad-mas { margin-top: 10px; font: inherit; font-weight: 600; color: #4f46e5; background: none; border: 0; cursor: pointer; padding: 0; }

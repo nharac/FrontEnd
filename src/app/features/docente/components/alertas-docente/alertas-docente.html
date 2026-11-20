@@ -1,0 +1,36 @@
+<section class="ad" aria-labelledby="ad-titulo">
+  <h3 id="ad-titulo" class="ad-titulo">
+    <mat-icon aria-hidden="true">notifications_active</mat-icon> Alertas automáticas
+    @if (alertas().length) { <span class="ad-contador" [class.ad-contador--alta]="altas() > 0">{{ alertas().length }}</span> }
+  </h3>
+
+  @if (cargando()) {
+    <p class="ad-vacio">Revisando la actividad del grupo…</p>
+  } @else if (error()) {
+    <p class="ad-vacio">No se pudieron cargar las alertas.</p>
+  } @else if (!alertas().length) {
+    <p class="ad-vacio"><mat-icon aria-hidden="true">verified</mat-icon> Todo en orden: nadie necesita atención especial ahora.</p>
+  } @else {
+    <ul class="ad-lista">
+      @for (a of visibles(); track $index) {
+        <li class="ad-item" [class.ad-item--alta]="a.gravedad === 'alta'">
+          <mat-icon class="ad-icono" aria-hidden="true">{{ icono(a) }}</mat-icon>
+          <div class="ad-texto">
+            <p class="ad-mensaje">{{ a.mensaje }}</p>
+            <p class="ad-sugerencia">{{ a.sugerencia }}</p>
+          </div>
+          @if (a.estudianteId) {
+            <a class="ad-ver" [routerLink]="['/docente/estudiantes', a.estudianteId]" [attr.aria-label]="'Ver a ' + a.estudiante">Ver</a>
+          } @else {
+            <a class="ad-ver" routerLink="/docente/estadisticas">Ver</a>
+          }
+        </li>
+      }
+    </ul>
+    @if (alertas().length > 5) {
+      <button type="button" class="ad-mas" (click)="verTodas.set(!verTodas())">
+        {{ verTodas() ? 'Ver menos' : 'Ver las ' + alertas().length + ' alertas' }}
+      </button>
+    }
+  }
+</section>

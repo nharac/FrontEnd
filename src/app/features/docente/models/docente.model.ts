@@ -187,3 +187,14 @@ export interface ContenidoOculto {
   ocultadoPor: string | null;
   fechaOculta: string | null;
 }
+
+/** Alerta automática del panel docente (GET /api/docente/alertas). */
+export interface AlertaDocente {
+  tipo: 'INACTIVO' | 'SIN_EMPEZAR' | 'TEMA_DIFICIL' | 'QUIZ_BAJO' | 'GRUPO_TEMA';
+  gravedad: 'alta' | 'media';
+  estudianteId: number | null;
+  estudiante: string | null;
+  tema: string | null;
+  mensaje: string;
+  sugerencia: string;
+}
