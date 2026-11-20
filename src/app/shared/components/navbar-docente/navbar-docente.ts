@@ -1,3 +1,4 @@
+import { Campanita } from '../campanita/campanita';
 import { AccesibilidadService } from '../../../core/services/accesibilidad.service';
 import { MatDividerModule } from '@angular/material/divider';
 import { Logo } from '../logo/logo';
@@ -20,7 +21,7 @@ import { Verificado } from '../verificado/verificado';
 @Component({
   selector: 'app-navbar-docente',
   standalone: true,
-  imports: [MatDividerModule, Verificado, Logo, BotonTema, 
+  imports: [Campanita, MatDividerModule, Verificado, Logo, BotonTema, 
     CommonModule,
     RouterLink,
     RouterLinkActive,

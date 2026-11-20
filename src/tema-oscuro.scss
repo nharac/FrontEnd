@@ -82,3 +82,27 @@ html.sin-animaciones *, html.sin-animaciones *::before, html.sin-animaciones *::
   .main-content { overflow-x: clip; }
   .main-content :where(table) { display: block; max-width: 100%; overflow-x: auto; }
 }
+
+// ============================================
+// Panel de la campanita (va en un overlay de Material, por eso es global)
+// ============================================
+.cp-menu.mat-mdc-menu-panel { max-width: min(380px, calc(100vw - 24px)) !important; width: 380px; border-radius: 18px !important; }
+.cp-menu .mat-mdc-menu-content { padding: 0 !important; }
+.cp-panel { font-family: 'Poppins', sans-serif; color: #1f2f3f; }
+.cp-cabeza { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 14px 16px 10px; border-bottom: 1px solid #eef0f4;
+  strong { font-size: 16px; } }
+.cp-todas { font: inherit; font-size: 12.5px; font-weight: 600; color: #4f46e5; background: none; border: 0; cursor: pointer; padding: 0; }
+.cp-vacio { display: flex; align-items: center; gap: 6px; margin: 0; padding: 22px 16px; color: #6b7280; font-size: 14px; }
+.cp-lista { list-style: none; margin: 0; padding: 4px; max-height: 420px; overflow-y: auto; }
+.cp-item { width: 100%; display: flex; gap: 10px; align-items: flex-start; text-align: left; font: inherit; color: inherit; cursor: pointer;
+  padding: 10px 12px; border: 0; border-radius: 12px; background: none;
+  &:hover { background: #f8fafc; }
+  &--nueva { background: #eef2ff; .cp-texto strong::after { content: ''; display: inline-block; width: 8px; height: 8px; margin-left: 6px; border-radius: 50%; background: #4f46e5; vertical-align: middle; } } }
+.cp-icono { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: #4f46e5; background: #e0e7ff;
+  mat-icon { font-size: 19px; width: 19px; height: 19px; }
+  &[data-tipo^='RETO'], &[data-tipo='EN_VIVO'] { color: #c2410c; background: #ffedd5; }
+  &[data-tipo='TAREA'], &[data-tipo='RECORDATORIO'] { color: #0f766e; background: #ccfbf1; }
+  &[data-tipo='LOGRO'], &[data-tipo='TORNEO'] { color: #b45309; background: #fef3c7; } }
+.cp-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  strong { font-size: 13.5px; line-height: 1.3; } small { font-size: 12.5px; color: #4b5563; line-height: 1.35; }
+  em { font-style: normal; font-size: 11.5px; color: #9ca3af; } }
