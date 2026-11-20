@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 import {
@@ -38,7 +38,19 @@ type Vista = 'ejercicios' | 'formulas' | 'graficas' | 'calculadora';
   templateUrl: './ejercicios-resueltos.html',
   styleUrl: './ejercicios-resueltos.scss',
 })
-export class EjerciciosResueltos {
+export class EjerciciosResueltos implements OnInit {
+  private readonly ruta = inject(ActivatedRoute, { optional: true });
+
+  /** /resueltos?tema=derivadas&ejercicio=g-der-3 abre directo ese ejercicio (viene de la práctica). */
+  ngOnInit(): void {
+    const q = this.ruta?.snapshot.queryParamMap;
+    const tema = q?.get('tema');
+    if (tema && this.temas.some(t => t.id === tema)) this.tema.set(tema as TemaResuelto);
+    const id = q?.get('ejercicio');
+    const e = id ? EJERCICIOS_RESUELTOS.find(x => x.id === id) : undefined;
+    if (e) { this.tema.set(e.tema); this.abrir(e); }
+  }
+
   readonly temas = TEMAS_RESUELTOS;
 
   /** Pestaña activa: ejercicios resueltos o fórmulas de consulta. */

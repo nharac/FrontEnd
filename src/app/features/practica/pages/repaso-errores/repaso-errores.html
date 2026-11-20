@@ -45,6 +45,11 @@
         @if (pistas()[p.id]; as pista) {
           <p class="re-pista"><mat-icon aria-hidden="true">lightbulb</mat-icon> {{ pista }}</p>
         }
+        @if (pistas()[p.id] && sugeridos()[p.id]; as s) {
+          <a class="re-sugerido" routerLink="/resueltos" [queryParams]="{ tema: s.tema, ejercicio: s.id }">
+            <mat-icon aria-hidden="true">menu_book</mat-icon> Mira uno parecido resuelto: <b>{{ s.titulo }}</b>
+          </a>
+        }
         <div class="re-acciones">
           <a class="re-link" routerLink="/chat">Pedir ayuda al tutor</a>
           <button type="button" class="re-btn" (click)="responder(p)"

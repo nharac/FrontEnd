@@ -1,4 +1,6 @@
 import { PuntosSumi } from '../../../../shared/components/puntos-sumi/puntos-sumi';
+import { RouterLink } from '@angular/router';
+import type { EjercicioResuelto } from '../../../resueltos/models/ejercicios-resueltos';
 import {
   Component,
   computed,
@@ -31,7 +33,7 @@ import { Confeti } from '../../../../shared/components/confeti/confeti';
  */
 @Component({
   selector: 'app-pregunta-card',
-  imports: [MatIconModule, ChatPanel, Confeti, Mascota, PuntosSumi],
+  imports: [MatIconModule, ChatPanel, Confeti, Mascota, PuntosSumi, RouterLink],
   templateUrl: './pregunta-card.html',
   styleUrl: './pregunta-card.scss',
   host: {
@@ -63,6 +65,19 @@ export class PreguntaCard {
   mostrarChat = signal(false);
 
   resuelta = computed(() => this.validacion()?.esCorrecta === true);
+  /**
+   * Ejercicio resuelto parecido, para mostrarlo después de un error.
+   * La biblioteca de resueltos es grande: se carga solo cuando hace falta.
+   */
+  sugerido = signal<EjercicioResuelto | null>(null);
+  private buscarSugerido = effect(() => {
+    if (this.intentos() > 0 && !this.resuelta() && !untracked(() => this.sugerido())) {
+      const p = untracked(() => this.pregunta());
+      import('../../../resueltos/models/sugerir')
+        .then(m => this.sugerido.set(m.sugerirResuelto(p.tema, p.enunciado, p.dificultad)))
+        .catch(() => { /* sin sugerencia */ });
+    }
+  });
   /** Cómo reacciona Sumi a la última respuesta. */
   reaccion = computed(() => {
     const v = this.validacion();
@@ -201,6 +216,7 @@ export class PreguntaCard {
     this.descartadas.set([]);
     this.validacion.set(null);
     this.pista.set(null);
+    this.sugerido.set(null);
     this.intentos.set(0);
     this.enviando.set(false);
     this.cargandoPista.set(false);

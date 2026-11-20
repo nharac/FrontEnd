@@ -1,3 +1,8 @@
 // Los estilos de la tarjeta viven en src/estudiante-practica.scss (globales, acotados a
 // app-pregunta-card) para no pasar el límite de 8 kB por componente.
 :host { display: grid; gap: 20px; align-items: start; }
+
+.pc-sugerido { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; border-radius: 14px; text-decoration: none;
+  color: #0f766e; background: #f0fdfa; border: 1px dashed #5eead4;
+  span { flex: 1; display: flex; flex-direction: column; min-width: 0; } small { font-size: 12px; color: #0f766e; } strong { color: #134e4a; }
+  &:hover { background: #ccfbf1; } }

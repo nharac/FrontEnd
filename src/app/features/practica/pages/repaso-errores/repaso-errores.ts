@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 import { PracticaService, ResumenRepaso } from '../../services/practica.service';
+import type { EjercicioResuelto } from '../../../resueltos/models/ejercicios-resueltos';
 import { Pregunta, TEMAS } from '../../models/practica.model';
 
 /**
@@ -26,6 +27,8 @@ export class RepasoErrores implements OnInit {
   pistas = signal<Record<number, string>>({});
   corregidas = signal(0);
   resumen = signal<ResumenRepaso | null>(null);
+  /** Ejercicio resuelto parecido para cada pregunta fallada (se carga al fallar). */
+  sugeridos = signal<Record<number, EjercicioResuelto>>({});
   enviando = signal<number | null>(null);
 
   pendientes = computed(() => this.preguntas().length);
@@ -58,6 +61,12 @@ export class RepasoErrores implements OnInit {
           this.corregidas.update(n => n + 1);
         } else {
           this.pistas.update(ps => ({ ...ps, [p.id]: v.pista ?? 'Revisa el procedimiento paso a paso.' }));
+          import('../../../resueltos/models/sugerir')
+            .then(m => {
+              const e = m.sugerirResuelto(p.tema, p.enunciado, p.dificultad);
+              if (e) this.sugeridos.update(x => ({ ...x, [p.id]: e }));
+            })
+            .catch(() => { /* sin sugerencia */ });
         }
       },
       error: () => this.enviando.set(null),

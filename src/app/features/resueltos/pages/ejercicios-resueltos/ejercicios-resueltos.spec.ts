@@ -95,3 +95,16 @@ describe('EjerciciosResueltos (biblioteca grande)', () => {
     expect(f.nativeElement.textContent).toContain('No hay ejercicios');
   });
 });
+
+describe('EjerciciosResueltos desde la práctica', () => {
+  it('abre directo el ejercicio sugerido con ?tema=&ejercicio=', async () => {
+    const { ActivatedRoute, convertToParamMap } = await import('@angular/router');
+    const e = EJERCICIOS_RESUELTOS.find(x => x.tema === 'derivadas')!;
+    TestBed.configureTestingModule({ imports: [EjerciciosResueltos], providers: [provideRouter([]),
+      { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap({ tema: 'derivadas', ejercicio: e.id }) } } }] });
+    const f = TestBed.createComponent(EjerciciosResueltos);
+    f.detectChanges();
+    expect(f.componentInstance.tema()).toBe('derivadas');
+    expect(f.componentInstance.seleccionado()?.id).toBe(e.id);
+  });
+});

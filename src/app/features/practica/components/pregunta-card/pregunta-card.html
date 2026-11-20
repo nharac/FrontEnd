@@ -56,6 +56,16 @@
     </div>
   }
 
+  @if (intentos() > 0 && !resuelta()) {
+    @if (sugerido(); as s) {
+      <a class="pc-sugerido" routerLink="/resueltos" [queryParams]="{ tema: s.tema, ejercicio: s.id }" target="_blank" rel="noopener">
+        <mat-icon aria-hidden="true">menu_book</mat-icon>
+        <span><small>Mira uno parecido resuelto paso a paso</small><strong>{{ s.titulo }}</strong></span>
+        <mat-icon aria-hidden="true">open_in_new</mat-icon>
+      </a>
+    }
+  }
+
   <footer class="pc__acciones">
     <p class="pc__atajos" aria-hidden="true">
       @if (resuelta()) {

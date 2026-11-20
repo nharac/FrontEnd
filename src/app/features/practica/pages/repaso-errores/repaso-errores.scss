@@ -26,3 +26,5 @@ $gris: #6b7280;
   &--hoy { background: linear-gradient(135deg, #4f46e5, #7c3aed); b, span { color: #fff; } }
   &--ok b { color: #059669; } }
 @media (max-width: 480px) { .re-cajas { grid-template-columns: repeat(2, 1fr); } }
+
+.re-sugerido { display: flex; align-items: center; gap: 6px; margin: 6px 0; font-size: 14px; color: #0f766e; text-decoration: none; mat-icon { font-size: 18px; width: 18px; height: 18px; } &:hover { text-decoration: underline; } }
