@@ -14,6 +14,9 @@ describe('Retos', () => {
     const s = {
       misDuelos: vi.fn(() => of([duelo({}), duelo({ id: 2, estado: 'TERMINADO', resultado: 'GANASTE', misCorrectas: 4, suyasCorrectas: 2 })])),
       companeros: vi.fn(() => of([{ id: 2, nombre: 'Beto Ruiz', fotoPerfilUrl: null }])),
+      torneo: vi.fn(() => of({ inicio: '2026-11-16', fin: '2026-11-22', diasRestantes: 2, campeonAnterior: null, tabla: [
+        { posicion: 1, usuarioId: 3, nombre: 'Laura Gómez', jugados: 2, ganados: 2, empates: 0, perdidos: 0, puntos: 6, soyYo: false },
+        { posicion: 2, usuarioId: 1, nombre: 'Pacho', jugados: 1, ganados: 1, empates: 0, perdidos: 0, puntos: 3, soyYo: true }] })),
       retar: vi.fn(() => of(duelo({ id: 3, soyRetador: true }))),
       preguntas: vi.fn(() => of([
         { id: 10, enunciado: '2+2', puntos: 1, opciones: [{ letra: 'A', texto: '4' }, { letra: 'B', texto: '5' }] },
@@ -37,6 +40,8 @@ describe('Retos', () => {
     expect(c.ganados()).toBe(1);
     expect(c.sumiPortada().titulo).toContain('reto esperando');
     expect(f.nativeElement.textContent).toContain('¡Ganaste!');
+    expect(f.nativeElement.textContent).toContain('Torneo de la semana');
+    expect(f.nativeElement.textContent).toContain('Vas de 2.º con 3 puntos');
     c.rivalId.set(2);
     c.tema.set('limites');
     f.detectChanges();

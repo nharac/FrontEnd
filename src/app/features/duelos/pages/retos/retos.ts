@@ -4,7 +4,7 @@ import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { DuelosService } from '../../services/duelos.service';
-import { Companero, Duelo, MODOS, ModoDuelo, PreguntaDuelo } from '../../models/duelo.model';
+import { Companero, Duelo, MODOS, ModoDuelo, PreguntaDuelo, Torneo } from '../../models/duelo.model';
 import { TEMAS } from '../../../practica/models/practica.model';
 import { TextoRicoDirective } from '../../../../shared/directives/texto-rico.directive';
 import { SumiDice } from '../../../../shared/components/sumi-dice/sumi-dice';
@@ -34,6 +34,10 @@ export class Retos implements OnInit, OnDestroy {
   readonly letras = ['A', 'B', 'C', 'D', 'E'];
 
   duelos = signal<Duelo[]>([]);
+  torneo = signal<Torneo | null>(null);
+  podio = computed(() => this.torneo()?.tabla.slice(0, 3) ?? []);
+  restoTabla = computed(() => this.torneo()?.tabla.slice(3, 10) ?? []);
+  miFila = computed(() => this.torneo()?.tabla.find(f => f.soyYo) ?? null);
   companeros = signal<Companero[]>([]);
   filtroRival = signal('');
   rivalId = signal<number | null>(null);
@@ -96,6 +100,7 @@ export class Retos implements OnInit, OnDestroy {
 
   private cargar(): void {
     this.servicio.misDuelos().subscribe({ next: d => this.duelos.set(d), error: () => this.error.set('No se pudieron cargar tus retos.') });
+    this.servicio.torneo().subscribe({ next: t => this.torneo.set(t), error: () => this.torneo.set(null) });
   }
 
   private falla(e: HttpErrorResponse, porDefecto: string): void {
@@ -186,6 +191,7 @@ export class Retos implements OnInit, OnDestroy {
 
   cerrarResultado(): void {
     this.resultado.set(null);
+    this.cargar();
   }
 
   private pararReloj(): void {

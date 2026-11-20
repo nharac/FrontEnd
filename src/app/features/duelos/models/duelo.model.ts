@@ -43,3 +43,23 @@ export interface PreguntaDuelo {
   puntos: number;
   opciones: { letra: string; texto: string }[];
 }
+
+export interface FilaTorneo {
+  posicion: number;
+  usuarioId: number;
+  nombre: string;
+  jugados: number;
+  ganados: number;
+  empates: number;
+  perdidos: number;
+  puntos: number;
+  soyYo: boolean;
+}
+
+export interface Torneo {
+  inicio: string;
+  fin: string;
+  diasRestantes: number;
+  tabla: FilaTorneo[];
+  campeonAnterior: FilaTorneo | null;
+}

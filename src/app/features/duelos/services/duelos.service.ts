@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { Companero, Duelo, PreguntaDuelo } from '../models/duelo.model';
+import { Companero, Duelo, PreguntaDuelo, Torneo } from '../models/duelo.model';
 
 @Injectable({ providedIn: 'root' })
 export class DuelosService {
@@ -12,6 +12,10 @@ export class DuelosService {
 
   misDuelos(): Observable<Duelo[]> {
     return this.http.get<Duelo[]>(this.API);
+  }
+
+  torneo(): Observable<Torneo> {
+    return this.http.get<Torneo>(`${this.API}/torneo`);
   }
 
   companeros(): Observable<Companero[]> {

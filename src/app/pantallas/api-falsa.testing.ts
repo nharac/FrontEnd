@@ -162,6 +162,7 @@ const RUTAS: [string, RegExp, (cuerpo?: unknown) => unknown][] = [
   ['GET', /\/notificaciones$/, () => ({ noLeidas: 0, notificaciones: [] })],
   ['GET', /\/tareas$/, () => []],
   ['GET', /\/duelos\/companeros$/, () => []],
+  ['GET', /\/duelos\/torneo$/, () => ({ inicio: '2026-11-16', fin: '2026-11-22', diasRestantes: 2, tabla: [], campeonAnterior: null })],
   ['GET', /\/duelos$/, () => []],
   ['GET', /\/docente\/alertas$/, () => [{ tipo: 'INACTIVO', gravedad: 'alta', estudianteId: 2, estudiante: 'Ana', tema: null,
     mensaje: 'Ana lleva 9 días sin practicar.', sugerencia: 'Asígnale una tarea corta para que retome.' }]],
