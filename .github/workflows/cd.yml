@@ -7,6 +7,8 @@
 #   EC2_USER      usuario SSH (por ejemplo ubuntu o ec2-user)
 #   EC2_SSH_KEY   contenido completo de la llave privada .pem
 #   EC2_RUTA_FRONTEND  carpeta del frontend en el servidor (por ejemplo /home/ubuntu/FrontEnd)
+#   EC2_RUTA_DESPLIEGUE carpeta despliegue del backend (por ejemplo /home/ubuntu/Backend-/despliegue).
+#                       Si tiene .env, se despliega con la arquitectura del anexo (NGINX + 2 backends + BD).
 # El .env NO va en GitHub: debe existir ya en esa carpeta del servidor.
 name: CD frontend
 
@@ -45,7 +47,9 @@ jobs:
             git fetch origin main
             git checkout main
             git reset --hard origin/main
-            docker compose up -d --build
+            # Con la arquitectura del anexo el compose vive en el repo del backend (despliegue/compose.yaml)
+            D="${{ secrets.EC2_RUTA_DESPLIEGUE }}"
+            if [ -n "$D" ] && [ -f "$D/.env" ]; then cd "$D"; docker compose up -d --build frontend nginx; else docker compose up -d --build; fi
             docker image prune -f
             # Se reintenta hasta 1 minuto mientras NGINX arranca
             for i in $(seq 1 12); do
@@ -53,5 +57,5 @@ jobs:
               echo "Esperando a que arranque el frontend ($i/12)..."
               sleep 5
             done
-            docker logs --tail 40 saesu-frontend
+            docker ps -a
             exit 1
